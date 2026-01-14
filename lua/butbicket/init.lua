@@ -1,8 +1,8 @@
-local bufferline = require 'my-theme.integrations.bufferline'
-local cmp = require 'my-theme.integrations.cmp'
-local colorscheme = require 'my-theme.colorscheme'
-local config = require 'my-theme.config'
-local utils = require 'my-theme.utils'
+local bufferline = require 'butbicket.integrations.bufferline'
+local cmp = require 'butbicket.integrations.cmp'
+local colorscheme = require 'butbicket.colorscheme'
+local config = require 'butbicket.config'
+local utils = require 'butbicket.utils'
 local theme = {}
 
 local function set_terminal_colors()
@@ -28,12 +28,12 @@ end
 
 local function set_groups()
   local bg = config.transparent and 'NONE' or colorscheme.editorBackground
-  local diff_add =
-    utils.shade(colorscheme.successText, 0.5, colorscheme.editorBackground)
-  local diff_delete =
-    utils.shade(colorscheme.syntaxError, 0.5, colorscheme.editorBackground)
-  local diff_change =
-    utils.shade(colorscheme.syntaxFunction, 0.5, colorscheme.editorBackground)
+  -- local diff_add =
+  --   utils.shade(colorscheme.successText, 0.5, colorscheme.editorBackground)
+  -- local diff_delete =
+  --   utils.shade(colorscheme.syntaxError, 0.5, colorscheme.editorBackground)
+  -- local diff_change =
+  --   utils.shade(colorscheme.syntaxFunction, 0.5, colorscheme.editorBackground)
   local diff_text =
     utils.shade(colorscheme.warningEmphasis, 0.5, colorscheme.editorBackground)
 
@@ -44,6 +44,15 @@ local function set_groups()
     ColorColumn = {
       bg = utils.shade(colorscheme.linkText, 0.5, colorscheme.editorBackground),
     },
+    Added = {
+      fg = colorscheme.added_bright,
+    },
+    Changed = {
+      fg = colorscheme.changed_bright,
+    },
+    Removed = {
+      fg = colorscheme.removed_bright,
+    },
     Conceal = {},
     Cursor = { fg = colorscheme.editorBackground, bg = colorscheme.mainText },
     lCursor = { link = 'Cursor' },
@@ -51,9 +60,9 @@ local function set_groups()
     CursorLine = { bg = colorscheme.popupBackground },
     CursorColumn = { link = 'CursorLine' },
     Directory = { fg = colorscheme.syntaxFunction },
-    DiffAdd = { bg = bg, fg = diff_add },
-    DiffChange = { bg = bg, fg = diff_change },
-    DiffDelete = { bg = bg, fg = diff_delete },
+    DiffAdd = { fg = colorscheme.added_bright },
+    DiffChange = { fg = colorscheme.changed_bright },
+    DiffDelete = { fg = colorscheme.removed_bright },
     DiffText = { bg = bg, fg = diff_text },
     EndOfBuffer = { fg = colorscheme.syntaxKeyword },
     TermCursor = { link = 'Cursor' },
@@ -66,27 +75,27 @@ local function set_groups()
     FoldColumn = { link = 'SignColumn' },
     IncSearch = {
       bg = utils.mix(
-        colorscheme.syntaxFunction,
+        colorscheme.purple,
         colorscheme.editorBackground,
         math.abs(0.30)
       ),
-      fg = colorscheme.editorBackground,
+      -- fg = colorscheme.editorBackground,
     },
     Substitute = { link = 'IncSearch' },
     CursorLineNr = { fg = colorscheme.commentText },
-    MatchParen = { fg = colorscheme.syntaxError, bg = bg },
+    MatchParen = { fg = colorscheme.bright_green, bold = true },
     ModeMsg = { link = 'Normal' },
     MsgArea = { link = 'Normal' },
     -- MsgSeparator = {},
     MoreMsg = { fg = colorscheme.syntaxFunction },
-    NonText = { fg = utils.shade(colorscheme.editorBackground, 0.30) },
+    NonText = { fg = utils.shade(colorscheme.editorBackground, 0.80) },
     NormalFloat = { bg = colorscheme.floatingWindowBackground },
     NormalNC = { link = 'Normal' },
     Pmenu = { link = 'NormalFloat' },
     PmenuSel = { bg = colorscheme.menuOptionBackground },
     PmenuSbar = {
       bg = utils.shade(
-        colorscheme.syntaxFunction,
+        colorscheme.windowBorder,
         0.5,
         colorscheme.editorBackground
       ),
@@ -95,73 +104,89 @@ local function set_groups()
     Question = { fg = colorscheme.syntaxFunction },
     QuickFixLine = { fg = colorscheme.syntaxFunction },
     SpecialKey = { fg = colorscheme.syntaxOperator },
-    StatusLine = { fg = colorscheme.mainText, bg = bg },
+    StatusLine = { fg = colorscheme.mainText, bg = colorscheme.windowBorder },
     StatusLineNC = {
       fg = colorscheme.inactiveText,
       bg = colorscheme.sidebarBackground,
     },
     TabLine = {
-      bg = colorscheme.sidebarBackground,
+      bg = colorscheme.windowBorder,
       fg = colorscheme.inactiveText,
     },
     TabLineFill = { link = 'TabLine' },
     TabLineSel = {
-      bg = colorscheme.editorBackground,
+      bg = colorscheme.separator,
       fg = colorscheme.emphasisText,
+      bold = true,
     },
-    Search = { bg = utils.shade(colorscheme.stringText, 0.40, colorscheme.bg) },
+    Search = { bg = colorscheme.old_mustard }, -- = utils.shade(colorscheme.mustard, 0.90, colorscheme.bg) },
     SpellBad = { undercurl = true, sp = colorscheme.syntaxError },
     SpellCap = { undercurl = true, sp = colorscheme.syntaxFunction },
     SpellLocal = { undercurl = true, sp = colorscheme.syntaxKeyword },
     SpellRare = { undercurl = true, sp = colorscheme.warningText },
     Title = { fg = colorscheme.syntaxFunction },
     Visual = {
-      bg = utils.shade(
-        colorscheme.syntaxFunction,
-        0.40,
-        colorscheme.editorBackground
-      ),
+      bg = colorscheme.menuOptionBackground,
+      -- bg = utils.shade(
+      --   colorscheme.commentText,
+      --   0.20,
+      --   colorscheme.editorBackground
+      -- ),
     },
     VisualNOS = { link = 'Visual' },
     WarningMsg = { fg = colorscheme.warningText },
     Whitespace = { fg = colorscheme.syntaxOperator },
     WildMenu = { bg = colorscheme.menuOptionBackground },
     Comment = {
+      -- fg = utils.shade(
+      --   colorscheme.commentText,
+      --   0.9,
+      --   colorscheme.editorBackground
+      -- ),
       fg = colorscheme.commentText,
       italic = config.italics.comments or false,
     },
 
+    SpecialComment = { fg = colorscheme.commentText },
     Constant = { fg = colorscheme.syntaxError },
     String = {
       fg = colorscheme.stringText,
       italic = config.italics.strings or false,
     },
     Character = { fg = colorscheme.stringText },
-    Number = { fg = colorscheme.foregroundEmphasis, bold = true },
-    Boolean = { fg = colorscheme.syntaxFunction },
+    Number = { fg = colorscheme.syntaxNumber },
+    Boolean = { fg = colorscheme.syntaxKeyword },
     Float = { link = 'Number' },
 
-    Identifier = { fg = colorscheme.mainText },
-    Function = { fg = colorscheme.syntaxKeyword },
-    Method = { fg = colorscheme.syntaxKeyword },
-    Property = { fg = colorscheme.syntaxFunction },
+    Identifier = { fg = colorscheme.steel_gray },
+    Function = { fg = colorscheme.syntaxFunction },
+    Method = { fg = colorscheme.syntaxFunction },
+    Property = { fg = colorscheme.text_dark },
     Field = { link = 'Property' },
-    Parameter = { fg = colorscheme.mainText },
-    Statement = { fg = colorscheme.syntaxError },
+    Parameter = { fg = colorscheme.steel_gray },
+    Statement = {
+      fg = colorscheme.keyword,
+      bold = true,
+      italic = config.italics.statements or false,
+    },
     Conditional = { fg = colorscheme.syntaxError },
     -- Repeat = {},
     Label = { fg = colorscheme.syntaxFunction },
-    Operator = { fg = colorscheme.syntaxError },
-    Keyword = { link = 'Statement', italic = config.italics.keywords or false },
+    Operator = { fg = colorscheme.parenthesis },
+    Keyword = {
+      link = 'Statement',
+      italic = config.italics.keywords or false,
+      bold = true,
+    },
     Exception = { fg = colorscheme.syntaxError },
 
     PreProc = { link = 'Keyword' },
     -- Include = {},
     Define = { fg = colorscheme.syntaxKeyword },
     Macro = { link = 'Define' },
-    PreCondit = { fg = colorscheme.syntaxError },
+    PreCondit = { fg = colorscheme.annotation },
 
-    Type = { fg = colorscheme.syntaxKeyword },
+    Type = { fg = colorscheme.type },
     Struct = { link = 'Type' },
     Class = { link = 'Type' },
 
@@ -174,7 +199,7 @@ local function set_groups()
     Special = { fg = colorscheme.syntaxOperator },
 
     SpecialChar = { fg = colorscheme.syntaxError },
-    Tag = { fg = colorscheme.stringText },
+    Tag = { fg = colorscheme.blue },
     Delimiter = { fg = colorscheme.syntaxOperator },
     -- SpecialComment = {},
     Debug = { fg = colorscheme.specialKeyword },
@@ -195,16 +220,47 @@ local function set_groups()
 
     DiagnosticError = { link = 'Error' },
     DiagnosticWarn = { link = 'WarningMsg' },
-    DiagnosticInfo = { fg = colorscheme.syntaxFunction },
-    DiagnosticHint = { fg = colorscheme.warningEmphasis },
+    DiagnosticInfo = { fg = colorscheme.blue },
+    DiagnosticHint = { fg = colorscheme.method },
     DiagnosticVirtualTextError = { link = 'DiagnosticError' },
     DiagnosticVirtualTextWarn = { link = 'DiagnosticWarn' },
     DiagnosticVirtualTextInfo = { link = 'DiagnosticInfo' },
     DiagnosticVirtualTextHint = { link = 'DiagnosticHint' },
-    DiagnosticUnderlineError = { undercurl = true, link = 'DiagnosticError' },
-    DiagnosticUnderlineWarn = { undercurl = true, link = 'DiagnosticWarn' },
-    DiagnosticUnderlineInfo = { undercurl = true, link = 'DiagnosticInfo' },
-    DiagnosticUnderlineHint = { undercurl = true, link = 'DiagnosticHint' },
+    -- DiagnosticUnderlineError = { undercurl = true, link = 'DiagnosticError' },
+    -- DiagnosticUnderlineWarn = { undercurl = true, link = 'DiagnosticWarn' },
+    -- DiagnosticUnderlineInfo = { undercurl = true, link = 'DiagnosticInfo' },
+    -- DiagnosticUnderlineHint = { undercurl = true, link = 'DiagnosticHint' },
+    DiagnosticUnderlineError = {
+      undercurl = true,
+      fg = colorscheme.syntaxError,
+    },
+    DiagnosticUnderlineWarn = { undercurl = true, fg = colorscheme.warningText },
+    DiagnosticUnderlineInfo = { undercurl = true, fg = colorscheme.blue },
+    DiagnosticUnderlineHint = { undercurl = true, fg = colorscheme.method },
+    DiagnosticLineError = {
+      bg = utils.shade(
+        colorscheme.syntaxError,
+        0.1,
+        colorscheme.editorBackground
+      ),
+    },
+    DiagnosticLineWarn = {
+      bg = utils.shade(
+        colorscheme.warningText,
+        0.1,
+        colorscheme.editorBackground
+      ),
+    },
+    DiagnosticLineInfo = {
+      bg = utils.shade(colorscheme.blue, 0.1, colorscheme.editorBackground),
+    },
+    DiagnosticLineHint = {
+      bg = utils.shade(colorscheme.method, 0.1, colorscheme.editorBackground),
+    },
+    -- DiagnosticUnderlineError = { undercurl = true },
+    -- DiagnosticUnderlineWarn = { undercurl = true },
+    -- DiagnosticUnderlineInfo = { undercurl = true },
+    -- DiagnosticUnderlineHint = { undercurl = true },
     -- DiagnosticFloatingError = {},
     -- DiagnosticFloatingWarn = {},
     -- DiagnosticFloatingInfo = {},
@@ -225,6 +281,21 @@ local function set_groups()
     -- sym'@text.literal'
     --
     -- For more information see https://github.com/rktjmp/lush.nvim/issues/109
+    TreesitterContextLineNumber = {
+      bg = colorscheme.base_1,
+      fg = colorscheme.separator,
+    },
+    TreesitterContextBottom = {
+      cterm = { underline = true },
+      sp = colorscheme.base_3,
+      underline = true,
+    },
+    TreesitterContextLineNumberBottom = { link = 'TreesitterContextBottom' },
+    TreesitterContextSeparator = {
+      bg = colorscheme.base_1,
+      fg = colorscheme.base_3,
+    },
+    TreesitterContext = { bg = colorscheme.base_1 },
 
     ['@text'] = { fg = colorscheme.mainText },
     ['@texcolorscheme.literal'] = { link = 'Property' },
@@ -242,14 +313,18 @@ local function set_groups()
     ['@texcolorscheme.todo'] = { link = 'Todo' },
     ['@comment'] = { link = 'Comment' },
     ['@punctuation'] = { link = 'Punctuation' },
-    ['@punctuation.bracket'] = { fg = colorscheme.warningEmphasis },
-    ['@punctuation.delimiter'] = { fg = colorscheme.syntaxError },
+    -- ['@punctuation.bracket'] = { link = 'Punctuation' }, -- fg = colorscheme.warningEmphasis },
+    ['@punctuation.bracket'] = { link = 'Punctuation' }, -- fg = colorscheme.warningEmphasis },
+    ['@punctuation.bracket.css'] = { fg = colorscheme.purple }, -- fg = colorscheme.warningEmphasis },
+    ['@punctuation.bracket.scss'] = { fg = colorscheme.purple }, -- fg = colorscheme.warningEmphasis },
+    -- ['@punctuation.bracket.typescript'] = { fg = colorscheme.light_yellow }, -- fg = colorscheme.warningEmphasis },
+    ['@punctuation.delimiter'] = { link = 'Punctuation' }, -- fg = colorscheme.syntaxError },
     ['@punctuation.terminator.statement'] = { link = 'Delimiter' },
     ['@punctuation.special'] = { fg = colorscheme.syntaxError },
-    ['@punctuation.separator.keyvalue'] = { fg = colorscheme.syntaxError },
+    ['@punctuation.separator.keyvalue'] = { link = 'Punctuation' }, -- { fg = colorscheme.syntaxError },
 
-    ['@texcolorscheme.diff.add'] = { fg = colorscheme.successText },
-    ['@texcolorscheme.diff.delete'] = { fg = colorscheme.errorText },
+    ['@texcolorscheme.diff.add'] = { fg = colorscheme.added },
+    ['@texcolorscheme.diff.delete'] = { fg = colorscheme.removed },
 
     ['@constant'] = { link = 'Constant' },
     ['@constant.builtin'] = { fg = colorscheme.syntaxFunction },
@@ -258,6 +333,8 @@ local function set_groups()
     -- ["@define"] = {},
     -- ["@macro"] = {},
     ['@string'] = { link = 'String' },
+    ['@string.vue'] = { fg = colorscheme.light_red },
+    ['@string.html'] = { fg = colorscheme.light_red },
     ['@string.escape'] = { fg = utils.shade(colorscheme.stringText, 0.45) },
     ['@string.special'] = { fg = utils.shade(colorscheme.syntaxFunction, 0.45) },
     -- ["@character"] = {},
@@ -283,17 +360,20 @@ local function set_groups()
     ['@operator'] = { link = 'Operator' },
     ['@exception'] = { link = 'Exception' },
     ['@variable'] = {
-      fg = colorscheme.syntaxFunction,
+      fg = colorscheme.variable,
       italic = config.italics.variables or false,
     },
-    ['@variable.builtin'] = { fg = colorscheme.syntaxFunction },
-    ['@variable.member'] = { fg = colorscheme.mainText },
+    ['@variable.builtin'] = { fg = colorscheme.emphasisText },
+    ['@variable.member'] = {
+      fg = colorscheme.annotation,
+      italic = config.italics.variable_members or false,
+    },
     ['@variable.parameter'] = {
-      fg = colorscheme.mainText,
-      italic = config.italics.variables or false,
+      fg = colorscheme.annotation,
+      italic = config.italics.variable_parameters or false,
     },
     ['@type'] = { link = 'Type' },
-    ['@type.definition'] = { fg = colorscheme.mainText },
+    ['@type.definition'] = { fg = colorscheme.variable },
     ['@type.builtin'] = { fg = colorscheme.syntaxFunction },
     ['@type.qualifier'] = { fg = colorscheme.syntaxFunction },
     ['@keyword'] = { link = 'Keyword' },
@@ -307,9 +387,9 @@ local function set_groups()
     ['@tag'] = { link = 'Tag' },
     ['@tag.builtin'] = { link = 'Tag' },
     ['@tag.delimiter'] = { fg = colorscheme.syntaxOperator },
-    ['@tag.attribute'] = { fg = colorscheme.syntaxKeyword },
+    ['@tag.attribute'] = { fg = colorscheme.method },
     ['@tag.jsx.element'] = { fg = colorscheme.syntaxFunction },
-    ['@attribute'] = { fg = colorscheme.syntaxKeyword },
+    ['@attribute'] = { fg = colorscheme.annotation },
     ['@error'] = { link = 'Error' },
     ['@warning'] = { link = 'WarningMsg' },
     ['@info'] = { fg = colorscheme.syntaxFunction },
@@ -367,7 +447,7 @@ end
 function theme.colorscheme()
   if vim.version().minor < 8 then
     vim.notify(
-      'Neovim 0.8+ is required for my-theme colorscheme',
+      'Neovim 0.8+ is required for butbicket colorscheme',
       vim.log.levels.ERROR,
       { title = 'Min Theme' }
     )
@@ -381,7 +461,7 @@ function theme.colorscheme()
 
   vim.g.VM_theme_set_by_colorscheme = true
   vim.o.termguicolors = true
-  vim.g.colors_name = 'my-theme'
+  vim.g.colors_name = 'butbicket'
 
   set_terminal_colors()
   set_groups()
