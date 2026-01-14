@@ -96,7 +96,7 @@ local function set_groups()
     },
     PmenuThumb = { bg = utils.shade(colorscheme.editorBackground, 0.20) },
     Question = { fg = colorscheme.syntaxFunction },
-    QuickFixLine = { fg = colorscheme.bright_green },
+    QuickFixLine = { bg = colorscheme.cursorline },
     SpecialKey = { fg = colorscheme.syntaxOperator },
     StatusLine = { fg = colorscheme.mainText, bg = colorscheme.windowBorder },
     StatusLineNC = {
@@ -297,11 +297,11 @@ local function set_groups()
     NeoTreeGitAdded = { fg = colorscheme.added_bright },
     NeoTreeGitConflict = { fg = colorscheme.errorText },
     NeoTreeGitDeleted = { fg = colorscheme.removed_bright },
-    NeoTreeGitIgnored = { fg = colorscheme.comment },
+    NeoTreeGitIgnored = { fg = colorscheme.slate_gray },
     NeoTreeGitModified = { fg = colorscheme.mustard }, -- unstaged
     NeoTreeGitStaged = { fg = colorscheme.green },
     NeoTreeGitRenamed = { fg = colorscheme.mustard },
-    NeoTreeGitUntracked = { fg = colorscheme.comment },
+    NeoTreeGitUntracked = { fg = colorscheme.slate_gray },
 
     ['@text'] = { fg = colorscheme.mainText },
     ['@texcolorscheme.literal'] = { link = 'Property' },
