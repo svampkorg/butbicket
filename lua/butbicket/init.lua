@@ -96,7 +96,7 @@ local function set_groups()
     },
     PmenuThumb = { bg = utils.shade(colorscheme.editorBackground, 0.20) },
     Question = { fg = colorscheme.syntaxFunction },
-    QuickFixLine = { fg = colorscheme.syntaxFunction },
+    QuickFixLine = { fg = colorscheme.bright_green },
     SpecialKey = { fg = colorscheme.syntaxOperator },
     StatusLine = { fg = colorscheme.mainText, bg = colorscheme.windowBorder },
     StatusLineNC = {
