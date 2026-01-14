@@ -44,15 +44,9 @@ local function set_groups()
     ColorColumn = {
       bg = utils.shade(colorscheme.linkText, 0.5, colorscheme.editorBackground),
     },
-    Added = {
-      fg = colorscheme.added_bright,
-    },
-    Changed = {
-      fg = colorscheme.changed_bright,
-    },
-    Removed = {
-      fg = colorscheme.removed_bright,
-    },
+    Added = { fg = colorscheme.added },
+    Changed = { fg = colorscheme.changed },
+    Removed = { fg = colorscheme.removed },
     Conceal = {},
     Cursor = { fg = colorscheme.editorBackground, bg = colorscheme.mainText },
     lCursor = { link = 'Cursor' },
@@ -281,6 +275,8 @@ local function set_groups()
     -- sym'@text.literal'
     --
     -- For more information see https://github.com/rktjmp/lush.nvim/issues/109
+
+    -- Tree-Sitter Context
     TreesitterContextLineNumber = {
       bg = colorscheme.base_1,
       fg = colorscheme.separator,
@@ -296,6 +292,16 @@ local function set_groups()
       fg = colorscheme.base_3,
     },
     TreesitterContext = { bg = colorscheme.base_1 },
+
+    -- NeoTree
+    NeoTreeGitAdded = { fg = colorscheme.added_bright },
+    NeoTreeGitConflict = { fg = colorscheme.errorText },
+    NeoTreeGitDeleted = { fg = colorscheme.removed_bright },
+    NeoTreeGitIgnored = { fg = colorscheme.comment },
+    NeoTreeGitModified = { fg = colorscheme.mustard }, -- unstaged
+    NeoTreeGitStaged = { fg = colorscheme.green },
+    NeoTreeGitRenamed = { fg = colorscheme.mustard },
+    NeoTreeGitUntracked = { fg = colorscheme.comment },
 
     ['@text'] = { fg = colorscheme.mainText },
     ['@texcolorscheme.literal'] = { link = 'Property' },
