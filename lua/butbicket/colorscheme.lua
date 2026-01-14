@@ -26,13 +26,11 @@ local fromBitBucket = {
   mustard = '#BA9420',
   yellow = '#FBC828',
   purple = '#BF63F3',
-  bg = {
-    base = '#101214',
-    base_1 = '#18191A', -- ts context
-    base_2 = '#1F1F21', -- panels
-    base_3 = '#2D2D2D', -- dead area
-    base_4 = '#303134', -- floats/pum
-  },
+  base = '#101214',
+  base_1 = '#18191A', -- ts context
+  base_2 = '#1F1F21', -- panels
+  base_3 = '#2D2D2D', -- dead area
+  base_4 = '#303134', -- floats/pum
   separator = '#46474B',
   cursorline = '#2B2B2E',
   added = '#164B35',
@@ -87,11 +85,11 @@ if vim.o.background == 'light' then
 else
   -- DARK
   colorscheme.editorBackground = config.transparent and 'none'
-    or fromBitBucket.bg.base
-  colorscheme.sidebarBackground = fromBitBucket.bg.base_2
-  colorscheme.popupBackground = fromBitBucket.bg.base_2
-  colorscheme.floatingWindowBackground = fromBitBucket.bg.base_1
-  colorscheme.menuOptionBackground = fromBitBucket.bg.base_3
+    or fromBitBucket.base
+  colorscheme.sidebarBackground = fromBitBucket.base_2
+  colorscheme.popupBackground = fromBitBucket.base_2
+  colorscheme.floatingWindowBackground = fromBitBucket.base_1
+  colorscheme.menuOptionBackground = fromBitBucket.base_3
 
   colorscheme.mainText = fromBitBucket.text_dark
   colorscheme.emphasisText = fromBitBucket.text
@@ -102,7 +100,7 @@ else
   colorscheme.selectedText = fromBitBucket.selected
   colorscheme.inactiveSelectionText = fromBitBucket.selected_inactive
 
-  colorscheme.windowBorder = fromBitBucket.bg.base_4
+  colorscheme.windowBorder = fromBitBucket.base_4
   colorscheme.focusedBorder = fromBitBucket.separator
   colorscheme.emphasizedBorder = fromBitBucket.blue
 
@@ -120,7 +118,7 @@ else
   colorscheme.syntaxOperator = fromBitBucket.parenthesis
   colorscheme.foregroundEmphasis = fromBitBucket.type
   colorscheme.syntaxNumber = fromBitBucket.number
-  colorscheme.terminalGray = fromBitBucket.bg.base
+  colorscheme.terminalGray = fromBitBucket.base
 end
 
 colorscheme.keyword = '#FD9891'
