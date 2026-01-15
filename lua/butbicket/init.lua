@@ -1,5 +1,6 @@
 local bufferline = require 'butbicket.integrations.bufferline'
 local cmp = require 'butbicket.integrations.cmp'
+local neogit = require 'butbicket.integrations.neogit'
 local colorscheme = require 'butbicket.colorscheme'
 local config = require 'butbicket.config'
 local utils = require 'butbicket.utils'
@@ -35,7 +36,7 @@ local function set_groups()
   -- local diff_change =
   --   utils.shade(colorscheme.syntaxFunction, 0.5, colorscheme.editorBackground)
   local diff_text =
-    utils.shade(colorscheme.warningEmphasis, 0.5, colorscheme.editorBackground)
+    utils.shade(colorscheme.old_mustard, 0.5, colorscheme.editorBackground)
 
   local groups = {
     -- base
@@ -54,10 +55,16 @@ local function set_groups()
     CursorLine = { bg = colorscheme.popupBackground },
     CursorColumn = { link = 'CursorLine' },
     Directory = { fg = colorscheme.syntaxFunction },
-    DiffAdd = { fg = colorscheme.added_bright },
-    DiffChange = { fg = colorscheme.changed_bright },
-    DiffDelete = { fg = colorscheme.removed_bright },
-    DiffText = { bg = bg, fg = diff_text },
+    DiffAdd = { bg = colorscheme.added_dim },
+    DiffChange = { bg = colorscheme.changed_dim },
+    DiffDelete = { bg = colorscheme.removed_dim },
+    GitSignsAddPreview = { bg = colorscheme.added_dim },
+    GitSignsChangePreview = { bg = colorscheme.changed_dim },
+    GitSignsDeletePreview = { bg = colorscheme.removed_dim },
+    GitSignsAddInline = { fg = colorscheme.added_bright },
+    GitSignsChangeInline = { fg = colorscheme.changed_bright },
+    GitSignsDeleteInline = { fg = colorscheme.removed_bright },
+    DiffText = { bg = diff_text },
     EndOfBuffer = { fg = colorscheme.syntaxKeyword },
     TermCursor = { link = 'Cursor' },
     TermCursorNC = { link = 'Cursor' },
@@ -65,7 +72,7 @@ local function set_groups()
     VertSplit = { fg = colorscheme.windowBorder, bg = bg },
     Winseparator = { link = 'VertSplit' },
     SignColumn = { link = 'Normal' },
-    Folded = { fg = colorscheme.mainText, bg = colorscheme.popupBackground },
+    Folded = { fg = colorscheme.mainText, bg = colorscheme.base_2 },
     FoldColumn = { link = 'SignColumn' },
     IncSearch = {
       bg = utils.mix(
@@ -76,13 +83,13 @@ local function set_groups()
       -- fg = colorscheme.editorBackground,
     },
     Substitute = { link = 'IncSearch' },
-    CursorLineNr = { fg = colorscheme.commentText },
-    MatchParen = { fg = colorscheme.bright_green, bold = true },
+    CursorLineNr = { fg = colorscheme.dark_slate },
+    MatchParen = { fg = colorscheme.hotpink, bold = true },
     ModeMsg = { link = 'Normal' },
     MsgArea = { link = 'Normal' },
     -- MsgSeparator = {},
     MoreMsg = { fg = colorscheme.syntaxFunction },
-    NonText = { fg = utils.shade(colorscheme.editorBackground, 0.80) },
+    NonText = { fg = utils.shade(colorscheme.editorBackground, 0.75) },
     NormalFloat = { bg = colorscheme.floatingWindowBackground },
     NormalNC = { link = 'Normal' },
     Pmenu = { link = 'NormalFloat' },
@@ -113,7 +120,7 @@ local function set_groups()
       fg = colorscheme.emphasisText,
       bold = true,
     },
-    Search = { bg = colorscheme.old_mustard }, -- = utils.shade(colorscheme.mustard, 0.90, colorscheme.bg) },
+    Search = { bg = utils.mix(colorscheme.old_mustard, colorscheme.selected_inactive, 0.5) }, -- = utils.shade(colorscheme.mustard, 0.90, colorscheme.bg) },
     SpellBad = { undercurl = true, sp = colorscheme.syntaxError },
     SpellCap = { undercurl = true, sp = colorscheme.syntaxFunction },
     SpellLocal = { undercurl = true, sp = colorscheme.syntaxKeyword },
@@ -329,8 +336,8 @@ local function set_groups()
     ['@punctuation.special'] = { fg = colorscheme.syntaxError },
     ['@punctuation.separator.keyvalue'] = { link = 'Punctuation' }, -- { fg = colorscheme.syntaxError },
 
-    ['@texcolorscheme.diff.add'] = { fg = colorscheme.added },
-    ['@texcolorscheme.diff.delete'] = { fg = colorscheme.removed },
+    ['@texcolorscheme.diff.add'] = { bg = colorscheme.added },
+    ['@texcolorscheme.diff.delete'] = { bg = colorscheme.removed },
 
     ['@constant'] = { link = 'Constant' },
     ['@constant.builtin'] = { fg = colorscheme.syntaxFunction },
@@ -426,6 +433,7 @@ local function set_groups()
 
   -- integrations
   groups = vim.tbl_extend('force', groups, cmp.highlights())
+  groups = vim.tbl_extend('force', groups, neogit.highlights())
 
   -- overrides
   groups = vim.tbl_extend(
