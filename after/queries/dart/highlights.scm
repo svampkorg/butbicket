@@ -1,3 +1,3 @@
 ;; extends
 
-(label (identifier) @identifier.parameter) @parameter
+;(label (identifier) @identifier.parameter) @parameter

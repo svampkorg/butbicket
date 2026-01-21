@@ -1,4 +1,5 @@
 local bufferline = require 'butbicket.integrations.bufferline'
+local haunt = require 'butbicket.integrations.haunt'
 local cmp = require 'butbicket.integrations.cmp'
 local neogit = require 'butbicket.integrations.neogit'
 local colorscheme = require 'butbicket.colorscheme'
@@ -164,7 +165,7 @@ local function set_groups()
     Method = { fg = colorscheme.syntaxFunction },
     Property = { fg = colorscheme.text_dark },
     Field = { link = 'Property' },
-    Parameter = { fg = colorscheme.steel_gray },
+    Parameter = { fg = colorscheme.parameter },
     Statement = {
       fg = colorscheme.keyword,
       bold = true,
@@ -185,7 +186,8 @@ local function set_groups()
     -- Include = {},
     Define = { fg = colorscheme.syntaxKeyword },
     Macro = { link = 'Define' },
-    PreCondit = { fg = colorscheme.annotation },
+    PreCondit = { fg = colorscheme.selected },
+    -- PreCondit = { link = 'Label' },
 
     Type = { fg = colorscheme.type },
     Struct = { link = 'Type' },
@@ -378,11 +380,11 @@ local function set_groups()
     },
     ['@variable.builtin'] = { fg = colorscheme.emphasisText },
     ['@variable.member'] = {
-      fg = colorscheme.annotation,
+      fg = colorscheme.variable_member,
       italic = config.italics.variable_members or false,
     },
     ['@variable.parameter'] = {
-      fg = colorscheme.annotation,
+      fg = colorscheme.parameter,
       italic = config.italics.variable_parameters or false,
     },
     ['@type'] = { link = 'Type' },
@@ -402,7 +404,7 @@ local function set_groups()
     ['@tag.delimiter'] = { fg = colorscheme.syntaxOperator },
     ['@tag.attribute'] = { fg = colorscheme.method },
     ['@tag.jsx.element'] = { fg = colorscheme.syntaxFunction },
-    ['@attribute'] = { fg = colorscheme.annotation },
+    ['@attribute'] = { fg = colorscheme.selected },
     ['@error'] = { link = 'Error' },
     ['@warning'] = { link = 'WarningMsg' },
     ['@info'] = { fg = colorscheme.syntaxFunction },
@@ -434,6 +436,7 @@ local function set_groups()
   -- integrations
   groups = vim.tbl_extend('force', groups, cmp.highlights())
   groups = vim.tbl_extend('force', groups, neogit.highlights())
+  groups = vim.tbl_extend('force', groups, haunt.highlights())
 
   -- overrides
   groups = vim.tbl_extend(
