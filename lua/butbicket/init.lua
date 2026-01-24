@@ -2,6 +2,7 @@ local bufferline = require 'butbicket.integrations.bufferline'
 local haunt = require 'butbicket.integrations.haunt'
 local cmp = require 'butbicket.integrations.cmp'
 local neogit = require 'butbicket.integrations.neogit'
+local blink = require 'butbicket.integrations.blink'
 local colorscheme = require 'butbicket.colorscheme'
 local config = require 'butbicket.config'
 local utils = require 'butbicket.utils'
@@ -92,6 +93,8 @@ local function set_groups()
     MoreMsg = { fg = colorscheme.syntaxFunction },
     NonText = { fg = utils.shade(colorscheme.editorBackground, 0.75) },
     NormalFloat = { bg = colorscheme.floatingWindowBackground },
+    FloatBorder = { bg = colorscheme.floatingWindowBackground, fg = colorscheme.windowBorder },
+    PmenuBorder = { bg = colorscheme.floatingWindowBackground, fg = colorscheme.windowBorder },
     NormalNC = { link = 'Normal' },
     Pmenu = { link = 'NormalFloat' },
     PmenuSel = { bg = colorscheme.menuOptionBackground },
@@ -438,6 +441,7 @@ local function set_groups()
   groups = vim.tbl_extend('force', groups, cmp.highlights())
   groups = vim.tbl_extend('force', groups, neogit.highlights())
   groups = vim.tbl_extend('force', groups, haunt.highlights())
+  groups = vim.tbl_extend('force', groups, blink.highlights())
 
   -- overrides
   groups = vim.tbl_extend(
