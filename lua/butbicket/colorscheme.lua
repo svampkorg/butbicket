@@ -150,8 +150,8 @@ else
   colorscheme.selectedText = colorscheme.selected
   colorscheme.inactiveSelectionText = colorscheme.selected_inactive
 
-  colorscheme.windowBorder = colorscheme.base_4
-  colorscheme.focusedBorder = colorscheme.separator
+  colorscheme.windowBorder = colorscheme.separator
+  colorscheme.focusedBorder = colorscheme.slate
   colorscheme.emphasizedBorder = colorscheme.blue
 
   colorscheme.syntaxError = colorscheme.red
