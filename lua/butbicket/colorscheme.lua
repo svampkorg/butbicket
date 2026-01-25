@@ -1,5 +1,6 @@
 local config = require 'butbicket.config'
 
+-- NOTE: saved for reference
 -- local fromBitBucket = {
 --   keyword = '#FD9891',
 --   method = '#7EE2B8',
@@ -85,15 +86,6 @@ colorscheme.changed_dim = '#20252B'
 colorscheme.added_bright = '#1A5C41'
 colorscheme.removed_bright = '#7B2922'
 colorscheme.changed_bright = '#1F3E6B'
--- NOTE: The old slightly more greenish grays:
--- colorscheme.abyss = '#151A17'
--- colorscheme.dark_charcoal = '#262E2A'
--- colorscheme.charcoal = '#37423F'
--- colorscheme.dark_slate = '#495554'
--- colorscheme.slate = '#5B6768'
--- colorscheme.slate_gray = '#6E777B'
--- colorscheme.steel_gray = '#81888D'
--- NOTE: More neutral grays
 colorscheme.abyss = '#171717'
 colorscheme.dark_charcoal = '#2A2A2A'
 colorscheme.charcoal = '#3D3D3D'
