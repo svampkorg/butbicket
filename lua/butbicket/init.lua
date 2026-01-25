@@ -41,7 +41,6 @@ local function set_groups()
     utils.shade(colorscheme.old_mustard, 0.5, colorscheme.editorBackground)
 
   local groups = {
-    -- base
     Normal = { fg = colorscheme.mainText, bg = bg },
     LineNr = { fg = colorscheme.lineNumberText },
     ColorColumn = {
@@ -82,14 +81,13 @@ local function set_groups()
         colorscheme.editorBackground,
         math.abs(0.30)
       ),
-      -- fg = colorscheme.editorBackground,
     },
     Substitute = { link = 'IncSearch' },
     CursorLineNr = { fg = colorscheme.dark_slate },
     MatchParen = { fg = colorscheme.hotpink, bold = true },
     ModeMsg = { link = 'Normal' },
     MsgArea = { link = 'Normal' },
-    -- MsgSeparator = {},
+    MsgSeparator = { link = 'VertSplit' },
     MoreMsg = { fg = colorscheme.syntaxFunction },
     NonText = { fg = utils.shade(colorscheme.editorBackground, 0.75) },
     NormalFloat = { bg = colorscheme.floatingWindowBackground },
@@ -332,7 +330,6 @@ local function set_groups()
     ['@texcolorscheme.todo'] = { link = 'Todo' },
     ['@comment'] = { link = 'Comment' },
     ['@punctuation'] = { link = 'Punctuation' },
-    -- ['@punctuation.bracket'] = { link = 'Punctuation' }, -- fg = colorscheme.warningEmphasis },
     ['@punctuation.bracket'] = { link = 'Punctuation' }, -- fg = colorscheme.warningEmphasis },
     ['@punctuation.bracket.css'] = { fg = colorscheme.purple }, -- fg = colorscheme.warningEmphasis },
     ['@punctuation.bracket.scss'] = { fg = colorscheme.purple }, -- fg = colorscheme.warningEmphasis },
