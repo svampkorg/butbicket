@@ -3,6 +3,7 @@ local haunt = require 'butbicket.integrations.haunt'
 local cmp = require 'butbicket.integrations.cmp'
 local neogit = require 'butbicket.integrations.neogit'
 local blink = require 'butbicket.integrations.blink'
+local snacks_indent = require 'butbicket.integrations.snacks_indent'
 local colorscheme = require 'butbicket.colorscheme'
 local config = require 'butbicket.config'
 local utils = require 'butbicket.utils'
@@ -109,17 +110,19 @@ local function set_groups()
     SpecialKey = { fg = colorscheme.syntaxOperator },
     StatusLine = { fg = colorscheme.mainText, bg = colorscheme.windowBorder },
     StatusLineNC = {
-      fg = colorscheme.inactiveText,
       bg = colorscheme.sidebarBackground,
+      fg = colorscheme.slate_gray,
     },
     TabLine = {
-      bg = colorscheme.windowBorder,
-      fg = colorscheme.inactiveText,
+      bg = colorscheme.dark_slate,
+      fg = colorscheme.steel_gray,
     },
-    TabLineFill = { link = 'TabLine' },
+    TabLineFill = {
+      bg = colorscheme.windowBorder,
+    },
     TabLineSel = {
-      bg = colorscheme.separator,
-      fg = colorscheme.emphasisText,
+      bg = colorscheme.slate,
+      fg = colorscheme.text_dark,
       bold = true,
     },
     Search = { bg = utils.mix(colorscheme.old_mustard, colorscheme.base_2, 0.4) }, -- = utils.shade(colorscheme.mustard, 0.90, colorscheme.bg) },
@@ -439,6 +442,7 @@ local function set_groups()
   groups = vim.tbl_extend('force', groups, neogit.highlights())
   groups = vim.tbl_extend('force', groups, haunt.highlights())
   groups = vim.tbl_extend('force', groups, blink.highlights())
+  groups = vim.tbl_extend('force', groups, snacks_indent.highlights())
 
   -- overrides
   groups = vim.tbl_extend(
