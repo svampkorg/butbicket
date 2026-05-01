@@ -5,19 +5,19 @@ local M = {}
 function M.highlights()
   return {
     BlinkCmpDocBorder = {
-      fg = colorscheme.windowBorder,
+      fg = colorscheme.floatBorder,
       bg = colorscheme.floatingWindowBackground,
     },
     BlinkCmpMenuBorder = {
-      fg = colorscheme.windowBorder,
+      fg = colorscheme.floatBorder,
       bg = colorscheme.floatingWindowBackground,
     },
     BlinkCmpSignatureHelpBorder = {
-      fg = colorscheme.windowBorder,
+      fg = colorscheme.floatBorder,
       bg = colorscheme.floatingWindowBackground,
     },
     BlinkCmpLabelDescription = {
-      fg = colorscheme.windowBorder,
+      fg = colorscheme.floatBorder,
       bg = colorscheme.floatingWindowBackground,
     },
   }

@@ -170,4 +170,5 @@ else
   colorscheme.syntaxNumber = colorscheme.number
   colorscheme.terminalGray = colorscheme.base
 end
+  colorscheme.floatBorder =  colorscheme.dark_slate
 return colorscheme

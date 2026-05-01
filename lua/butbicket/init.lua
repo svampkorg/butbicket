@@ -4,6 +4,9 @@ local cmp = require 'butbicket.integrations.cmp'
 local neogit = require 'butbicket.integrations.neogit'
 local blink = require 'butbicket.integrations.blink'
 local snacks_indent = require 'butbicket.integrations.snacks_indent'
+local render_markdown = require 'butbicket.integrations.render_markdown'
+local flash = require 'butbicket.integrations.flash'
+local arrow = require 'butbicket.integrations.arrow'
 local colorscheme = require 'butbicket.colorscheme'
 local config = require 'butbicket.config'
 local utils = require 'butbicket.utils'
@@ -92,14 +95,14 @@ local function set_groups()
     MoreMsg = { fg = colorscheme.syntaxFunction },
     NonText = { fg = utils.shade(colorscheme.editorBackground, 0.75) },
     NormalFloat = { bg = colorscheme.floatingWindowBackground },
-    FloatBorder = { bg = colorscheme.floatingWindowBackground, fg = colorscheme.windowBorder },
-    PmenuBorder = { bg = colorscheme.floatingWindowBackground, fg = colorscheme.windowBorder },
+    FloatBorder = { bg = colorscheme.floatingWindowBackground, fg = colorscheme.floatBorder },
+    PmenuBorder = { bg = colorscheme.floatingWindowBackground, fg = colorscheme.floatBorder },
     NormalNC = { link = 'Normal' },
     Pmenu = { link = 'NormalFloat' },
     PmenuSel = { bg = colorscheme.menuOptionBackground },
     PmenuSbar = {
       bg = utils.shade(
-        colorscheme.windowBorder,
+        colorscheme.floatBorder,
         0.5,
         colorscheme.editorBackground
       ),
@@ -179,7 +182,8 @@ local function set_groups()
     Conditional = { fg = colorscheme.syntaxError },
     -- Repeat = {},
     Label = { fg = colorscheme.syntaxFunction },
-    Operator = { fg = colorscheme.parenthesis },
+    -- Operator = { fg = colorscheme.parenthesis, bold = true },
+    Operator = { fg = colorscheme.syntaxOperator, bold = true },
     Keyword = {
       link = 'Statement',
       italic = config.italics.keywords or false,
@@ -203,7 +207,7 @@ local function set_groups()
     -- Typedef = {},
 
     Attribute = { link = 'Character' },
-    Punctuation = { fg = colorscheme.syntaxOperator },
+    Punctuation = { fg = colorscheme.light_red },
     Special = { fg = colorscheme.syntaxOperator },
 
     SpecialChar = { fg = colorscheme.syntaxError },
@@ -316,6 +320,8 @@ local function set_groups()
     NeoTreeGitStaged = { fg = colorscheme.green },
     NeoTreeGitRenamed = { fg = colorscheme.mustard },
     NeoTreeGitUntracked = { fg = colorscheme.slate_gray },
+    LazyLocal = { fg = colorscheme.green },
+    LazySpecial = { fg = colorscheme.blue },
 
     ['@text'] = { fg = colorscheme.mainText },
     ['@texcolorscheme.literal'] = { link = 'Property' },
@@ -443,6 +449,10 @@ local function set_groups()
   groups = vim.tbl_extend('force', groups, haunt.highlights())
   groups = vim.tbl_extend('force', groups, blink.highlights())
   groups = vim.tbl_extend('force', groups, snacks_indent.highlights())
+  groups = vim.tbl_extend('force', groups, render_markdown.highlights())
+  groups = vim.tbl_extend('force', groups, flash.highlights())
+  groups = vim.tbl_extend('force', groups, arrow.highlights())
+
 
   -- overrides
   groups = vim.tbl_extend(
