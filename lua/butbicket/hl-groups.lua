@@ -217,18 +217,20 @@ return {
   LazyLocal = { fg = colorscheme.green },
   LazySpecial = { fg = colorscheme.blue },
   ['@text'] = { fg = colorscheme.mainText },
-  ['@texcolorscheme.literal'] = { link = 'Property' },
-  ['@texcolorscheme.strong'] = { link = 'Bold' },
-  ['@texcolorscheme.italic'] = { link = 'Italic' },
-  ['@texcolorscheme.title'] = { link = 'Keyword' },
-  ['@texcolorscheme.uri'] = {
+  ['@markup'] = { fg = colorscheme.mainText },
+  ['@markup.raw'] = { link = 'Property' },
+  ['@markup.strong'] = { link = 'Bold' },
+  ['@markup.italic'] = { link = 'Italic' },
+  ['@markup.heading'] = { link = 'Keyword' },
+  ['@markup.link'] = {
     fg = colorscheme.syntaxFunction,
     sp = colorscheme.syntaxFunction,
     underline = true,
   },
-  ['@texcolorscheme.underline'] = { link = 'Underlined' },
+  ['@markup.link.url'] = { link = '@markup.link' },
+  ['@markup.underline'] = { link = 'Underlined' },
   ['@symbol'] = { fg = colorscheme.syntaxOperator },
-  ['@texcolorscheme.todo'] = { link = 'Todo' },
+  ['@comment.todo'] = { link = 'Todo' },
   ['@comment'] = { link = 'Comment' },
   ['@punctuation'] = { link = 'Punctuation' },
   ['@punctuation.bracket'] = { link = 'Punctuation' }, -- fg = colorscheme.warningEmphasis },
@@ -238,11 +240,10 @@ return {
   ['@punctuation.terminator.statement'] = { link = 'Delimiter' },
   ['@punctuation.special'] = { fg = colorscheme.syntaxError },
   ['@punctuation.separator.keyvalue'] = { link = 'Punctuation' }, -- { fg = colorscheme.syntaxError },
-  ['@texcolorscheme.diff.add'] = { bg = colorscheme.added },
-  ['@texcolorscheme.diff.delete'] = { bg = colorscheme.removed },
+  ['@diff.plus'] = { bg = colorscheme.added },
+  ['@diff.minus'] = { bg = colorscheme.removed },
   ['@constant'] = { link = 'Constant' },
   ['@constant.builtin'] = { fg = colorscheme.syntaxFunction },
-  ['@constancolorscheme.builtin'] = { link = 'Keyword' },
   ['@string'] = { link = 'String' },
   ['@string.vue'] = { fg = colorscheme.light_red },
   ['@string.html'] = { fg = colorscheme.light_red },
@@ -294,9 +295,9 @@ return {
   ['@error'] = { link = 'Error' },
   ['@warning'] = { link = 'WarningMsg' },
   ['@info'] = { fg = colorscheme.syntaxFunction },
-  ['@label.json'] = { fg = colorscheme.property }, -- For json
-  ['@label.help'] = { link = '@texcolorscheme.uri' }, -- For help files
-  ['@texcolorscheme.uri.html'] = { underline = true }, -- For html
+  ['@label.json'] = { link = 'Property' }, -- For json
+  ['@label.help'] = { link = '@markup.link' }, -- For help files
+  ['@markup.link.html'] = { underline = true }, -- For html
   ['@lsp.type.namespace'] = { link = '@namespace' },
   ['@lsp.type.type'] = { link = '@type' },
   ['@lsp.type.class'] = { link = '@type' },

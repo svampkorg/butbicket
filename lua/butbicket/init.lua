@@ -1,16 +1,31 @@
-local arrow = require 'butbicket.integrations.arrow'
-local blink = require 'butbicket.integrations.blink'
-local bufferline = require 'butbicket.integrations.bufferline'
-local cmp = require 'butbicket.integrations.cmp'
-local flash = require 'butbicket.integrations.flash'
-local haunt = require 'butbicket.integrations.haunt'
-local neogit = require 'butbicket.integrations.neogit'
-local snacks_indent = require 'butbicket.integrations.snacks_indent'
 local config = require 'butbicket.config'
-local colorscheme = require 'butbicket.colorscheme'
 local theme = {}
 
+-- Modules whose output depends on `vim.o.background` / config and therefore
+-- must be re-evaluated on every `colorscheme()` call (e.g. dark <-> light
+-- toggle in the same session). `config` is intentionally excluded: it holds
+-- user setup state via its metatable and must survive reloads.
+local reloadable = {
+  'butbicket.colorscheme',
+  'butbicket.hl-groups',
+  'butbicket.integrations.arrow',
+  'butbicket.integrations.blink',
+  'butbicket.integrations.bufferline',
+  'butbicket.integrations.cmp',
+  'butbicket.integrations.flash',
+  'butbicket.integrations.haunt',
+  'butbicket.integrations.neogit',
+  'butbicket.integrations.snacks_indent',
+}
+
+local function reload()
+  for _, module in ipairs(reloadable) do
+    package.loaded[module] = nil
+  end
+end
+
 local function set_terminal_colors()
+  local colorscheme = require 'butbicket.colorscheme'
   vim.g.terminal_color_0 = colorscheme.editorBackground
   vim.g.terminal_color_1 = colorscheme.syntaxError
   vim.g.terminal_color_2 = colorscheme.successText
@@ -24,7 +39,7 @@ local function set_terminal_colors()
   vim.g.terminal_color_10 = colorscheme.stringText
   vim.g.terminal_color_11 = colorscheme.warningText
   vim.g.terminal_color_12 = colorscheme.syntaxOperator
-  vim.g.terminal_color_13 = colorscheme.syntaxError
+  vim.g.terminal_color_13 = colorscheme.specialKeyword
   vim.g.terminal_color_14 = colorscheme.stringText
   vim.g.terminal_color_15 = colorscheme.commentText
   vim.g.terminal_color_background = colorscheme.editorBackground
@@ -32,16 +47,24 @@ local function set_terminal_colors()
 end
 
 local function set_groups()
-  local groups = require('hl-groups')
+  local groups = require 'butbicket.hl-groups'
 
   -- integrations
-  groups = vim.tbl_extend('force', groups, cmp.highlights())
-  groups = vim.tbl_extend('force', groups, neogit.highlights())
-  groups = vim.tbl_extend('force', groups, haunt.highlights())
-  groups = vim.tbl_extend('force', groups, blink.highlights())
-  groups = vim.tbl_extend('force', groups, snacks_indent.highlights())
-  groups = vim.tbl_extend('force', groups, flash.highlights())
-  groups = vim.tbl_extend('force', groups, arrow.highlights())
+  for _, name in ipairs {
+    'cmp',
+    'neogit',
+    'haunt',
+    'blink',
+    'snacks_indent',
+    'flash',
+    'arrow',
+  } do
+    groups = vim.tbl_extend(
+      'force',
+      groups,
+      require('butbicket.integrations.' .. name).highlights()
+    )
+  end
 
   -- overrides
   groups = vim.tbl_extend(
@@ -57,21 +80,22 @@ local function set_groups()
 end
 
 function theme.setup(values)
+  values = values or {}
   setmetatable(
     config,
     { __index = vim.tbl_extend('force', config.defaults, values) }
   )
 
-  theme.bufferline = { highlights = {} }
-  theme.bufferline.highlights = bufferline.highlights(config)
+  local bufferline = require 'butbicket.integrations.bufferline'
+  theme.bufferline = { highlights = bufferline.highlights(config) }
 end
 
 function theme.colorscheme()
-  if vim.version().minor < 8 then
+  if vim.fn.has 'nvim-0.8' == 0 then
     vim.notify(
       'Neovim 0.8+ is required for butbicket colorscheme',
       vim.log.levels.ERROR,
-      { title = 'Min Theme' }
+      { title = 'butbicket' }
     )
     return
   end
@@ -80,6 +104,8 @@ function theme.colorscheme()
   if vim.fn.exists 'syntax_on' then
     vim.api.nvim_command 'syntax reset'
   end
+
+  reload()
 
   vim.g.VM_theme_set_by_colorscheme = true
   vim.o.termguicolors = true

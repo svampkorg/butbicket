@@ -98,6 +98,49 @@ colorscheme.bright_green = '#30FF91'
 
 if vim.o.background == 'light' then
   -- LIGHT
+  -- Remap the raw base palette to light-appropriate hues. hl-groups.lua and the
+  -- integrations reference several of these keys directly (not only via the
+  -- semantic aliases below), so without this block their dark values bleed
+  -- through and render near-invisible on a white background. All foreground
+  -- values here clear WCAG AA (>=4.5) on white; see tests/run.lua.
+  -- syntax foreground
+  colorscheme.text = '#2a2a2a'
+  colorscheme.text_dark = '#2a2a2a' -- Property / Field
+  colorscheme.keyword = '#c0392b' -- Statement / Keyword
+  colorscheme.type = '#1e4f8f'
+  colorscheme.method = '#0f6e5a'
+  colorscheme.number = '#1a5fb4'
+  colorscheme.variable = '#454b52'
+  colorscheme.variable_member = '#5f636a'
+  colorscheme.parameter = '#5f636a'
+  colorscheme.parenthesis = '#5f636a'
+  colorscheme.light_red = '#93591a' -- punctuation / brackets
+  colorscheme.purple = '#9b2393'
+  colorscheme.mustard = '#9c6400'
+  colorscheme.blue = '#1976d2'
+  colorscheme.green = '#22863a'
+  colorscheme.red = '#c0392b'
+  colorscheme.hotpink = '#d1006a' -- MatchParen / flash
+  colorscheme.bright_green = '#177a3a'
+  colorscheme.selected = '#8a3d5f'
+  -- surfaces
+  colorscheme.base_1 = '#f0f0f0'
+  colorscheme.base_2 = '#eaeaea'
+  colorscheme.base_3 = '#dcdcdc'
+  colorscheme.base_4 = '#ededed'
+  colorscheme.cursorline = '#e8e8e8'
+  colorscheme.old_mustard = '#d9b23a' -- search-highlight base
+  -- diff (GitHub-light palette)
+  colorscheme.added = '#c4e7d4'
+  colorscheme.removed = '#f7d4d0'
+  colorscheme.changed = '#cfe2fb'
+  colorscheme.added_dim = '#e6f4ea'
+  colorscheme.removed_dim = '#fbe9e7'
+  colorscheme.changed_dim = '#e3f0fd'
+  colorscheme.added_bright = '#1a7f37'
+  colorscheme.removed_bright = '#cf222e'
+  colorscheme.changed_bright = '#0969da'
+
   -- use #FDFDFD as white
   colorscheme.editorBackground = config.transparent and 'none' or '#ffffff'
   colorscheme.sidebarBackground = '#dddddd'
@@ -122,10 +165,10 @@ if vim.o.background == 'light' then
   colorscheme.syntaxError = '#d6656a'
   colorscheme.syntaxKeyword = '#9966cc'
   colorscheme.errorText = '#d32f2f'
-  colorscheme.warningText = '#f29718'
+  colorscheme.warningText = '#b26a00' -- darkened for >=4.0 contrast on white
   colorscheme.linkText = '#1976d2'
   colorscheme.commentText = '#848484'
-  colorscheme.stringText = '#dd8500'
+  colorscheme.stringText = '#b35c00' -- darkened to AA (4.7) on white
   colorscheme.successText = '#22863a'
   colorscheme.warningEmphasis = '#cd9731'
   colorscheme.specialKeyword = '#800080'
