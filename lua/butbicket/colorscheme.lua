@@ -98,6 +98,7 @@ colorscheme.bright_green = '#30FF91'
 
 if vim.o.background == 'light' then
   -- LIGHT
+  -- use #FDFDFD as white
   colorscheme.editorBackground = config.transparent and 'none' or '#ffffff'
   colorscheme.sidebarBackground = '#dddddd'
   colorscheme.popupBackground = '#f6f6f6'
