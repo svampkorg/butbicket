@@ -133,24 +133,31 @@ and your host terminal stay in sync.
 
 ## Claude Code
 
-The same generator emits two Claude Code artifacts (dark + light) under
-`extras/`:
+The generator emits two kinds of artifact under `extras/` (dark + light):
 
-- **`extras/claude-code/butbicket-*.json`** — a Claude Code custom theme (UI
-  chrome: diffs, borders, status, accent). Copy to `~/.claude/themes/`, then set
-  `"theme": "custom:butbicket-dark"` in `~/.claude/settings.json`.
-- **`extras/bat/butbicket-*.tmTheme`** — the **code syntax** theme. Claude Code
-  renders code via [bat](https://github.com/sharkdp/bat), so:
-  ```sh
-  cp extras/bat/butbicket-*.tmTheme "$(bat --config-dir)/themes/"
-  bat cache --build
-  ```
-  then point Claude Code at it with
-  `"env": { "CLAUDE_CODE_SYNTAX_HIGHLIGHT": "butbicket-dark" }` in
-  `~/.claude/settings.json` (restart required).
+**UI chrome** — `extras/claude-code/butbicket-*.json` is a Claude Code custom
+theme (diffs, borders, status, accent). Copy to `~/.claude/themes/`, then set
+`"theme": "custom:butbicket-dark"` in `~/.claude/settings.json`.
 
-Custom themes cover UI chrome only — syntax highlighting is the bat theme's job,
-which is why both are needed for a fully themed Claude Code.
+**Code syntax highlighting.** Claude Code highlights code with an internal
+engine (highlight.js), *not* bat — it only accepts a small set of built-in
+theme names via `CLAUDE_CODE_SYNTAX_HIGHLIGHT` (`Monokai Extended`, `GitHub`,
+`ansi`), and does **not** load custom `.tmTheme` files. To get butbicket colors,
+use the terminal's 16-color palette:
+
+```jsonc
+// ~/.claude/settings.json
+"env": { "CLAUDE_CODE_SYNTAX_HIGHLIGHT": "ansi" }
+```
+
+With `ansi`, code is coloured from ANSI slots 0–15 — so if your terminal runs a
+butbicket theme (see `extras/ghostty/` etc.), Claude Code's code inherits the
+butbicket palette. Restart Claude Code after changing the env.
+
+**`extras/bat/butbicket-*.tmTheme`** is a genuine bat/Sublime theme for actual
+`bat` usage in the terminal (`bat --theme=butbicket-dark`); install with
+`cp extras/bat/*.tmTheme "$(bat --config-dir)/themes/" && bat cache --build`.
+It is *not* used by Claude Code.
 
 ## Contributing
 
