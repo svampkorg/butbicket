@@ -131,6 +131,27 @@ literal red/green/blue mapping — e.g. slot 4 carries a mint tone. It mirrors
 `set_terminal_colors()` in `lua/butbicket/init.lua`, so `:terminal` inside Neovim
 and your host terminal stay in sync.
 
+## Claude Code
+
+The same generator emits two Claude Code artifacts (dark + light) under
+`extras/`:
+
+- **`extras/claude-code/butbicket-*.json`** — a Claude Code custom theme (UI
+  chrome: diffs, borders, status, accent). Copy to `~/.claude/themes/`, then set
+  `"theme": "custom:butbicket-dark"` in `~/.claude/settings.json`.
+- **`extras/bat/butbicket-*.tmTheme`** — the **code syntax** theme. Claude Code
+  renders code via [bat](https://github.com/sharkdp/bat), so:
+  ```sh
+  cp extras/bat/butbicket-*.tmTheme "$(bat --config-dir)/themes/"
+  bat cache --build
+  ```
+  then point Claude Code at it with
+  `"env": { "CLAUDE_CODE_SYNTAX_HIGHLIGHT": "butbicket-dark" }` in
+  `~/.claude/settings.json` (restart required).
+
+Custom themes cover UI chrome only — syntax highlighting is the bat theme's job,
+which is why both are needed for a fully themed Claude Code.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). In short: run `stylua .` and `nvim -l
