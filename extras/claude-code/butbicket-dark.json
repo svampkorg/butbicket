@@ -1,0 +1,26 @@
+{
+  "name": "butbicket-dark",
+  "base": "dark",
+  "overrides": {
+    "claude": "#669CF0",
+    "text": "#D4D4D4",
+    "inverseText": "#101214",
+    "inactive": "#636363",
+    "subtle": "#46474B",
+    "suggestion": "#636363",
+    "permission": "#669CF0",
+    "planMode": "#DA70D6",
+    "autoAccept": "#73A130",
+    "bashBorder": "#CECFD2",
+    "promptBorder": "#636363",
+    "success": "#73A130",
+    "error": "#E78178",
+    "warning": "#BA9420",
+    "diffAdded": "#164B35",
+    "diffRemoved": "#5D1F1A",
+    "diffAddedDimmed": "#212A27",
+    "diffRemovedDimmed": "#2E2322",
+    "diffAddedWord": "#1A5C41",
+    "diffRemovedWord": "#7B2922"
+  }
+}

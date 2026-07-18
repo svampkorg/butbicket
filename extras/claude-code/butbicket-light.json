@@ -1,0 +1,26 @@
+{
+  "name": "butbicket-light",
+  "base": "light",
+  "overrides": {
+    "claude": "#1976D2",
+    "text": "#616161",
+    "inverseText": "#FFFFFF",
+    "inactive": "#9E9E9E",
+    "subtle": "#C2C3C5",
+    "suggestion": "#848484",
+    "permission": "#999999",
+    "planMode": "#9B2393",
+    "autoAccept": "#22863A",
+    "bashBorder": "#A1A1A1",
+    "promptBorder": "#AAAAAA",
+    "success": "#22863A",
+    "error": "#D32F2F",
+    "warning": "#B26A00",
+    "diffAdded": "#C4E7D4",
+    "diffRemoved": "#F7D4D0",
+    "diffAddedDimmed": "#E6F4EA",
+    "diffRemovedDimmed": "#FBE9E7",
+    "diffAddedWord": "#1A7F37",
+    "diffRemovedWord": "#CF222E"
+  }
+}

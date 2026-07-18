@@ -38,6 +38,38 @@ local function collect(background)
     sel_bg = upper(c.selected),
     sel_fg = upper(c.emphasisText),
     accent = upper(c.linkText),
+
+    -- syntax palette (bat .tmTheme)
+    keyword = upper(c.keyword),
+    string = upper(c.stringText),
+    func = upper(c.syntaxFunction),
+    number = upper(c.syntaxNumber or c.number),
+    type = upper(c.type),
+    variable = upper(c.variable),
+    parameter = upper(c.parameter),
+    comment = upper(c.commentText),
+    operator = upper(c.syntaxOperator),
+    boolean = upper(c.syntaxKeyword),
+    punctuation = upper(c.light_red),
+    tag = upper(c.linkText),
+    attribute = upper(c.method),
+    line_bg = upper(c.cursorline),
+
+    -- ui / status / diffs (Claude Code custom theme)
+    error = upper(c.errorText),
+    warning = upper(c.warningText),
+    success = upper(c.successText),
+    purple = upper(c.purple),
+    added = upper(c.added),
+    removed = upper(c.removed),
+    added_dim = upper(c.added_dim),
+    removed_dim = upper(c.removed_dim),
+    added_word = upper(c.added_bright),
+    removed_word = upper(c.removed_bright),
+    border = upper(c.windowBorder),
+    focus_border = upper(c.focusedBorder),
+    emph_border = upper(c.emphasizedBorder),
+    inactive = upper(c.inactiveText),
   }
 end
 
@@ -165,6 +197,147 @@ emitters.warp = function(t)
   return { ext = ".yaml", body = join(l, "\n") .. "\n" }
 end
 
+-- Claude Code custom theme (~/.claude/themes/<name>.json). Controls UI chrome
+-- only — diffs, borders, status, accent — NOT code syntax highlighting (that is
+-- bat's job; see the `bat` emitter). Unknown/invalid override keys are ignored.
+emitters["claude-code"] = function(t)
+  local overrides = {
+    { "claude", t.accent },
+    { "text", t.fg },
+    { "inverseText", t.bg },
+    { "inactive", t.inactive },
+    { "subtle", t.border },
+    { "suggestion", t.comment },
+    { "permission", t.emph_border },
+    { "planMode", t.purple },
+    { "autoAccept", t.success },
+    { "bashBorder", t.operator },
+    { "promptBorder", t.focus_border },
+    { "success", t.success },
+    { "error", t.error },
+    { "warning", t.warning },
+    { "diffAdded", t.added },
+    { "diffRemoved", t.removed },
+    { "diffAddedDimmed", t.added_dim },
+    { "diffRemovedDimmed", t.removed_dim },
+    { "diffAddedWord", t.added_word },
+    { "diffRemovedWord", t.removed_word },
+  }
+  local lines = {}
+  for i, kv in ipairs(overrides) do
+    lines[i] = ('    "%s": "%s"%s'):format(
+      kv[1],
+      kv[2],
+      i < #overrides and "," or ""
+    )
+  end
+  local body = table.concat({
+    "{",
+    ('  "name": "%s",'):format(t.name),
+    ('  "base": "%s",'):format(t.light and "light" or "dark"),
+    '  "overrides": {',
+    join(lines, "\n"),
+    "  }",
+    "}",
+    "",
+  }, "\n")
+  return { ext = ".json", body = body }
+end
+
+-- bat / Sublime .tmTheme for CODE SYNTAX highlighting. Claude Code renders code
+-- via bat, reading the theme name from CLAUDE_CODE_SYNTAX_HIGHLIGHT (or
+-- BAT_THEME). Install into `$(bat --config-dir)/themes/`, run `bat cache
+-- --build`, then set that env var to the theme name.
+emitters.bat = function(t)
+  local function settings(kvs)
+    local out = {}
+    for _, kv in ipairs(kvs) do
+      out[#out + 1] =
+        ("        <key>%s</key>\n        <string>%s</string>"):format(
+          kv[1],
+          kv[2]
+        )
+    end
+    return join(out, "\n")
+  end
+
+  local function entry(scope, kvs)
+    local head = scope
+        and ("      <key>scope</key>\n      <string>%s</string>\n"):format(scope)
+      or ""
+    return table.concat({
+      "    <dict>",
+      head .. "      <key>settings</key>",
+      "      <dict>",
+      settings(kvs),
+      "      </dict>",
+      "    </dict>",
+    }, "\n")
+  end
+
+  -- scope -> color (+ optional fontStyle)
+  local scopes = {
+    { "comment", t.comment, "italic" },
+    { "string", t.string },
+    { "constant.numeric", t.number },
+    { "constant.language", t.boolean },
+    { "constant.character.escape", t.string },
+    { "keyword, storage, storage.type, keyword.control", t.keyword },
+    {
+      "keyword.operator, punctuation.separator, punctuation.terminator",
+      t.operator,
+    },
+    {
+      "entity.name.function, support.function, meta.function-call",
+      t.func,
+    },
+    { "variable, variable.other, meta.variable", t.variable },
+    { "variable.parameter", t.parameter },
+    {
+      "entity.name.type, entity.name.class, support.type, support.class",
+      t.type,
+    },
+    { "entity.name.tag", t.tag },
+    { "entity.other.attribute-name", t.attribute },
+    { "punctuation.definition, meta.brace, punctuation.section", t.punctuation },
+    { "invalid, invalid.illegal", t.error },
+  }
+
+  local entries = {
+    entry(nil, {
+      { "background", t.bg },
+      { "foreground", t.fg },
+      { "caret", t.cursor },
+      { "selection", t.sel_bg },
+      { "lineHighlight", t.line_bg },
+    }),
+  }
+  for _, sc in ipairs(scopes) do
+    local kvs = { { "foreground", sc[2] } }
+    if sc[3] then
+      kvs[#kvs + 1] = { "fontStyle", sc[3] }
+    end
+    entries[#entries + 1] = entry(sc[1], kvs)
+  end
+
+  local body = table.concat({
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+    '<plist version="1.0">',
+    "<dict>",
+    "  <key>name</key>",
+    ("  <string>%s</string>"):format(t.name),
+    "  <key>settings</key>",
+    "  <array>",
+    join(entries, "\n"),
+    "  </array>",
+    "</dict>",
+    "</plist>",
+    "",
+  }, "\n")
+  return { ext = ".tmTheme", body = body }
+end
+
 local function write(path, contents)
   vim.fn.mkdir(vim.fn.fnamemodify(path, ":h"), "p")
   local fd = assert(io.open(path, "w"))
@@ -175,7 +348,7 @@ end
 
 local variants = arg[1] and { arg[1] } or { "dark", "light" }
 local terminals = arg[2] and { arg[2] }
-  or { "ghostty", "kitty", "alacritty", "wezterm", "warp" }
+  or { "ghostty", "kitty", "alacritty", "wezterm", "warp", "claude-code", "bat" }
 
 for _, v in ipairs(variants) do
   local t = collect(v)
