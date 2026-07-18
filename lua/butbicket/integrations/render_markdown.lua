@@ -5,7 +5,7 @@ local M = {}
 
 function M.highlights()
   return {
-    RenderMarkdownCode = { bg = 'none' },
+    RenderMarkdownCode = { bg = "none" },
   }
 end
 

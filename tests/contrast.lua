@@ -3,7 +3,7 @@
 local M = {}
 
 local function hex_to_rgb(hex)
-  hex = hex:gsub('#', '')
+  hex = hex:gsub("#", "")
   return tonumber(hex:sub(1, 2), 16),
     tonumber(hex:sub(3, 4), 16),
     tonumber(hex:sub(5, 6), 16)

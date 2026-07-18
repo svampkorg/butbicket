@@ -1,2 +1,2 @@
-vim.o.background = 'light'
-require('butbicket').colorscheme()
+vim.o.background = "light"
+require("butbicket").colorscheme()

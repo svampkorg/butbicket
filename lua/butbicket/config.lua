@@ -1,6 +1,6 @@
 local config = {
   defaults = {
-    theme = 'dark',
+    theme = "dark",
     transparent = false,
     italics = {
       comments = true,

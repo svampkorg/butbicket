@@ -1,13 +1,13 @@
 local M = {}
 
 local function hex_to_rgb(hex)
-  local hex_type = '[abcdef0-9][abcdef0-9]'
-  local pat = '^#(' .. hex_type .. ')(' .. hex_type .. ')(' .. hex_type .. ')$'
+  local hex_type = "[abcdef0-9][abcdef0-9]"
+  local pat = "^#(" .. hex_type .. ")(" .. hex_type .. ")(" .. hex_type .. ")$"
   hex = string.lower(hex)
 
   assert(
     string.find(hex, pat) ~= nil,
-    'hex_to_rgb: invalid hex: ' .. tostring(hex)
+    "hex_to_rgb: invalid hex: " .. tostring(hex)
   )
 
   local red, green, blue = string.match(hex, pat)
@@ -24,7 +24,7 @@ function M.mix(fg, bg, alpha)
   end
 
   return string.format(
-    '#%02X%02X%02X',
+    "#%02X%02X%02X",
     blendChannel(1),
     blendChannel(2),
     blendChannel(3)
@@ -32,15 +32,15 @@ function M.mix(fg, bg, alpha)
 end
 
 function M.shade(color, value, base)
-  if vim.o.background == 'light' then
+  if vim.o.background == "light" then
     if base == nil then
-      base = '#000000'
+      base = "#000000"
     end
 
     return M.mix(color, base, math.abs(value))
   else
     if base == nil then
-      base = '#ffffff'
+      base = "#ffffff"
     end
 
     return M.mix(color, base, math.abs(value))

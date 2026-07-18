@@ -1,1 +1,1 @@
-require('butbicket').colorscheme()
+require("butbicket").colorscheme()

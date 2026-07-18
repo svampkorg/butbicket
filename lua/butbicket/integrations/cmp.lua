@@ -1,4 +1,4 @@
-local colorscheme = require 'butbicket.colorscheme'
+local colorscheme = require("butbicket.colorscheme")
 
 local M = {}
 
