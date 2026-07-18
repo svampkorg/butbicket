@@ -252,18 +252,19 @@ emitters.bat = function(t)
   local function settings(kvs)
     local out = {}
     for _, kv in ipairs(kvs) do
-      out[#out + 1] =
-        ("        <key>%s</key>\n        <string>%s</string>"):format(
-          kv[1],
-          kv[2]
-        )
+      out[#out + 1] = ("        <key>%s</key>\n        <string>%s</string>"):format(
+        kv[1],
+        kv[2]
+      )
     end
     return join(out, "\n")
   end
 
   local function entry(scope, kvs)
     local head = scope
-        and ("      <key>scope</key>\n      <string>%s</string>\n"):format(scope)
+        and ("      <key>scope</key>\n      <string>%s</string>\n"):format(
+          scope
+        )
       or ""
     return table.concat({
       "    <dict>",
@@ -299,7 +300,10 @@ emitters.bat = function(t)
     },
     { "entity.name.tag", t.tag },
     { "entity.other.attribute-name", t.attribute },
-    { "punctuation.definition, meta.brace, punctuation.section", t.punctuation },
+    {
+      "punctuation.definition, meta.brace, punctuation.section",
+      t.punctuation,
+    },
     { "invalid, invalid.illegal", t.error },
   }
 
