@@ -75,6 +75,8 @@
       <dict>
         <key>foreground</key>
         <string>#C0392B</string>
+        <key>fontStyle</key>
+        <string>italic</string>
       </dict>
     </dict>
     <dict>
@@ -138,15 +140,6 @@
       <dict>
         <key>foreground</key>
         <string>#0F6E5A</string>
-      </dict>
-    </dict>
-    <dict>
-      <key>scope</key>
-      <string>punctuation.definition, meta.brace, punctuation.section</string>
-      <key>settings</key>
-      <dict>
-        <key>foreground</key>
-        <string>#93591A</string>
       </dict>
     </dict>
     <dict>

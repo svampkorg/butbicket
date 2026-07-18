@@ -283,7 +283,7 @@ emitters.bat = function(t)
     { "constant.numeric", t.number },
     { "constant.language", t.boolean },
     { "constant.character.escape", t.string },
-    { "keyword, storage, storage.type, keyword.control", t.keyword },
+    { "keyword, storage, storage.type, keyword.control", t.keyword, "italic" },
     {
       "keyword.operator, punctuation.separator, punctuation.terminator",
       t.operator,
@@ -300,10 +300,9 @@ emitters.bat = function(t)
     },
     { "entity.name.tag", t.tag },
     { "entity.other.attribute-name", t.attribute },
-    {
-      "punctuation.definition, meta.brace, punctuation.section",
-      t.punctuation,
-    },
+    -- NOTE: no broad `punctuation.definition` rule — it out-specifies `comment`
+    -- and `string` (whose delimiters inherit punctuation.definition.*) and would
+    -- recolour them. Brackets fall to foreground, matching the Neovim look.
     { "invalid, invalid.illegal", t.error },
   }
 
