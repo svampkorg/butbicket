@@ -111,7 +111,7 @@ for _, bg in ipairs { 'dark', 'light' } do
   end
 end
 
-print('')
+print ''
 if #failures > 0 then
   print(('%d check(s) failed'):format(#failures))
   os.exit(1)
