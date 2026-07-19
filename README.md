@@ -91,7 +91,7 @@ require('butbicket').setup {
 
 ## Integrations
 
-Highlight support ships for: nvim-cmp, blink.cmp, neogit, flash.nvim, arrow.nvim,
+Highlight support ships for: nvim-cmp, blink.cmp, neogit, flash.nvim,
 bufferline, snacks indent, haunt, render-markdown, and lualine.
 
 For lualine:

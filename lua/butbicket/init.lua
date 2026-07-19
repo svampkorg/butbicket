@@ -8,7 +8,7 @@ local theme = {}
 local reloadable = {
   "butbicket.colorscheme",
   "butbicket.hl-groups",
-  "butbicket.integrations.arrow",
+  -- "butbicket.integrations.arrow",
   "butbicket.integrations.blink",
   "butbicket.integrations.bufferline",
   "butbicket.integrations.cmp",
