@@ -24,12 +24,7 @@ return {
   DiffAdd = { bg = colorscheme.added_dim },
   DiffChange = { bg = colorscheme.changed_dim },
   DiffDelete = { bg = colorscheme.removed_dim },
-  GitSignsAddPreview = { bg = colorscheme.added_dim },
-  GitSignsChangePreview = { bg = colorscheme.changed_dim },
-  GitSignsDeletePreview = { bg = colorscheme.removed_dim },
-  GitSignsAddInline = { fg = colorscheme.added_bright },
-  GitSignsChangeInline = { fg = colorscheme.changed_bright },
-  GitSignsDeleteInline = { fg = colorscheme.removed_bright },
+  -- GitSigns groups now live in integrations/gitsigns.lua (auto-gated).
   DiffText = { bg = diff_text },
   EndOfBuffer = { fg = colorscheme.syntaxKeyword },
   TermCursor = { link = "Cursor" },
@@ -191,31 +186,8 @@ return {
   DiagnosticLineHint = {
     bg = utils.shade(colorscheme.method, 0.1, colorscheme.editorBackground),
   },
-  TreesitterContextLineNumber = {
-    bg = colorscheme.base_2,
-    fg = colorscheme.separator,
-  },
-  TreesitterContextBottom = {
-    cterm = { underline = true },
-    sp = colorscheme.base_3,
-    underline = true,
-  },
-  TreesitterContextLineNumberBottom = { link = "TreesitterContextBottom" },
-  TreesitterContextSeparator = {
-    bg = colorscheme.base_2,
-    fg = colorscheme.base_3,
-  },
-  TreesitterContext = { bg = colorscheme.base_1 },
-  NeoTreeGitAdded = { fg = colorscheme.added_bright },
-  NeoTreeGitConflict = { fg = colorscheme.errorText },
-  NeoTreeGitDeleted = { fg = colorscheme.removed_bright },
-  NeoTreeGitIgnored = { fg = colorscheme.slate_gray },
-  NeoTreeGitModified = { fg = colorscheme.mustard }, -- unstaged
-  NeoTreeGitStaged = { fg = colorscheme.green },
-  NeoTreeGitRenamed = { fg = colorscheme.mustard },
-  NeoTreeGitUntracked = { fg = colorscheme.slate_gray },
-  LazyLocal = { fg = colorscheme.green },
-  LazySpecial = { fg = colorscheme.blue },
+  -- treesitter-context, neo-tree and lazy groups now live in their own
+  -- auto-gated integration modules.
   ["@text"] = { fg = colorscheme.mainText },
   ["@markup"] = { fg = colorscheme.mainText },
   ["@markup.raw"] = { link = "Property" },

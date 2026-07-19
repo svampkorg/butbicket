@@ -5,20 +5,17 @@ local theme = {}
 -- must be re-evaluated on every `colorscheme()` call (e.g. dark <-> light
 -- toggle in the same session). `config` is intentionally excluded: it holds
 -- user setup state via its metatable and must survive reloads.
-local reloadable = {
-  "butbicket.colorscheme",
-  "butbicket.hl-groups",
-  -- "butbicket.integrations.arrow",
-  "butbicket.integrations.blink",
-  "butbicket.integrations.bufferline",
-  "butbicket.integrations.cmp",
-  "butbicket.integrations.flash",
-  "butbicket.integrations.haunt",
-  "butbicket.integrations.neogit",
-  "butbicket.integrations.snacks_indent",
-}
-
+--
+-- The integration module list is derived from the registry so it can never
+-- drift out of sync with the integrations that are actually applied.
 local function reload()
+  local integrations = require("butbicket.integrations")
+  local reloadable = {
+    "butbicket.colorscheme",
+    "butbicket.hl-groups",
+    "butbicket.integrations",
+  }
+  vim.list_extend(reloadable, integrations.modules())
   for _, module in ipairs(reloadable) do
     package.loaded[module] = nil
   end
@@ -49,22 +46,12 @@ end
 local function set_groups()
   local groups = require("butbicket.hl-groups")
 
-  -- integrations
-  for _, name in ipairs({
-    "cmp",
-    "neogit",
-    "haunt",
-    "blink",
-    "snacks_indent",
-    "flash",
-    "arrow",
-  }) do
-    groups = vim.tbl_extend(
-      "force",
-      groups,
-      require("butbicket.integrations." .. name).highlights()
-    )
-  end
+  -- integrations (enabled + installed only; see the registry)
+  groups = vim.tbl_extend(
+    "force",
+    groups,
+    require("butbicket.integrations").highlights(config)
+  )
 
   -- overrides
   groups = vim.tbl_extend(
