@@ -4,7 +4,7 @@
 -- Exits non-zero on any failure so CI can gate on it.
 
 package.path = "./lua/?.lua;./lua/?/init.lua;" .. package.path
-local contrast = dofile("tests/contrast.lua")
+local contrast = require("butbicket.contrast")
 
 local failures = {}
 local function check(ok, msg)
@@ -243,6 +243,45 @@ do
   check(
     next(I.highlights({ integrations = { default = true } })) == nil,
     "no installed plugins emits no groups"
+  )
+end
+
+-- Flavour playground: pure helpers (no UI). Requiring the module must not open
+-- any window, and serialize() must emit a paste-ready, loadable flavour block.
+print("\n== playground ==")
+do
+  local wins_before = #vim.api.nvim_list_wins()
+  local pg = require("butbicket.playground")
+  check(
+    #vim.api.nvim_list_wins() == wins_before,
+    "require('butbicket.playground') opens no window"
+  )
+  check(
+    type(pg.open) == "function" and type(pg.serialize) == "function",
+    "playground exposes open() + serialize()"
+  )
+
+  local opts = {
+    background = "#101214",
+    foreground = "#e7e7e8",
+    hue_shift = 30,
+    chroma_mult = 1, -- neutral: must be omitted from output
+    n_hues = 0, -- present (0 = grayscale) must survive
+    base_hue = 0, -- neutral: omitted
+    accents = { keyword = "#c678dd", func = 140 },
+  }
+  local body = pg.serialize(opts)
+  local loader = load("return " .. body)
+  check(loader ~= nil, "serialize() output is loadable Lua")
+  local t = loader and loader()
+  check(t and t.background == "#101214", "serialize round-trips background")
+  check(t and t.hue_shift == 30, "serialize round-trips hue_shift")
+  check(t and t.chroma_mult == nil, "serialize omits neutral chroma_mult")
+  check(t and t.n_hues == 0, "serialize keeps n_hues = 0 (grayscale)")
+  check(t and t.base_hue == nil, "serialize omits neutral base_hue")
+  check(
+    t and t.accents and t.accents.keyword == "#c678dd" and t.accents.func == 140,
+    "serialize round-trips accents (hex + degrees)"
   )
 end
 

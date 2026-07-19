@@ -1,5 +1,6 @@
 -- WCAG 2.x relative-luminance contrast helpers.
--- Pure Lua, no Neovim API — usable from tests and from palette tooling.
+-- Pure Lua, no Neovim API — usable from tests, palette tooling, and the
+-- flavour playground's live AA readout.
 local M = {}
 
 local function hex_to_rgb(hex)

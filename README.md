@@ -194,6 +194,29 @@ changing anything:
 nvim -l scripts/gen-flavour.lua
 ```
 
+### Flavour playground
+
+`:ButbicketFlavour` opens a live editor: a control panel with every flavour knob
+(background/foreground, `hue_shift`, `chroma_mult`, `n_hues`, `base_hue`, and the
+per-role accents) beside a sample buffer that recolors instantly as you tune. Each
+accent row shows its WCAG contrast against the background, flagged `⚠` below AA.
+
+| key       | action                                            |
+| --------- | ------------------------------------------------- |
+| `j` / `k` | move between knobs                                |
+| `-` / `+` | nudge the focused knob (hex knobs nudge lightness) |
+| `e`       | type a value (hex, degrees, or `auto` to clear)   |
+| `a`       | accept — copy a paste-ready `flavour = { … }` and keep it applied |
+| `q`       | cancel — restore the previous look                |
+
+Accept copies the block to the `+` register; paste it into your `setup{}` to make
+it permanent. There is no default keymap — bind `<Plug>(butbicket-flavour)` if you
+want one:
+
+```lua
+vim.keymap.set("n", "<leader>bf", "<Plug>(butbicket-flavour)")
+```
+
 ## Terminal colors
 
 The scheme exports a 16-color palette to `vim.g.terminal_color_*`. Matching

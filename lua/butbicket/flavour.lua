@@ -25,7 +25,7 @@ end
 -- keys each role owns. Semantic-meaning colors (errorText/warningText/
 -- successText and the diff added/removed/changed families) are intentionally
 -- absent: they stay locked to their hue so "error is red" survives any flavour.
-local ROLE_KEYS = {
+M.ROLE_KEYS = {
   keyword = { "keyword", "syntaxKeyword" },
   func = { "method", "syntaxFunction" },
   special = { "specialKeyword", "purple", "dark_purple" },
@@ -35,6 +35,7 @@ local ROLE_KEYS = {
   link = { "linkText", "blue" },
   accent = { "hotpink" },
 }
+local ROLE_KEYS = M.ROLE_KEYS
 
 local function circ_dist(a, b)
   local d = math.abs((a - b) % 360)
