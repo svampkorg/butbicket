@@ -212,6 +212,50 @@ do
     "n_hues leaves semantic successText locked"
   )
   check(hued.editorBackground ~= nil, "generate_hues keeps a complete palette")
+
+  -- Regression: the `number` role must move `syntaxNumber` too — the Number /
+  -- Float / @number highlight groups read that alias, not `number`. Pinning the
+  -- role and leaving syntaxNumber behind is an invisible-no-op bug.
+  local pinned_num = flavour.generate_hues(canonical, {
+    background = "#101214",
+    foreground = "#e7e7e8",
+    accents = { number = "#00ff00" },
+  })
+  check(
+    pinned_num.syntaxNumber == pinned_num.number
+      and pinned_num.syntaxNumber ~= canonical.syntaxNumber,
+    "number role re-hues syntaxNumber (the key Number group uses)"
+  )
+
+  -- General anti-trap guard: for each accent role, the palette key(s) that its
+  -- *headline* highlight groups actually read (from hl-groups.lua) must land on
+  -- the pinned hue. A role whose ROLE_KEYS omits one of these keys re-tones a
+  -- color nothing paints with — an invisible no-op (the `number`/`syntaxNumber`
+  -- bug). If a group starts reading a new alias, add its key here.
+  local role_group_keys = {
+    keyword = { "keyword", "syntaxKeyword" }, -- Statement, Boolean, Define
+    func = { "syntaxFunction" }, -- Function, Method
+    type = { "type" }, -- Type
+    number = { "syntaxNumber" }, -- Number, Float, @number
+    string = { "stringText" }, -- String, Character
+    link = { "blue" }, -- Tag
+    special = { "specialKeyword" }, -- Debug, @debug
+    accent = { "hotpink" }, -- MatchParen
+  }
+  for role, keys in pairs(role_group_keys) do
+    local out = flavour.generate_hues(canonical, {
+      background = "#101214",
+      foreground = "#e7e7e8",
+      accents = { [role] = 200 }, -- pin to a fixed hue
+    })
+    for _, key in ipairs(keys) do
+      local h = oklab.hex_to_oklch(out[key]).h or -1
+      check(
+        circ(h, 200) < 10,
+        string.format("role %-8s drives %-14s (hue %.0f -> 200)", role, key, h)
+      )
+    end
+  end
 end
 
 -- Integration registry: every module loads and returns a highlight table, and
