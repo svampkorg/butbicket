@@ -91,14 +91,27 @@ require('butbicket').setup {
 
 ## Integrations
 
-Highlight support ships for: nvim-cmp, blink.cmp, neogit, flash.nvim,
-bufferline, snacks indent, haunt, render-markdown, and lualine.
+Dedicated highlight support ships for: nvim-cmp, blink.cmp, neogit, flash.nvim,
+arrow.nvim, snacks indent, and haunt. Git (gitsigns/neo-tree), treesitter-context
+and lazy.nvim groups are set as part of the core scheme.
 
-For lualine:
+**lualine** — a theme is provided (`lua/lualine/themes/butbicket.lua`):
 
 ```lua
 require('lualine').setup { options = { theme = 'butbicket' } }
 ```
+
+**bufferline** — after `setup {}`, apply the generated highlights:
+
+```lua
+require('butbicket').setup {}
+require('bufferline').setup {
+  highlights = require('butbicket').bufferline.highlights,
+}
+```
+
+> A config-driven integration system (auto-detecting installed plugins, with a
+> much wider plugin set) is in progress on the `rework-color-grading` branch.
 
 ## Terminal colors
 
@@ -142,17 +155,22 @@ theme (diffs, borders, status, accent). Copy to `~/.claude/themes/`, then set
 **Code syntax highlighting.** Claude Code highlights code with an internal
 engine (highlight.js), *not* bat — it only accepts a small set of built-in
 theme names via `CLAUDE_CODE_SYNTAX_HIGHLIGHT` (`Monokai Extended`, `GitHub`,
-`ansi`), and does **not** load custom `.tmTheme` files. To get butbicket colors,
-use the terminal's 16-color palette:
+`ansi`), and does **not** load custom `.tmTheme` files.
 
 ```jsonc
-// ~/.claude/settings.json
-"env": { "CLAUDE_CODE_SYNTAX_HIGHLIGHT": "ansi" }
+// ~/.claude/settings.json  (restart Claude Code after changing)
+"env": { "CLAUDE_CODE_SYNTAX_HIGHLIGHT": "Monokai Extended" }
 ```
 
-With `ansi`, code is coloured from ANSI slots 0–15 — so if your terminal runs a
-butbicket theme (see `extras/ghostty/` etc.), Claude Code's code inherits the
-butbicket palette. Restart Claude Code after changing the env.
+- `ansi` colours code from the terminal's ANSI slots 0–15 — on-palette if your
+  terminal runs a butbicket theme, but **coarse**: highlight.js collapses
+  keyword/comment/number onto a single ANSI slot, and comments can't be dimmed.
+- `Monokai Extended` gives proper token separation (dim comments, distinct
+  keyword/string/number) at the cost of not being the butbicket palette.
+
+There's no way to get the full butbicket treesitter palette into Claude Code's
+code blocks — pick on-palette-but-coarse (`ansi`) or readable-but-off-palette
+(`Monokai Extended`).
 
 **`extras/bat/butbicket-*.tmTheme`** is a genuine bat/Sublime theme for actual
 `bat` usage in the terminal (`bat --theme=butbicket-dark`); install with
