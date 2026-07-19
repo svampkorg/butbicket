@@ -215,4 +215,17 @@ else
   colorscheme.terminalGray = colorscheme.base
 end
 colorscheme.floatBorder = colorscheme.dark_slate
+
+-- Opt-in flavour: re-tone the whole palette onto a new base while keeping
+-- butbicket's hue relationships (see butbicket.flavour). Applied last so it
+-- transforms the fully-resolved palette, then transparency is re-honoured.
+if type(config.flavour) == "table" then
+  local flavoured =
+    require("butbicket.flavour").generate(colorscheme, config.flavour)
+  if config.transparent then
+    flavoured.editorBackground = "none"
+  end
+  return flavoured
+end
+
 return colorscheme

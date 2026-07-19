@@ -111,6 +111,76 @@ for _, bg in ipairs({ "dark", "light" }) do
   end
 end
 
+-- OKLab math: hex -> OKLch -> hex must round-trip within 1/255 per channel.
+-- Guards the conversion module the palette tooling (flavour, light preview)
+-- depends on.
+print("\n== oklab round-trip ==")
+do
+  local oklab = require("butbicket.oklab")
+  local function channels(hex)
+    return tonumber(hex:sub(2, 3), 16),
+      tonumber(hex:sub(4, 5), 16),
+      tonumber(hex:sub(6, 7), 16)
+  end
+  local samples = {
+    "#ffffff",
+    "#000000",
+    "#101214",
+    "#fd9891",
+    "#7ee2b8",
+    "#8fb8f6",
+    "#fbc828",
+    "#669cf0",
+    "#e78178",
+    "#bf63f3",
+    "#73a130",
+    "#ba9420",
+  }
+  for _, hex in ipairs(samples) do
+    local rt = oklab.oklch_to_hex(oklab.hex_to_oklch(hex))
+    local r1, g1, b1 = channels(hex)
+    local r2, g2, b2 = channels(rt)
+    local d = math.max(math.abs(r1 - r2), math.abs(g1 - g2), math.abs(b1 - b2))
+    check(d <= 1, string.format("round-trip %s -> %s (Δ%d)", hex, rt, d))
+  end
+end
+
+-- Flavour generator: a re-toned palette preserves every semantic key and its
+-- syntax foregrounds still clear their floor on the new background.
+print("\n== flavour generator ==")
+do
+  vim.o.background = "dark"
+  package.loaded["butbicket.colorscheme"] = nil
+  local canonical = require("butbicket.colorscheme")
+  local flavour = require("butbicket.flavour")
+
+  local p = flavour.generate(canonical, {
+    background = "#0d1b2a",
+    foreground = "#e2e8f4",
+    hue_shift = -8,
+  })
+
+  for _, key in ipairs(required_keys) do
+    check(p[key] ~= nil, "flavour keeps palette." .. key)
+  end
+
+  local bg = p.editorBackground
+  for _, pair in ipairs(contrast_pairs(p)) do
+    if pair.fg then
+      local r = contrast.ratio(pair.fg, bg)
+      check(
+        r >= pair.floor,
+        string.format(
+          "flavour %-14s %.2f (floor %.1f)",
+          pair.name,
+          r,
+          pair.floor
+        )
+      )
+    end
+  end
+end
+
 print("")
 if #failures > 0 then
   print(("%d check(s) failed"):format(#failures))

@@ -22,6 +22,7 @@
 ---@field transparent boolean
 ---@field italics butbicket.Italics
 ---@field integrations butbicket.Integrations
+---@field flavour false|butbicket.FlavourOpts re-tone the palette onto a new base
 ---@field overrides table|fun():table
 
 local config = {
@@ -43,6 +44,7 @@ local config = {
     integrations = {
       default = true,
     },
+    flavour = false,
     overrides = {},
   },
 }
