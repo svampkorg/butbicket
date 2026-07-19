@@ -283,6 +283,31 @@ do
     t and t.accents and t.accents.keyword == "#c678dd" and t.accents.func == 140,
     "serialize round-trips accents (hex + degrees)"
   )
+
+  -- The panel's swatch + contrast readout indexes flavour.ROLE_KEYS[role][1]
+  -- for every accent role; a missing entry would break the render silently.
+  local flavour = require("butbicket.flavour")
+  local roles = {
+    "keyword",
+    "func",
+    "special",
+    "type",
+    "number",
+    "string",
+    "link",
+    "accent",
+  }
+  local ok_roles = true
+  for _, role in ipairs(roles) do
+    local keys = flavour.ROLE_KEYS[role]
+    if type(keys) ~= "table" or type(keys[1]) ~= "string" then
+      ok_roles = false
+    end
+  end
+  check(
+    ok_roles,
+    "flavour.ROLE_KEYS covers every accent role the panel renders"
+  )
 end
 
 print("")

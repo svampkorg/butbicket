@@ -198,16 +198,26 @@ nvim -l scripts/gen-flavour.lua
 
 `:ButbicketFlavour` opens a live editor: a control panel with every flavour knob
 (background/foreground, `hue_shift`, `chroma_mult`, `n_hues`, `base_hue`, and the
-per-role accents) beside a sample buffer that recolors instantly as you tune. Each
-accent row shows its WCAG contrast against the background, flagged `⚠` below AA.
+per-role accents) beside a sample buffer that recolors instantly as you tune. Every
+color knob shows a live swatch, and each accent shows its WCAG contrast against the
+background, flagged `⚠` below AA. If a flavour is already set (in `setup{}` or from
+a previous accept), the playground opens with those values instead of from scratch.
 
-| key       | action                                            |
-| --------- | ------------------------------------------------- |
-| `j` / `k` | move between knobs                                |
-| `-` / `+` | nudge the focused knob (hex knobs nudge lightness) |
-| `e`       | type a value (hex, degrees, or `auto` to clear)   |
+| key       | action                                                |
+| --------- | ----------------------------------------------------- |
+| `j` / `k` | move between knobs                                     |
+| `-` / `+` | nudge the focused knob (hex knobs nudge lightness)     |
+| `e`       | type a value (hex, degrees, or `auto` to clear)        |
+| `c`       | open the OKLch color editor for a color knob           |
 | `a`       | accept — copy a paste-ready `flavour = { … }` and keep it applied |
-| `q`       | cancel — restore the previous look                |
+| `q`       | cancel — restore the previous look                     |
+
+The color editor (`c`, for background/foreground/accents) has an editable hex
+field with L/C/H channel rows you nudge with `-`/`+`. The hex is plain buffer
+text, so an external color picker — e.g. [ccc.nvim](https://github.com/uga-rosa/ccc.nvim)
+(`:CccPick`) or [oklch-color-picker](https://github.com/eero-lehtinen/oklch-color-picker.nvim)
+(`pick_under_cursor()`) — run with the cursor on it updates the color just like
+any buffer edit.
 
 Accept copies the block to the `+` register; paste it into your `setup{}` to make
 it permanent. There is no default keymap — bind `<Plug>(butbicket-flavour)` if you
