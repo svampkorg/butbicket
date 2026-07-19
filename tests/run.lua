@@ -179,6 +179,39 @@ do
       )
     end
   end
+
+  -- n_hues + accents: accents pin a role, semantic-meaning colors stay locked.
+  local oklab = require("butbicket.oklab")
+  local plain = flavour.generate(canonical, {
+    background = "#101214",
+    foreground = "#e7e7e8",
+  })
+  local hued = flavour.generate_hues(canonical, {
+    background = "#101214",
+    foreground = "#e7e7e8",
+    n_hues = 3,
+    accents = { keyword = "#c678dd" },
+  })
+  local function hue(hex)
+    return oklab.hex_to_oklch(hex).h or 0
+  end
+  local function circ(a, b)
+    local d = math.abs((a - b) % 360)
+    return math.min(d, 360 - d)
+  end
+  check(
+    circ(hue(hued.syntaxKeyword), hue("#c678dd")) < 3,
+    "accents pin keyword hue to the requested color"
+  )
+  check(
+    hued.errorText == plain.errorText,
+    "n_hues leaves semantic errorText locked"
+  )
+  check(
+    hued.successText == plain.successText,
+    "n_hues leaves semantic successText locked"
+  )
+  check(hued.editorBackground ~= nil, "generate_hues keeps a complete palette")
 end
 
 -- Integration registry: every module loads and returns a highlight table, and

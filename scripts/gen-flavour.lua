@@ -27,6 +27,25 @@ local flavours = {
     hue_shift = 12,
     chroma_mult = 0.9,
   },
+  {
+    name = "n_hues = 3 (triadic)",
+    background = "#101214",
+    foreground = "#e7e7e8",
+    n_hues = 3,
+    base_hue = 20,
+  },
+  {
+    name = "n_hues = 0 (grayscale accents)",
+    background = "#101214",
+    foreground = "#e7e7e8",
+    n_hues = 0,
+  },
+  {
+    name = "accents pinned (keyword=purple, string=green)",
+    background = "#101214",
+    foreground = "#e7e7e8",
+    accents = { keyword = "#c678dd", string = 145, func = 250 },
+  },
 }
 
 local syntax = {
@@ -42,7 +61,7 @@ local syntax = {
 }
 
 for _, f in ipairs(flavours) do
-  local p = flavour.generate(canonical, f)
+  local p = flavour.generate_hues(canonical, f)
   print(
     string.format(
       "\n== %s  bg=%s fg=%s ==",

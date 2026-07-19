@@ -221,7 +221,7 @@ colorscheme.floatBorder = colorscheme.dark_slate
 -- transforms the fully-resolved palette, then transparency is re-honoured.
 if type(config.flavour) == "table" then
   local flavoured =
-    require("butbicket.flavour").generate(colorscheme, config.flavour)
+    require("butbicket.flavour").generate_hues(colorscheme, config.flavour)
   if config.transparent then
     flavoured.editorBackground = "none"
   end

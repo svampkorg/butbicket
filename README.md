@@ -154,7 +154,41 @@ require('butbicket').setup {
 }
 ```
 
-Preview generated flavours without changing anything:
+### Accent hues
+
+Beyond re-basing, you can reshape the accent hues (mini.hues style). This only
+touches syntax-identity roles — diagnostic/diff colors stay red/green/blue.
+
+`n_hues` snaps every accent role to the nearest of N hues spread evenly around
+the wheel (`0` = grayscale accents), and `base_hue` rotates where they start:
+
+```lua
+flavour = {
+  background = '#101214',
+  foreground = '#e7e7e8',
+  n_hues = 3,      -- triadic; 0 = monochrome accents
+  base_hue = 20,   -- optional: degrees the hue slots start at
+}
+```
+
+`accents` pins individual roles to an exact hue — a hex string or hue in degrees
+— and any role you don't list is generated as normal. Roles: `keyword`, `func`,
+`special`, `type`, `number`, `string`, `link`, `accent`.
+
+```lua
+flavour = {
+  background = '#101214',
+  foreground = '#e7e7e8',
+  accents = {
+    keyword = '#c678dd', -- pin to a color's hue
+    string  = 145,       -- or a hue angle in degrees
+    func    = 250,
+  },
+}
+```
+
+Preview generated flavours (including the `n_hues`/`accents` samples) without
+changing anything:
 
 ```sh
 nvim -l scripts/gen-flavour.lua
