@@ -181,6 +181,38 @@ do
   end
 end
 
+-- Integration registry: every module loads and returns a highlight table, and
+-- the enable/detect gating behaves.
+print("\n== integrations ==")
+do
+  vim.o.background = "dark"
+  package.loaded["butbicket.colorscheme"] = nil
+  package.loaded["butbicket.integrations"] = nil
+  local I = require("butbicket.integrations")
+  local cfg = { transparent = false, italics = { bufferline = false } }
+
+  for _, spec in ipairs(I.registry) do
+    local ok, hl = pcall(function()
+      local mod = require("butbicket.integrations." .. spec.module)
+      return spec.wants_config and mod.highlights(cfg) or mod.highlights()
+    end)
+    check(
+      ok and type(hl) == "table",
+      "integration " .. spec.name .. " highlights() returns a table"
+    )
+  end
+
+  -- Gating: nothing is emitted when no plugin is installed / all disabled.
+  check(
+    next(I.highlights({ integrations = { default = false } })) == nil,
+    "default=false emits no groups"
+  )
+  check(
+    next(I.highlights({ integrations = { default = true } })) == nil,
+    "no installed plugins emits no groups"
+  )
+end
+
 print("")
 if #failures > 0 then
   print(("%d check(s) failed"):format(#failures))

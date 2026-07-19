@@ -74,6 +74,8 @@ require('butbicket').setup {
     statements = true,
     bufferline = false,
   },
+  integrations = { default = true }, -- see Integrations
+  flavour = false, -- see Flavours
   overrides = {}, -- table, or a function returning a table, of highlight groups
 }
 ```
@@ -91,9 +93,33 @@ require('butbicket').setup {
 
 ## Integrations
 
-Dedicated highlight support ships for: nvim-cmp, blink.cmp, neogit, flash.nvim,
-arrow.nvim, snacks indent, and haunt. Git (gitsigns/neo-tree), treesitter-context
-and lazy.nvim groups are set as part of the core scheme.
+Integrations are **auto-detected**: a plugin's highlights are only applied when
+that plugin is actually installed, so leaving them all on is safe and keeps
+`:hi` uncluttered. Each is also toggleable via `config.integrations`.
+
+Dedicated support ships for: nvim-cmp, blink.cmp, neogit, flash.nvim,
+arrow.nvim, snacks (indent, picker, dashboard), haunt, telescope, nvim-tree,
+neo-tree, diffview, which-key, todo-comments, gitsigns, treesitter-context,
+lazy.nvim, nvim-dap (+ dap-view, dap-virtual-text), grug-far, codecompanion,
+vim-fugitive, vim-matchup, mini.\* (files, pick, indentscope, hipatterns, icons,
+notify, statusline, cursorword, tabline, …), render-markdown, and bufferline.
+
+`integrations.default` sets the fallback for every integration; individual names
+override it:
+
+```lua
+require('butbicket').setup {
+  integrations = {
+    default = true,     -- apply any installed integration (the default)
+    telescope = false,  -- …except opt out of specific ones
+  },
+}
+
+-- Or opt in to only a chosen few:
+require('butbicket').setup {
+  integrations = { default = false, gitsigns = true, cmp = true },
+}
+```
 
 **lualine** — a theme is provided (`lua/lualine/themes/butbicket.lua`):
 
@@ -110,8 +136,29 @@ require('bufferline').setup {
 }
 ```
 
-> A config-driven integration system (auto-detecting installed plugins, with a
-> much wider plugin set) is in progress on the `rework-color-grading` branch.
+## Flavours
+
+A **flavour** re-tones the whole palette onto a new background/foreground while
+keeping ButBicket's structure and hue relationships (functions, keywords, etc.
+stay recognisably themselves). It is opt-in and off by default. Colors are
+remapped perceptually in OKLab, so contrast stays sensible.
+
+```lua
+require('butbicket').setup {
+  flavour = {
+    background = '#0d1b2a', -- new base background
+    foreground = '#e2e8f4', -- new base foreground
+    hue_shift = -8,         -- optional: rotate every hue (degrees)
+    chroma_mult = 1.0,      -- optional: scale saturation
+  },
+}
+```
+
+Preview generated flavours without changing anything:
+
+```sh
+nvim -l scripts/gen-flavour.lua
+```
 
 ## Terminal colors
 
