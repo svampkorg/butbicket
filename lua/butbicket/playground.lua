@@ -26,9 +26,9 @@ local AA = 4.5 -- WCAG AA floor for normal text
 local NS = vim.api.nvim_create_namespace("butbicket_flavour_playground")
 local SWATCH = "██" -- two full blocks; U+2588 is 3 bytes each
 
--- Stable accent-role order (matches flavour.ROLE_KEYS); also drives serialize.
-local ACCENT_ROLES =
-  { "keyword", "func", "special", "type", "number", "string", "link", "accent" }
+-- Accent-role order comes straight from flavour, so the knob list and serialize
+-- output can never drift from the roles the generator actually supports.
+local ACCENT_ROLES = flavour.ROLE_ORDER
 
 -- Knob table. `neutral` is the value assumed when a numeric knob is unset and
 -- the user starts nudging it. Accent knobs read/write `opts.accents[name]`.

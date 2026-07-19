@@ -171,18 +171,26 @@ flavour = {
 }
 ```
 
-`accents` pins individual roles to an exact hue — a hex string or hue in degrees
-— and any role you don't list is generated as normal. Roles: `keyword`, `func`,
-`special`, `type`, `number`, `string`, `link`, `accent`.
+`accents` pins individual roles, and any role you don't list is generated as
+normal. A pin is either:
+
+- a **hex string** — the role takes that exact color (lightness, chroma, and
+  hue), so a color you picked lands verbatim; or
+- a **number** — a hue angle in degrees; only the hue moves, each role keeps its
+  own lightness/chroma (grading preserved).
+
+Roles: `keyword`, `func`, `special`, `type`, `number`, `string`, `link`,
+`accent`, `comment`, `variable`, `operator`. (Diagnostic/diff colors are never
+re-hued.)
 
 ```lua
 flavour = {
   background = '#101214',
   foreground = '#e7e7e8',
   accents = {
-    keyword = '#c678dd', -- pin to a color's hue
-    string  = 145,       -- or a hue angle in degrees
-    func    = 250,
+    keyword = '#c678dd', -- exact color
+    string  = 145,       -- hue angle only (keeps string's lightness/chroma)
+    comment = 210,
   },
 }
 ```

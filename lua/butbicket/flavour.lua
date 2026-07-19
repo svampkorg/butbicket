@@ -34,8 +34,31 @@ M.ROLE_KEYS = {
   string = { "stringText" },
   link = { "linkText", "blue" },
   accent = { "hotpink" },
+  comment = { "commentText" },
+  -- variable family, minus text_dark (that is body text / mainText — re-hueing
+  -- it would tint all normal text, not just variables).
+  variable = { "variable", "variable_member", "parameter" },
+  -- true operators only; brackets/punctuation are a separate color (light_red).
+  operator = { "syntaxOperator" },
 }
 local ROLE_KEYS = M.ROLE_KEYS
+
+-- Display / serialize order for the roles (a map has none). The playground reads
+-- this so its knob list can never drift from ROLE_KEYS; a test asserts the two
+-- stay in sync.
+M.ROLE_ORDER = {
+  "keyword",
+  "func",
+  "special",
+  "type",
+  "number",
+  "string",
+  "link",
+  "accent",
+  "comment",
+  "variable",
+  "operator",
+}
 
 local function circ_dist(a, b)
   local d = math.abs((a - b) % 360)
@@ -71,8 +94,9 @@ end
 ---@field chroma_mult? number multiply every chroma (default 1)
 ---@field n_hues? number snap accent roles to N evenly-spaced hues (0 = grayscale)
 ---@field base_hue? number degrees: where the hue slots start (default 0)
----@field accents? table<string, string|number> pin a role to a hex or hue-degrees;
----       roles: keyword, func, special, type, number, string, link, accent
+---@field accents? table<string, string|number> pin a role to a hex (exact color)
+---       or a number (hue degrees, hue-only). Roles: keyword, func, special,
+---       type, number, string, link, accent, comment, variable, operator
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
 
@@ -135,9 +159,12 @@ end
 ---Generate a flavour and, on top of the re-tone, re-hue the accent roles:
 --- - `n_hues`: snap every accent role's hue to the nearest of N evenly-spaced
 ---   slots around the wheel (mini.hues style). 0 desaturates accents to gray.
---- - `accents`: pin named roles to an exact hue (hex or degrees); pinned roles
----   ignore the slot snapping. Roles not present are generated as normal.
----Each key keeps its own lightness + chroma (grading is preserved); only hue
+--- - `accents`: pin named roles; pinned roles ignore the slot snapping. A pin
+---   given as **degrees** (number) rotates hue only, keeping each key's own
+---   lightness + chroma (grading preserved). A pin given as a **hex** sets that
+---   role's keys to the exact color — so a color chosen in the playground lands
+---   verbatim (its lightness/chroma matter, not just its hue).
+---Except for exact-hex pins, each key keeps its own lightness + chroma; only hue
 ---moves. Semantic-meaning colors (error/warning/success, diff) are never touched.
 ---@param palette table<string, any>
 ---@param opts butbicket.FlavourOpts
@@ -166,19 +193,25 @@ function M.generate_hues(palette, opts)
 
   for role, keys in pairs(ROLE_KEYS) do
     local pinned = accents and accents[role]
+    -- A hex pin is an exact color; a number pin (or n_hues) only moves hue.
+    local exact = type(pinned) == "string" and pinned:match(HEX) and pinned
     for _, key in ipairs(keys) do
       local hex = base[key]
       if type(hex) == "string" and hex:match(HEX) then
-        local lch = oklab.hex_to_oklch(hex)
-        local hue, chroma = lch.h, lch.c
-        if pinned ~= nil then
-          hue = resolve_hue(pinned)
-        elseif n == 0 then
-          chroma = 0
-        elseif slots and lch.h then
-          hue = nearest_slot(lch.h, slots)
+        if exact then
+          out[key] = exact
+        else
+          local lch = oklab.hex_to_oklch(hex)
+          local hue, chroma = lch.h, lch.c
+          if pinned ~= nil then
+            hue = resolve_hue(pinned) -- degrees: rotate hue only
+          elseif n == 0 then
+            chroma = 0
+          elseif slots and lch.h then
+            hue = nearest_slot(lch.h, slots)
+          end
+          out[key] = oklab.oklch_to_hex({ l = lch.l, c = chroma, h = hue })
         end
-        out[key] = oklab.oklch_to_hex({ l = lch.l, c = chroma, h = hue })
       end
     end
   end

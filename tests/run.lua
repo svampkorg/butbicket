@@ -203,6 +203,17 @@ do
     circ(hue(hued.syntaxKeyword), hue("#c678dd")) < 3,
     "accents pin keyword hue to the requested color"
   )
+  -- A hex pin is an exact color (L/C/H), so a color chosen in the playground
+  -- lands verbatim — the swatch matches the value. A degrees pin moves hue only.
+  local exact = flavour.generate_hues(canonical, {
+    background = "#101214",
+    foreground = "#e7e7e8",
+    accents = { string = "#d3b778" },
+  })
+  check(
+    exact.stringText == "#d3b778",
+    "hex-pinned accent lands verbatim (exact color, not hue-only)"
+  )
   check(
     hued.errorText == plain.errorText,
     "n_hues leaves semantic errorText locked"
@@ -227,11 +238,12 @@ do
     "number role re-hues syntaxNumber (the key Number group uses)"
   )
 
-  -- General anti-trap guard: for each accent role, the palette key(s) that its
-  -- *headline* highlight groups actually read (from hl-groups.lua) must land on
-  -- the pinned hue. A role whose ROLE_KEYS omits one of these keys re-tones a
-  -- color nothing paints with — an invisible no-op (the `number`/`syntaxNumber`
-  -- bug). If a group starts reading a new alias, add its key here.
+  -- General anti-trap guard, independent of ROLE_KEYS: this maps each role to
+  -- the palette key(s) its *headline* highlight groups actually read (audited
+  -- from hl-groups.lua). Pinning a role to an exact hex must set every one of
+  -- those keys to that hex; if ROLE_KEYS omits one, the group it feeds never
+  -- changes (the `number`/`syntaxNumber` bug). When a group starts reading a new
+  -- key, add it here — the mismatch then fails loudly instead of shipping.
   local role_group_keys = {
     keyword = { "keyword", "syntaxKeyword" }, -- Statement, Boolean, Define
     func = { "syntaxFunction" }, -- Function, Method
@@ -241,21 +253,33 @@ do
     link = { "blue" }, -- Tag
     special = { "specialKeyword" }, -- Debug, @debug
     accent = { "hotpink" }, -- MatchParen
+    comment = { "commentText" }, -- Comment, SpecialComment, @comment
+    variable = { "variable", "variable_member", "parameter" }, -- @variable(.member), Parameter
+    operator = { "syntaxOperator" }, -- Operator, Delimiter, Special
   }
+  local PIN = "#3366cc"
   for role, keys in pairs(role_group_keys) do
     local out = flavour.generate_hues(canonical, {
       background = "#101214",
       foreground = "#e7e7e8",
-      accents = { [role] = 200 }, -- pin to a fixed hue
+      accents = { [role] = PIN }, -- exact-hex pin: deterministic, no hue drift
     })
     for _, key in ipairs(keys) do
-      local h = oklab.hex_to_oklch(out[key]).h or -1
-      check(
-        circ(h, 200) < 10,
-        string.format("role %-8s drives %-14s (hue %.0f -> 200)", role, key, h)
-      )
+      check(out[key] == PIN, string.format("role %-8s drives %s", role, key))
     end
   end
+
+  -- flavour.ROLE_ORDER (drives the playground's knob list) must match ROLE_KEYS
+  -- exactly, so the two can never drift.
+  local in_order = {}
+  for _, role in ipairs(flavour.ROLE_ORDER) do
+    in_order[role] = true
+  end
+  local order_ok = #flavour.ROLE_ORDER == vim.tbl_count(flavour.ROLE_KEYS)
+  for role in pairs(flavour.ROLE_KEYS) do
+    order_ok = order_ok and in_order[role]
+  end
+  check(order_ok, "flavour.ROLE_ORDER matches ROLE_KEYS exactly")
 end
 
 -- Integration registry: every module loads and returns a highlight table, and
@@ -328,21 +352,12 @@ do
     "serialize round-trips accents (hex + degrees)"
   )
 
-  -- The panel's swatch + contrast readout indexes flavour.ROLE_KEYS[role][1]
-  -- for every accent role; a missing entry would break the render silently.
+  -- The panel builds a knob per flavour.ROLE_ORDER entry and indexes
+  -- flavour.ROLE_KEYS[role][1] for its swatch + contrast; a missing entry would
+  -- break the render silently.
   local flavour = require("butbicket.flavour")
-  local roles = {
-    "keyword",
-    "func",
-    "special",
-    "type",
-    "number",
-    "string",
-    "link",
-    "accent",
-  }
   local ok_roles = true
-  for _, role in ipairs(roles) do
+  for _, role in ipairs(flavour.ROLE_ORDER) do
     local keys = flavour.ROLE_KEYS[role]
     if type(keys) ~= "table" or type(keys[1]) ~= "string" then
       ok_roles = false
@@ -350,7 +365,7 @@ do
   end
   check(
     ok_roles,
-    "flavour.ROLE_KEYS covers every accent role the panel renders"
+    "every flavour.ROLE_ORDER role has ROLE_KEYS the panel can render"
   )
 end
 
