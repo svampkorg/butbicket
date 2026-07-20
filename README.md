@@ -236,6 +236,8 @@ nvim -l scripts/gen-flavour.lua
 
 ### Flavour playground
 
+![preview](assets/playground.png)
+
 `:ButbicketFlavour` opens a live editor: a control panel with every flavour knob
 (background/foreground, `hue_shift`, `chroma_mult`, `n_hues`, `base_hue`, and the
 per-role accents, plus the `search`/`incsearch` background roles) beside a sample
