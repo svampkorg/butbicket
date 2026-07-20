@@ -6,16 +6,34 @@ local M = {}
 
 local HEX = "^#%x%x%x%x%x%x$"
 
--- Flash is search on steroids, so its colors track the accent: FlashMatch uses
--- `hotpink` (the accent.accent flavour role), and both the current-match fg and
--- the jump label are derived from that same hotpink here. `colorscheme` is the
--- graded palette at this point, so an accent.accent pin flows straight through.
+-- Flash is search on steroids, so its accent-carrying colors track the accent:
+-- FlashMatch uses `hotpink` (the accent.accent flavour role), and the
+-- current-match fg + jump label are derived from that same hotpink here.
+-- `colorscheme` is the graded palette at this point, so an accent.accent pin
+-- flows straight through. The current-match BACKGROUND is the exception — it is
+-- a neutral surface derived from editorBackground (see current_bg), so it stays
+-- a subtle "Enter jumps here" marker regardless of how the accent is tuned.
 
 local function bg_is_dark()
   local bg = colorscheme.editorBackground
   local l = (type(bg) == "string" and bg:match(HEX)) and oklab.lightness(bg)
     or 0
   return l < 50
+end
+
+-- A subtle raised surface for the current match (the one Enter jumps to).
+-- Derived from editorBackground, NOT the search color: a small lightness lift on
+-- a dark bg / dip on a light one marks the spot without needing readable text
+-- (Enter jumps regardless). Returns nil when the background is transparent, so
+-- FlashCurrent simply omits a bg then.
+local function current_bg(dark)
+  local bg = colorscheme.editorBackground
+  if type(bg) ~= "string" or not bg:match(HEX) then
+    return nil
+  end
+  local lch = oklab.hex_to_oklch(bg)
+  local l = math.min(math.max(lch.l + (dark and 12 or -10), 0), 100)
+  return oklab.oklch_to_hex({ l = l, c = lch.c, h = lch.h })
 end
 
 -- A bright, vivid foreground in the accent hue for the current match. Chroma
@@ -53,7 +71,7 @@ function M.highlights()
     -- accent so flash still renders something sane.
     return {
       FlashMatch = { fg = hp },
-      FlashCurrent = { fg = hp, bg = colorscheme.searchBase },
+      FlashCurrent = { fg = hp, bg = current_bg(bg_is_dark()) },
       FlashLabel = { fg = hp, bold = true },
     }
   end
@@ -65,7 +83,7 @@ function M.highlights()
     FlashMatch = { fg = hp },
     FlashCurrent = {
       fg = match_fg(lch, dark),
-      bg = colorscheme.searchBase,
+      bg = current_bg(dark),
     },
     FlashLabel = { fg = letter, bg = chip, bold = true },
   }
