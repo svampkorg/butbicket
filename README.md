@@ -214,18 +214,25 @@ a previous accept), the playground opens with those values instead of from scrat
 | key       | action                                                |
 | --------- | ----------------------------------------------------- |
 | `j` / `k` | move between knobs                                     |
-| `-` / `+` | nudge the focused knob (hex knobs nudge lightness)     |
+| `h` / `l` | nudge the focused knob (hex knobs nudge lightness)     |
 | `e`       | type a value (hex, degrees, or `auto` to clear)        |
 | `c`       | open the OKLch color editor for a color knob           |
+| `p`       | pin the focused accent at its current color (press again to unpin) |
+| `P`       | pin every unpinned accent at its current color         |
 | `a`       | accept — copy a paste-ready `flavour = { … }` and keep it applied |
 | `q`       | cancel — restore the previous look                     |
 
 The color editor (`c`, for background/foreground/accents) has an editable hex
-field with L/C/H channel rows you nudge with `-`/`+`. The hex is plain buffer
+field with L/C/H channel rows you nudge with `h`/`l`. The hex is plain buffer
 text, so an external color picker — e.g. [ccc.nvim](https://github.com/uga-rosa/ccc.nvim)
 (`:CccPick`) or [oklch-color-picker](https://github.com/eero-lehtinen/oklch-color-picker.nvim)
 (`pick_under_cursor()`) — run with the cursor on it updates the color just like
 any buffer edit.
+
+`p` freezes an accent at the exact color its swatch shows (an exact-hex pin, so
+`hue_shift`/`base_hue`/`n_hues` no longer move it): spin the global hue wheel to
+place the unpinned roles, `p` each one you like, then keep spinning the rest.
+`P` pins them all at once. `p` again on a pinned role clears it back to auto.
 
 Accept copies the block to the `+` register; paste it into your `setup{}` to make
 it permanent. On exit (accept or cancel) the playground fires a `ColorScheme`

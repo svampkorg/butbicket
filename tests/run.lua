@@ -367,6 +367,26 @@ do
     ok_roles,
     "every flavour.ROLE_ORDER role has ROLE_KEYS the panel can render"
   )
+
+  -- "Pin at current color": the panel resolves a role's swatch hex and writes it
+  -- into accents[role]. Because a hex pin is exact (L/C/H), a later spin of the
+  -- global hue wheel (base_hue) must leave the pinned role's palette key put —
+  -- exactly the "freeze this one, keep spinning the others" behaviour.
+  vim.o.background = "dark"
+  package.loaded["butbicket.colorscheme"] = nil
+  local canonical = require("butbicket.colorscheme")
+  local role = "keyword"
+  local key = flavour.ROLE_KEYS[role][1]
+  local seed = { background = "#101214", foreground = "#e7e7e8", n_hues = 4 }
+  local resolved = flavour.generate_hues(canonical, seed)[key]
+  -- pin it, then rotate the wheel hard
+  seed.accents = { [role] = resolved }
+  seed.base_hue = 137
+  local after = flavour.generate_hues(canonical, seed)[key]
+  check(
+    after == resolved,
+    "pinned accent survives a base_hue change (frozen at its resolved hex)"
+  )
 end
 
 -- Extras generator: emits one file per target, and the output reflects the

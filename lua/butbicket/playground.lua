@@ -247,8 +247,8 @@ local function render_panel(session)
     lines[#lines + 1] = " ⚠ = below AA (4.5) on this background"
     lines[#lines + 1] = ""
   end
-  lines[#lines + 1] = " j/k move · -/+ nudge · e edit · c color"
-  lines[#lines + 1] = " a accept (copy) · q cancel"
+  lines[#lines + 1] = " j/k move · h/l nudge · p pin · P all"
+  lines[#lines + 1] = " e edit · c color · a accept · q cancel"
 
   local buf = session.panel.buf
   vim.bo[buf].modifiable = true
@@ -405,6 +405,58 @@ local function edit(session)
   end)
 end
 
+-- The exact color an accent role resolves to right now (the hex its swatch
+-- shows), or nil if it isn't a paintable hex. Pinning writes this verbatim.
+local function resolved_accent(session, role)
+  local hex = graded_palette(session)[flavour.ROLE_KEYS[role][1]]
+  return is_hex(hex) and hex or nil
+end
+
+-- Pin the focused accent to the exact color its swatch currently shows, so the
+-- global hue knobs (hue_shift/base_hue/n_hues) stop moving it — spin the wheel,
+-- freeze the roles you like, keep spinning the rest. A hex pin overrides the
+-- generator verbatim (L/C/H all frozen). A second `p` on an already-hex-pinned
+-- role clears it back to auto. Only accent knobs pin; others are a no-op.
+local function pin(session)
+  local k = KNOBS[session.focus]
+  if k.kind ~= "accent" then
+    notify(k.label .. " is not an accent role — nothing to pin")
+    return
+  end
+  if is_hex(session.opts.accents[k.name]) then
+    session.opts.accents[k.name] = nil
+    notify(("accent.%s unpinned (auto)"):format(k.name))
+  else
+    local hex = resolved_accent(session, k.name)
+    if not hex then
+      notify("no resolved color to pin for " .. k.label, vim.log.levels.WARN)
+      return
+    end
+    session.opts.accents[k.name] = hex
+    notify(("accent.%s pinned %s"):format(k.name, hex))
+  end
+  refresh(session)
+end
+
+-- Freeze every currently-unpinned accent at its resolved color at once, so a
+-- whole wheel position can be locked in before spinning the numeric knobs on.
+local function pin_all(session)
+  local n = 0
+  for _, role in ipairs(ACCENT_ROLES) do
+    if not is_hex(session.opts.accents[role]) then
+      local hex = resolved_accent(session, role)
+      if hex then
+        session.opts.accents[role] = hex
+        n = n + 1
+      end
+    end
+  end
+  notify(
+    ("pinned %d accent%s at current colors"):format(n, n == 1 and "" or "s")
+  )
+  refresh(session)
+end
+
 -- ── lifecycle ──────────────────────────────────────────────────────────────
 
 local close_color_editor -- forward decl (defined with the color editor below)
@@ -484,7 +536,7 @@ end
 -- plain, editable buffer text with a swatch — so an external picker (ccc.nvim,
 -- oklch-color-picker) run under the cursor, or a hand edit, updates it just like
 -- any buffer; TextChanged parses it back. Below it, L/C/H channel rows nudge
--- with -/+ (OKLch matches the palette engine, so nudges stay perceptually even
+-- with h/l (OKLch matches the palette engine, so nudges stay perceptually even
 -- and in gamut). Every change live-applies to the parent flavour.
 
 local COLOR_CHANNELS = {
@@ -531,7 +583,7 @@ local function render_color_editor(ed, keep_hexline)
     tail[#tail + 1] = ("%s %s  %s"):format(marker, ch.label, shown)
   end
   tail[#tail + 1] = ""
-  tail[#tail + 1] = " j/k focus · -/+ nudge"
+  tail[#tail + 1] = " j/k focus · h/l nudge"
   tail[#tail + 1] = " <CR> apply · q cancel"
 
   ed.rendering = true
@@ -671,12 +723,12 @@ local function open_color_editor(session)
     ed.focus = math.max(ed.focus - 1, 1)
     render_color_editor(ed, false)
   end)
-  for _, lhs in ipairs({ "l", "+", "=", "<Right>" }) do
+  for _, lhs in ipairs({ "l", "<Right>" }) do
     m(lhs, function()
       nudge_channel(ed, 1)
     end)
   end
-  for _, lhs in ipairs({ "h", "-", "_", "<Left>" }) do
+  for _, lhs in ipairs({ "h", "<Left>" }) do
     m(lhs, function()
       nudge_channel(ed, -1)
     end)
@@ -827,12 +879,12 @@ function M.open()
   map(pbuf, "<Up>", function()
     move(session, -1)
   end)
-  for _, lhs in ipairs({ "l", "+", "=", "<Right>" }) do
+  for _, lhs in ipairs({ "l", "<Right>" }) do
     map(pbuf, lhs, function()
       nudge(session, 1)
     end)
   end
-  for _, lhs in ipairs({ "h", "-", "_", "<Left>" }) do
+  for _, lhs in ipairs({ "h", "<Left>" }) do
     map(pbuf, lhs, function()
       nudge(session, -1)
     end)
@@ -844,6 +896,12 @@ function M.open()
   end
   map(pbuf, "c", function()
     open_color_editor(session)
+  end)
+  map(pbuf, "p", function()
+    pin(session)
+  end)
+  map(pbuf, "P", function()
+    pin_all(session)
   end)
   map(pbuf, "a", function()
     accept(session)
