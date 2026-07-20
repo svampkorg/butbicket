@@ -211,6 +211,22 @@ flavour = {
 }
 ```
 
+**Light and dark.** A flat `flavour` like the above targets a single background;
+it applies only on the polarity its `background` implies (dark here), and the
+other side renders canonical butbicket — so `:set background=light` /
+`:colorscheme butbicket-light` still switches. To carry a re-tone into *both*,
+give each background its own recipe:
+
+```lua
+flavour = {
+  dark  = { background = '#101214', foreground = '#e7e7e8', hue_shift = 30 },
+  light = { background = '#fafaf7', foreground = '#202020', hue_shift = 30 },
+}
+```
+
+Either side may be omitted (that background then stays canonical). The playground
+(below) can tune both and copies this shape.
+
 Preview generated flavours (including the `n_hues`/`accents` samples) without
 changing anything:
 
@@ -232,6 +248,12 @@ diagnostics preview (line backgrounds, gutter signs, virtual-text messages) so
 those roles are visible too. If a flavour is already set (in `setup{}` or from a
 previous accept), the playground opens with those values instead of from scratch.
 
+`t` toggles the preview between dark and light. Each background has its own
+recipe; the first switch to a side seeds it from the side you were on (same
+hue_shift/chroma/accents/pins, re-anchored to that base) and it diverges as you
+edit. `a` copies both sides as `flavour = { dark = {…}, light = {…} }` (only the
+sides you touched).
+
 The panel and sample size to their content, capped to the window. Neovim floats
 have no scrollbar; when the knob list is taller than the screen it scrolls with
 the focused knob and the panel footer shows how many rows are hidden (`↑ n` /
@@ -245,6 +267,7 @@ the focused knob and the panel footer shows how many rows are hidden (`↑ n` /
 | `c`       | open the OKLch color editor for a color knob           |
 | `p`       | pin the focused accent at its current color (press again to unpin) |
 | `P`       | pin every unpinned accent at its current color         |
+| `t`       | toggle the preview background light/dark — each side keeps its own recipe |
 | `a`       | accept — copy a paste-ready `flavour = { … }` and keep it applied |
 | `q`       | cancel — restore the previous look                     |
 

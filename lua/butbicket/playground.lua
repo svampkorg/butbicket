@@ -223,6 +223,27 @@ end
 local LABEL_W = 18
 local VAL_W = 8
 
+-- Build a normalized opts table (the knob state) from a flavour recipe and the
+-- canonical palette for a background. Missing background/foreground fall back to
+-- that base's anchors — so seeding one polarity from another (recipe with its
+-- bg/fg stripped) re-anchors onto the new base while carrying every transform.
+local function default_opts(recipe, base)
+  recipe = type(recipe) == "table" and recipe or {}
+  local anchor_bg = (is_hex(base.editorBackground) and base.editorBackground)
+    or (is_hex(recipe.background) and recipe.background)
+    or "#101214"
+  return {
+    background = is_hex(recipe.background) and recipe.background or anchor_bg,
+    foreground = is_hex(recipe.foreground) and recipe.foreground
+      or base.emphasisText,
+    hue_shift = recipe.hue_shift or 0,
+    chroma_mult = recipe.chroma_mult or 1,
+    n_hues = recipe.n_hues,
+    base_hue = recipe.base_hue or 0,
+    accents = vim.deepcopy(recipe.accents or {}),
+  }
+end
+
 -- Render the current opts as a paste-ready Lua table expression. Only knobs
 -- that deviate from their neutral value are emitted; bg/fg are always present
 -- (flavour.generate requires them).
@@ -262,10 +283,29 @@ end
 
 M.serialize = serialize -- exposed for tests
 
+-- Serialize the per-background variants map to a paste-ready
+-- `{ dark = {…}, light = {…} }` expression (only the sides that exist).
+local function serialize_variants(variants)
+  local lines = { "{" }
+  for _, pol in ipairs({ "dark", "light" }) do
+    if variants[pol] then
+      local inner = serialize(variants[pol]):gsub("\n", "\n  ")
+      lines[#lines + 1] = ("  %s = %s,"):format(pol, inner)
+    end
+  end
+  lines[#lines + 1] = "}"
+  return table.concat(lines, "\n")
+end
+
+M.serialize_variants = serialize_variants -- exposed for tests
+
 -- Apply the current opts globally by shadowing config.flavour (see file header)
--- and re-running the colorscheme. Everything on screen re-tones instantly.
+-- and re-running the colorscheme. `config.flavour` carries BOTH background
+-- variants (a `{ dark, light }` map); colorscheme.lua picks the one matching the
+-- current `vim.o.background` (which the toggle keeps in sync). Everything on
+-- screen re-tones instantly.
 local function apply(session)
-  config.flavour = session.opts
+  config.flavour = session.variants
   require("butbicket").colorscheme()
 end
 
@@ -309,6 +349,7 @@ local function render_panel(session)
 
   local lines, warn = {}, false
   lines[#lines + 1] = " butbicket · flavour playground"
+  lines[#lines + 1] = (" background · %s"):format(session.polarity)
   lines[#lines + 1] = ""
   local fg_ratio = is_hex(gen.emphasisText)
       and contrast.ratio(gen.emphasisText, bg)
@@ -370,7 +411,8 @@ local function render_panel(session)
     lines[#lines + 1] = ""
   end
   lines[#lines + 1] = " j/k move · h/l nudge · p pin · P all"
-  lines[#lines + 1] = " e edit · c color · a accept · q cancel"
+  lines[#lines + 1] = " t light/dark · e edit · c color"
+  lines[#lines + 1] = " a accept · q cancel"
 
   local buf = session.panel.buf
   vim.bo[buf].modifiable = true
@@ -636,6 +678,26 @@ local function pin_all(session)
   refresh(session)
 end
 
+-- Flip the preview between dark and light so you can tune the flavour for both
+-- `butbicket-dark` and `butbicket-light`. Each background keeps its OWN recipe;
+-- the first time you switch to a side, it is seeded from the side you were on
+-- (same hue_shift/chroma/n_hues/accents/pins) but re-anchored onto that side's
+-- canonical bg/fg — a starting point that then diverges as you edit it.
+local function toggle_bg(session)
+  local new = (session.polarity == "dark") and "light" or "dark"
+  if not session.variants[new] then
+    local seed = vim.deepcopy(session.opts)
+    seed.background, seed.foreground = nil, nil -- re-anchor to the new base
+    session.variants[new] = default_opts(seed, session.bases[new])
+    notify(("seeded %s flavour from %s"):format(new, session.polarity))
+  end
+  session.polarity = new
+  vim.o.background = new
+  session.opts = session.variants[new]
+  session.base = session.bases[new]
+  refresh(session)
+end
+
 -- ── lifecycle ──────────────────────────────────────────────────────────────
 
 local close_color_editor -- forward decl (defined with the color editor below)
@@ -673,6 +735,10 @@ local function close(session, restore)
   -- raw shadow already holds the accepted opts and is intentionally kept.
   if restore then
     config.flavour = session.prev_flavour
+    -- the bg toggle may have flipped vim.o.background during preview; put it back
+    if session.prev_background then
+      vim.o.background = session.prev_background
+    end
   end
   local target = (restore and session.prev_colors_name)
     or vim.g.colors_name
@@ -682,7 +748,7 @@ local function close(session, restore)
 end
 
 local function accept(session)
-  local block = "flavour = " .. serialize(session.opts)
+  local block = "flavour = " .. serialize_variants(session.variants)
   local ok = pcall(vim.fn.setreg, "+", block)
   if not ok then
     pcall(vim.fn.setreg, '"', block)
@@ -965,36 +1031,67 @@ function M.open()
   -- Capture the canonical (unflavoured) palette to grade from and size the
   -- readout against, without disturbing the user's real config beyond the one
   -- raw key we restore on close.
+  -- Capture the canonical (unflavoured) palette for BOTH backgrounds — to grade
+  -- against and to anchor each polarity's variant. Restores vim.o.background.
   config.flavour = false
-  package.loaded["butbicket.colorscheme"] = nil
-  local base = vim.deepcopy(require("butbicket.colorscheme"))
+  local function capture(pol)
+    local prev = vim.o.background
+    vim.o.background = pol
+    package.loaded["butbicket.colorscheme"] = nil
+    local p = vim.deepcopy(require("butbicket.colorscheme"))
+    vim.o.background = prev
+    return p
+  end
+  local bases = { dark = capture("dark"), light = capture("light") }
 
-  local fallback_bg = (vim.o.background == "light") and "#ffffff" or "#101214"
-  local seed_bg = is_hex(base.editorBackground) and base.editorBackground
-    or fallback_bg
-  if not is_hex(base.editorBackground) then
+  local cur = (vim.o.background == "light") and "light" or "dark"
+  if not is_hex(bases[cur].editorBackground) then
     notify(
-      "transparent background — previewing on " .. seed_bg,
+      "transparent background — previewing on the canonical base",
       vim.log.levels.WARN
     )
   end
 
-  local seed = type(active) == "table" and active or {}
+  -- The flavour recipe the active config supplies for a polarity: its
+  -- per-background sub-table, or a legacy flat flavour on its native side.
+  local function recipe_for(pol)
+    if type(active) ~= "table" then
+      return nil
+    end
+    if active[pol] ~= nil then
+      return active[pol]
+    end
+    if type(active.background) == "string" then
+      local native = (oklab.lightness(active.background) < 50) and "dark"
+        or "light"
+      if native == pol then
+        return active
+      end
+    end
+    return nil
+  end
+
+  -- Seed a variant for every polarity the config already covers; the current one
+  -- is always seeded (from its recipe or the canonical base) so it is editable.
+  -- An uncovered other side is created lazily on the first toggle.
+  local variants = {}
+  for _, pol in ipairs({ "dark", "light" }) do
+    local r = recipe_for(pol)
+    if r or pol == cur then
+      variants[pol] = default_opts(r or {}, bases[pol])
+    end
+  end
+
   local session = {
-    base = base,
-    opts = {
-      background = is_hex(seed.background) and seed.background or seed_bg,
-      foreground = is_hex(seed.foreground) and seed.foreground
-        or base.emphasisText,
-      hue_shift = seed.hue_shift or 0,
-      chroma_mult = seed.chroma_mult or 1,
-      n_hues = seed.n_hues,
-      base_hue = seed.base_hue or 0,
-      accents = vim.deepcopy(seed.accents or {}),
-    },
+    bases = bases,
+    base = bases[cur],
+    variants = variants,
+    opts = variants[cur],
+    polarity = cur,
     focus = 1,
     prev_flavour = prev_flavour,
     prev_colors_name = vim.g.colors_name,
+    prev_background = vim.o.background,
     panel = {},
     example = {},
   }
@@ -1024,8 +1121,9 @@ function M.open()
   -- render_panel draws an overflow footer showing how many rows are hidden.
   local ui_w, ui_h = vim.o.columns, vim.o.lines
   local max_h = math.max(8, ui_h - 4)
-  -- panel rows: title + blank + contrast + blank + knobs + blank + warn + help
-  local panel_content = #KNOBS + 9
+  -- panel rows: title + polarity + blank + contrast + blank + knobs + blank +
+  -- warn(2) + help(3)
+  local panel_content = #KNOBS + 11
   local panel_h = math.min(panel_content, max_h)
   local example_h = math.min(#elines, max_h)
   local panel_w = 46
@@ -1124,6 +1222,9 @@ function M.open()
   end)
   map(pbuf, "P", function()
     pin_all(session)
+  end)
+  map(pbuf, "t", function()
+    toggle_bg(session)
   end)
   map(pbuf, "a", function()
     accept(session)

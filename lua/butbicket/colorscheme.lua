@@ -227,12 +227,33 @@ colorscheme.floatBorder = colorscheme.dark_slate
 -- Opt-in flavour: re-tone the whole palette onto a new base while keeping
 -- butbicket's hue relationships (see butbicket.flavour). Applied last so it
 -- transforms the fully-resolved palette, then transparency is re-honoured.
+--
+-- Two shapes are accepted:
+--   * per-background: `{ dark = <opts>, light = <opts> }` — the variant matching
+--     the current `vim.o.background` applies; each side is an independent recipe,
+--     so `butbicket-light`/`:set background=light` gives a light flavour and the
+--     dark one is untouched. Either side may be omitted.
+--   * legacy flat: a single `<opts>` (has a `background` key) — applied ONLY on
+--     the polarity its background implies, so toggling to the other side falls
+--     back to canonical butbicket instead of freezing on the flavour's fixed base.
+-- A missing / mismatched side renders the canonical palette, so the light/dark
+-- toggle always changes the background.
 local result = colorscheme
 if type(config.flavour) == "table" then
-  result =
-    require("butbicket.flavour").generate_hues(colorscheme, config.flavour)
-  if config.transparent then
-    result.editorBackground = "none"
+  local fl = config.flavour
+  local variant = fl[vim.o.background] -- fl.dark / fl.light
+  if variant == nil and type(fl.background) == "string" then
+    local oklab = require("butbicket.oklab")
+    local poly = (oklab.lightness(fl.background) < 50) and "dark" or "light"
+    if poly == vim.o.background then
+      variant = fl
+    end
+  end
+  if type(variant) == "table" then
+    result = require("butbicket.flavour").generate_hues(colorscheme, variant)
+    if config.transparent then
+      result.editorBackground = "none"
+    end
   end
 end
 

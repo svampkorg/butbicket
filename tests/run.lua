@@ -427,6 +427,26 @@ do
     "serialize round-trips accents (hex + degrees)"
   )
 
+  -- Per-background variants serialize to a loadable { dark = {…}, light = {…} }.
+  local vbody = pg.serialize_variants({
+    dark = { background = "#101214", foreground = "#e7e7e8", hue_shift = 10 },
+    light = { background = "#ffffff", foreground = "#202020", hue_shift = 20 },
+  })
+  local vloader = load("return " .. vbody)
+  check(vloader ~= nil, "serialize_variants output is loadable Lua")
+  local v = vloader and vloader()
+  check(
+    v and v.dark and v.dark.background == "#101214" and v.dark.hue_shift == 10,
+    "serialize_variants round-trips the dark side"
+  )
+  check(
+    v
+      and v.light
+      and v.light.background == "#ffffff"
+      and v.light.hue_shift == 20,
+    "serialize_variants round-trips the light side"
+  )
+
   -- The panel builds a knob per flavour.ROLE_ORDER entry and indexes
   -- flavour.ROLE_KEYS[role][1] for its swatch + contrast; a missing entry would
   -- break the render silently.

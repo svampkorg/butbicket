@@ -17,12 +17,19 @@
 ---@field default? boolean fallback for unlisted integrations (default `true`)
 ---@field [string] boolean per-integration opt-out (e.g. `cmp = false`)
 
+---Per-background flavours: an independent recipe for each `vim.o.background`, so
+---`butbicket-light` and `butbicket-dark` can carry different re-tones. Either
+---side may be omitted (that background then renders canonical butbicket).
+---@class butbicket.FlavourByBackground
+---@field dark? butbicket.FlavourOpts applied when background = "dark"
+---@field light? butbicket.FlavourOpts applied when background = "light"
+
 ---@class butbicket.Config
 ---@field theme "dark"|"light"
 ---@field transparent boolean
 ---@field italics butbicket.Italics
 ---@field integrations butbicket.Integrations
----@field flavour false|butbicket.FlavourOpts re-tone the palette onto a new base
+---@field flavour false|butbicket.FlavourOpts|butbicket.FlavourByBackground re-tone the palette onto a new base (a single recipe, or one per background)
 ---@field overrides table|fun():table
 
 local config = {
