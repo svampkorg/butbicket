@@ -83,17 +83,17 @@ function M.highlights(config)
       bg = colorscheme.editorBackground,
     },
 
-    warning = { fg = colorscheme.warningEmphasis, bg = bg },
-    warning_visible = { fg = colorscheme.warningEmphasis, bg = bg },
+    warning = { fg = colorscheme.accentEmphasis, bg = bg },
+    warning_visible = { fg = colorscheme.accentEmphasis, bg = bg },
     warning_selected = {
-      fg = colorscheme.warningEmphasis,
+      fg = colorscheme.accentEmphasis,
       bg = colorscheme.editorBackground,
       italic = config.italics.bufferline or false,
     },
-    warning_diagnostic = { fg = colorscheme.warningEmphasis, bg = bg },
-    warning_diagnostic_visible = { fg = colorscheme.warningEmphasis, bg = bg },
+    warning_diagnostic = { fg = colorscheme.accentEmphasis, bg = bg },
+    warning_diagnostic_visible = { fg = colorscheme.accentEmphasis, bg = bg },
     warning_diagnostic_selected = {
-      fg = colorscheme.warningEmphasis,
+      fg = colorscheme.accentEmphasis,
       bg = colorscheme.editorBackground,
     },
 

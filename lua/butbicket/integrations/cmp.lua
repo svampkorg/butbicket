@@ -14,7 +14,7 @@ function M.highlights()
     -- kind support
     CmpItemKindSnippet = { fg = colorscheme.stringText },
     CmpItemKindKeyword = { fg = colorscheme.syntaxError },
-    CmpItemKindText = { fg = colorscheme.warningEmphasis },
+    CmpItemKindText = { fg = colorscheme.accentEmphasis },
     CmpItemKindMethod = { fg = colorscheme.syntaxKeyword },
     CmpItemKindConstructor = { fg = colorscheme.syntaxKeyword },
     CmpItemKindFunction = { fg = colorscheme.syntaxKeyword },
@@ -33,7 +33,7 @@ function M.highlights()
     CmpItemKindReference = { fg = colorscheme.syntaxError },
     CmpItemKindEnumMember = { fg = colorscheme.syntaxError },
     CmpItemKindStruct = { fg = colorscheme.syntaxFunction },
-    CmpItemKindValue = { fg = colorscheme.warningEmphasis },
+    CmpItemKindValue = { fg = colorscheme.accentEmphasis },
     CmpItemKindEvent = { fg = colorscheme.syntaxFunction },
     CmpItemKindOperator = { fg = colorscheme.syntaxError },
     CmpItemKindTypeParameter = { fg = colorscheme.syntaxError },

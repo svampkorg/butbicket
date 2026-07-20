@@ -17,7 +17,7 @@ function M.highlights()
     CodeCompanionChatToolSuccess = { fg = c.successText },
     CodeCompanionChatToolFailure = { fg = c.errorText },
     CodeCompanionChatToolInProgress = { fg = c.warningText },
-    CodeCompanionChatToolPending = { fg = c.warningEmphasis },
+    CodeCompanionChatToolPending = { fg = c.accentEmphasis },
     CodeCompanionVirtualText = { fg = c.commentText, italic = true },
     CodeCompanionTools = { fg = c.method },
     CodeCompanionToolsStarted = { fg = c.warningText },

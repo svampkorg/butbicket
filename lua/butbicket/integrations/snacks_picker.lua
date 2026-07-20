@@ -25,7 +25,7 @@ function M.highlights()
     SnacksPickerListCursorLine = { bg = c.cursorline },
     SnacksPickerPreviewCursorLine = { bg = c.cursorline },
     -- results
-    SnacksPickerMatch = { fg = c.warningEmphasis, bold = true },
+    SnacksPickerMatch = { fg = c.accentEmphasis, bold = true },
     SnacksPickerDir = { fg = c.commentText },
     SnacksPickerFile = { fg = c.mainText },
     SnacksPickerDirectory = { fg = c.linkText },
@@ -42,7 +42,7 @@ function M.highlights()
     -- dashboard
     SnacksDashboardNormal = { fg = c.mainText },
     SnacksDashboardDesc = { fg = c.linkText },
-    SnacksDashboardIcon = { fg = c.warningEmphasis },
+    SnacksDashboardIcon = { fg = c.accentEmphasis },
     SnacksDashboardKey = { fg = c.syntaxKeyword },
     SnacksDashboardTitle = { fg = c.syntaxFunction, bold = true },
     SnacksDashboardHeader = { fg = c.syntaxFunction },

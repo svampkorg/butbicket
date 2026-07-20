@@ -28,10 +28,10 @@ function M.highlights()
     MiniPickBorderText = { fg = c.syntaxKeyword },
     MiniPickHeader = { fg = c.syntaxFunction, bold = true },
     MiniPickPrompt = { fg = c.syntaxKeyword },
-    MiniPickPromptPrefix = { fg = c.warningEmphasis },
+    MiniPickPromptPrefix = { fg = c.accentEmphasis },
     MiniPickMatchCurrent = { bg = c.cursorline },
     MiniPickMatchMarked = { fg = c.warningText },
-    MiniPickMatchRanges = { fg = c.warningEmphasis, bold = true },
+    MiniPickMatchRanges = { fg = c.accentEmphasis, bold = true },
     MiniPickIconDirectory = { fg = c.linkText },
 
     -- mini.indentscope
@@ -69,7 +69,7 @@ function M.highlights()
     MiniIconsOrange = { fg = c.warningText },
     MiniIconsPurple = { fg = c.specialKeyword },
     MiniIconsRed = { fg = c.errorText },
-    MiniIconsYellow = { fg = c.warningEmphasis },
+    MiniIconsYellow = { fg = c.accentEmphasis },
 
     -- mini.notify
     MiniNotifyNormal = { fg = c.mainText, bg = c.floatingWindowBackground },
@@ -99,7 +99,7 @@ function M.highlights()
     },
     MiniStatuslineModeCommand = {
       fg = c.editorBackground,
-      bg = c.warningEmphasis,
+      bg = c.accentEmphasis,
       bold = true,
     },
     MiniStatuslineModeOther = {
@@ -134,7 +134,7 @@ function M.highlights()
       bg = c.sidebarBackground,
     },
     MiniTablineModifiedHidden = {
-      fg = c.warningEmphasis,
+      fg = c.accentEmphasis,
       bg = c.sidebarBackground,
     },
     MiniTablineFill = { bg = c.windowBorder },
@@ -150,7 +150,7 @@ function M.highlights()
     MiniStarterHeader = { fg = c.syntaxFunction },
     MiniStarterFooter = { fg = c.commentText },
     MiniStarterItem = { fg = c.mainText },
-    MiniStarterItemPrefix = { fg = c.warningEmphasis },
+    MiniStarterItemPrefix = { fg = c.accentEmphasis },
     MiniStarterSection = { fg = c.syntaxKeyword, bold = true },
     MiniStarterQuery = { fg = c.successText },
     MiniStarterCurrent = { bg = c.cursorline },

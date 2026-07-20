@@ -18,7 +18,7 @@ function M.highlights()
     NvimTreeFolderArrowOpen = { fg = c.syntaxOperator },
     NvimTreeOpenedFile = { fg = c.emphasisText, bold = true },
     NvimTreeModifiedFile = { fg = c.warningText },
-    NvimTreeSpecialFile = { fg = c.warningEmphasis, underline = true },
+    NvimTreeSpecialFile = { fg = c.accentEmphasis, underline = true },
     NvimTreeExecFile = { fg = c.successText },
     NvimTreeImageFile = { fg = c.specialKeyword },
     NvimTreeSymlink = { fg = c.linkText, italic = true },

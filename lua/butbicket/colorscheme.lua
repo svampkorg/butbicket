@@ -181,7 +181,7 @@ if vim.o.background == "light" then
   colorscheme.linkText = "#1976d2"
   colorscheme.commentText = "#848484"
   colorscheme.stringText = "#b35c00" -- darkened to AA (4.7) on white
-  colorscheme.warningEmphasis = "#cd9731"
+  colorscheme.accentEmphasis = "#cd9731"
   colorscheme.specialKeyword = "#800080"
   colorscheme.syntaxOperator = "#a1a1a1"
   colorscheme.foregroundEmphasis = "#000000"
@@ -214,7 +214,7 @@ else
   colorscheme.syntaxKeyword = colorscheme.keyword
   colorscheme.linkText = colorscheme.blue
   colorscheme.stringText = colorscheme.stringText
-  colorscheme.warningEmphasis = colorscheme.yellow
+  colorscheme.accentEmphasis = colorscheme.yellow
   colorscheme.specialKeyword = colorscheme.method
   colorscheme.commentText = colorscheme.slate
   colorscheme.syntaxOperator = colorscheme.parenthesis

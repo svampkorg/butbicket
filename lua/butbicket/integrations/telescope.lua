@@ -16,7 +16,7 @@ function M.highlights()
     },
     TelescopeResultsTitle = {
       fg = c.editorBackground,
-      bg = c.warningEmphasis,
+      bg = c.accentEmphasis,
       bold = true,
     },
     TelescopePreviewNormal = { fg = c.mainText, bg = c.editorBackground },
@@ -39,7 +39,7 @@ function M.highlights()
     TelescopeSelectionCaret = { fg = c.syntaxKeyword, bg = c.cursorline },
     TelescopeMultiSelection = { fg = c.warningText },
     TelescopeMultiIcon = { fg = c.syntaxFunction },
-    TelescopeMatching = { fg = c.warningEmphasis, bold = true },
+    TelescopeMatching = { fg = c.accentEmphasis, bold = true },
     TelescopeResultsComment = { fg = c.commentText },
     TelescopeResultsDiffAdd = { fg = c.added_bright },
     TelescopeResultsDiffChange = { fg = c.changed_bright },

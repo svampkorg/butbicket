@@ -12,7 +12,7 @@ function M.highlights()
     DapBreakpointCondition = { fg = c.warningText },
     DapBreakpointRejected = { fg = c.inactiveText },
     DapLogPoint = { fg = c.linkText },
-    DapStopped = { fg = c.warningEmphasis },
+    DapStopped = { fg = c.accentEmphasis },
     -- nvim-dap-virtual-text
     NvimDapVirtualText = { fg = c.commentText, italic = true },
     NvimDapVirtualTextChanged = { fg = c.changed_bright, italic = true },
@@ -20,7 +20,7 @@ function M.highlights()
     NvimDapVirtualTextInfo = { fg = c.linkText, italic = true },
     -- nvim-dap-view
     NvimDapView = { fg = c.mainText, bg = c.sidebarBackground },
-    NvimDapViewFrameCurrent = { fg = c.warningEmphasis, bold = true },
+    NvimDapViewFrameCurrent = { fg = c.accentEmphasis, bold = true },
     NvimDapViewTab = { fg = c.mainText },
     NvimDapViewVirtualText = { fg = c.commentText },
     NvimDapViewVirtualTextUpdated = { fg = c.changed_bright },

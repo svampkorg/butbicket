@@ -9,7 +9,7 @@ function M.highlights()
     WhichKeyDesc = { fg = c.mainText },
     WhichKeySeparator = { fg = c.commentText },
     WhichKeyValue = { fg = c.commentText },
-    WhichKeyIcon = { fg = c.warningEmphasis },
+    WhichKeyIcon = { fg = c.accentEmphasis },
     WhichKeyNormal = { bg = c.floatingWindowBackground },
     WhichKeyBorder = { fg = c.floatBorder, bg = c.floatingWindowBackground },
     WhichKeyTitle = {
@@ -25,7 +25,7 @@ function M.highlights()
     WhichKeyColorOrange = { fg = c.warningText },
     WhichKeyColorPurple = { fg = c.specialKeyword },
     WhichKeyColorRed = { fg = c.errorText },
-    WhichKeyColorYellow = { fg = c.warningEmphasis },
+    WhichKeyColorYellow = { fg = c.accentEmphasis },
   }
 end
 

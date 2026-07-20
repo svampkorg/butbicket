@@ -9,7 +9,7 @@ function M.highlights()
     fugitiveHeader = { fg = c.syntaxKeyword, bold = true },
     fugitiveHeading = { fg = c.syntaxFunction, bold = true },
     fugitiveHelpHeader = { fg = c.syntaxKeyword },
-    fugitiveHelpTag = { fg = c.warningEmphasis },
+    fugitiveHelpTag = { fg = c.accentEmphasis },
     fugitiveHash = { fg = c.commentText },
     fugitiveCount = { fg = c.number },
     diffAdded = { fg = c.added_bright },

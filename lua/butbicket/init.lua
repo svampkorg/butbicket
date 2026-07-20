@@ -26,7 +26,7 @@ local function set_terminal_colors()
   vim.g.terminal_color_0 = colorscheme.editorBackground
   vim.g.terminal_color_1 = colorscheme.syntaxError
   vim.g.terminal_color_2 = colorscheme.successText
-  vim.g.terminal_color_3 = colorscheme.warningEmphasis
+  vim.g.terminal_color_3 = colorscheme.accentEmphasis
   vim.g.terminal_color_4 = colorscheme.syntaxFunction
   vim.g.terminal_color_5 = colorscheme.syntaxKeyword
   vim.g.terminal_color_6 = colorscheme.linkText

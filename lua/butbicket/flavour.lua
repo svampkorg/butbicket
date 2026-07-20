@@ -58,6 +58,10 @@ M.ROLES = {
   -- attributes / decorators / annotations (@override etc.) + PreCondit; own key
   -- so it doesn't drag the selection color it used to share.
   { name = "annotation", keys = { "annotation" } },
+  -- the accent yellow: match emphasis (Telescope/Snacks/MiniPick/GrugFar),
+  -- icons, prompt prefixes, which-key keys, terminal color 3. Not a warning
+  -- (that is `warn`); a plain decorative accent, free to rotate/pin.
+  { name = "emphasis", keys = { "accentEmphasis" } },
   -- UI backgrounds: hlsearch matches, and the incremental-search / :substitute
   -- preview. Each has a dedicated single-purpose palette key so tuning it never
   -- touches syntax or the diff tint.
@@ -140,9 +144,9 @@ end
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
 ---       or a number (hue degrees, hue-only). Roles: keyword, func, special,
 ---       type, number, string, link, accent, comment, variable, operator,
----       punctuation, annotation, search, incsearch, added, changed, removed,
----       error, warn, info, hint, success (added..success are locked identities
----       — only an explicit pin moves them)
+---       punctuation, annotation, emphasis, search, incsearch, added, changed,
+---       removed, error, warn, info, hint, success (added..success are locked
+---       identities — only an explicit pin moves them)
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
 

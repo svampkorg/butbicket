@@ -41,6 +41,7 @@ local required_keys = {
   "warningText",
   "successText",
   "specialKeyword",
+  "accentEmphasis",
   "windowBorder",
   "floatBorder",
   "searchBase",
@@ -318,6 +319,7 @@ do
     operator = { "syntaxOperator" }, -- Operator, Delimiter, Special
     punctuation = { "light_red" }, -- Punctuation / brackets
     annotation = { "annotation" }, -- @attribute, PreCondit
+    emphasis = { "accentEmphasis" }, -- TelescopeMatching, icons, keys
     search = { "searchBase" }, -- Search, CurSearch (+ flash current label)
     incsearch = { "incSearchBase" }, -- IncSearch, Substitute
     added = { "addedBase" }, -- diff add identity (locked)
