@@ -224,9 +224,16 @@ per-role accents, plus the `search`/`incsearch` background roles) beside a sampl
 buffer that recolors instantly as you tune. Foreground knobs show a solid swatch;
 the background roles show sample text (`Ab`) painted on the color so you can see
 the fg/bg contrast. Each shows its WCAG contrast (color-on-background for syntax,
-text-on-color for the background roles), flagged `⚠` below AA. If a flavour is
-already set (in `setup{}` or from a previous accept), the playground opens with
-those values instead of from scratch.
+text-on-color for the background roles), flagged `⚠` below AA. Locked identities
+are grouped as `diff.*` and `diag.*`. The sample ends with a git-diff and a
+diagnostics preview (line backgrounds, gutter signs, virtual-text messages) so
+those roles are visible too. If a flavour is already set (in `setup{}` or from a
+previous accept), the playground opens with those values instead of from scratch.
+
+The panel and sample size to their content, capped to the window. Neovim floats
+have no scrollbar; when the knob list is taller than the screen it scrolls with
+the focused knob and the panel footer shows how many rows are hidden (`↑ n` /
+`n ↓`).
 
 | key       | action                                                |
 | --------- | ----------------------------------------------------- |

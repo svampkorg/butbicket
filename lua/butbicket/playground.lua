@@ -67,10 +67,20 @@ local KNOBS = {
     neutral = 0,
   },
 }
+-- Locked roles split into two display families: the diff identities and the
+-- diagnostic/status identities. Everything else is a normal accent (or a bg role).
+local DIFF_ROLES = { added = true, changed = true, removed = true }
 for _, role in ipairs(ACCENT_ROLES) do
   local surface = flavour.ROLE_SURFACE[role]
   local locked = flavour.ROLE_LOCKED[role]
-  local prefix = locked and "diff." or (surface == "bg" and "ui." or "accent.")
+  local prefix
+  if locked then
+    prefix = DIFF_ROLES[role] and "diff." or "diag."
+  elseif surface == "bg" then
+    prefix = "ui."
+  else
+    prefix = "accent."
+  end
   KNOBS[#KNOBS + 1] = {
     name = role,
     label = prefix .. role,
@@ -131,6 +141,46 @@ local DIFF_DEMO = {
   },
 }
 
+-- A diagnostics demo, same idea as the diff demo: each line gets a
+-- DiagnosticLine{Error,Warn,Info,Hint} background, a gutter sign coloured by the
+-- matching Diagnostic{Error,Warn,Info,Hint} fg, and an eol virtual message in the
+-- virtual-text group — so the error/warn/info/hint roles are all visible and
+-- recolor live with the flavour.
+local DIAG_DEMO = {
+  {
+    text = "  danger()",
+    line = "DiagnosticLineError",
+    sign = "E",
+    grp = "DiagnosticError",
+    vt = "DiagnosticVirtualTextError",
+    msg = "undefined global",
+  },
+  {
+    text = "  shady()",
+    line = "DiagnosticLineWarn",
+    sign = "W",
+    grp = "DiagnosticWarn",
+    vt = "DiagnosticVirtualTextWarn",
+    msg = "unused result",
+  },
+  {
+    text = "  note()",
+    line = "DiagnosticLineInfo",
+    sign = "I",
+    grp = "DiagnosticInfo",
+    vt = "DiagnosticVirtualTextInfo",
+    msg = "shadowed local",
+  },
+  {
+    text = "  tip()",
+    line = "DiagnosticLineHint",
+    sign = "H",
+    grp = "DiagnosticHint",
+    vt = "DiagnosticVirtualTextHint",
+    msg = "prefer :method()",
+  },
+}
+
 local P -- the single active session, or nil
 
 local function clamp(x, lo, hi)
@@ -151,6 +201,20 @@ local function fmt_num(x)
   end
   return ("%.4g"):format(x)
 end
+
+-- Right-pad a string to a fixed *display* width. Lua's %-Ns pads by byte count,
+-- which misaligns multibyte glyphs (the `°` after degree values, the ⚠ mark), so
+-- the value/contrast columns drift. strdisplaywidth counts cells, keeping them
+-- flush.
+local function pad_disp(s, w)
+  local pad = w - vim.fn.strdisplaywidth(s)
+  return pad > 0 and (s .. string.rep(" ", pad)) or s
+end
+
+-- Column widths for the knob rows. LABEL_W fits the longest label
+-- ("accent.punctuation" = 18); VAL_W fits a hex/`(auto)`/degrees value.
+local LABEL_W = 18
+local VAL_W = 8
 
 -- Render the current opts as a paste-ready Lua table expression. Only knobs
 -- that deviate from their neutral value are emitted; bg/fg are always present
@@ -279,11 +343,11 @@ local function render_panel(session)
     if is_hex(color) then
       cell = is_bg and BG_SWATCH or SWATCH
     end
-    lines[#lines + 1] = ("%s %s %-14s %s%s"):format(
+    lines[#lines + 1] = ("%s %s %s %s%s"):format(
       marker,
       cell,
-      k.label,
-      val,
+      pad_disp(k.label, LABEL_W),
+      pad_disp(val, VAL_W),
       suffix
     )
     session.knob_line[i] = #lines
@@ -325,8 +389,34 @@ local function render_panel(session)
   end
 
   if vim.api.nvim_win_is_valid(session.panel.win) then
+    local win = session.panel.win
     local ln = session.knob_line[session.focus]
-    pcall(vim.api.nvim_win_set_cursor, session.panel.win, { ln, 0 })
+    pcall(vim.api.nvim_win_set_cursor, win, { ln, 0 })
+
+    -- Overflow footer: floats have no native scrollbar, so when the knob list is
+    -- taller than the window the panel scrolls with the focused knob; show how
+    -- many rows are hidden above / below the viewport so "there is more" reads.
+    local total = #lines
+    local footer = ""
+    if total > (session.panel_h or total) then
+      local top = vim.fn.line("w0", win)
+      local bot = vim.fn.line("w$", win)
+      local parts = {}
+      if top > 1 then
+        parts[#parts + 1] = "↑ " .. (top - 1)
+      end
+      if bot < total then
+        parts[#parts + 1] = (total - bot) .. " ↓"
+      end
+      if #parts > 0 then
+        footer = " " .. table.concat(parts, "   ") .. " "
+      end
+    end
+    pcall(
+      vim.api.nvim_win_set_config,
+      win,
+      { footer = footer, footer_pos = footer ~= "" and "right" or nil }
+    )
   end
 end
 
@@ -876,17 +966,7 @@ function M.open()
     example = {},
   }
 
-  -- geometry: panel (narrow) on the left, example (wide) on the right
-  local ui_w, ui_h = vim.o.columns, vim.o.lines
-  local height = math.min(ui_h - 6, 28)
-  local panel_w = 42
-  local example_w = math.min(ui_w - panel_w - 10, 84)
-  local total_w = panel_w + example_w + 3
-  local col0 = math.max(0, math.floor((ui_w - total_w) / 2))
-  local row0 = math.max(0, math.floor((ui_h - height) / 2))
-
-  -- example buffer (real syntax groups paint it via filetype/treesitter)
-  local ebuf = vim.api.nvim_create_buf(false, true)
+  -- example content, built before geometry so the float can size to its length
   local elines = vim.split(SAMPLE:gsub("^\n", ""), "\n", { plain = true })
   elines[#elines + 1] = ""
   elines[#elines + 1] = "-- git diff preview"
@@ -894,6 +974,33 @@ function M.open()
   for _, d in ipairs(DIFF_DEMO) do
     elines[#elines + 1] = d.text
   end
+  elines[#elines + 1] = ""
+  elines[#elines + 1] = "-- diagnostics preview"
+  local diag_row0 = #elines -- 0-based row of the first diagnostic line
+  for _, d in ipairs(DIAG_DEMO) do
+    elines[#elines + 1] = d.text
+  end
+
+  -- geometry: panel (narrow) on the left, example (wide) on the right. Each
+  -- float sizes to its own content, capped to the screen. Neovim floats have no
+  -- native scrollbar, so a too-tall panel scrolls with the focused knob and
+  -- render_panel draws an overflow footer showing how many rows are hidden.
+  local ui_w, ui_h = vim.o.columns, vim.o.lines
+  local max_h = math.max(8, ui_h - 4)
+  -- panel rows: title + blank + contrast + blank + knobs + blank + warn + help
+  local panel_content = #KNOBS + 9
+  local panel_h = math.min(panel_content, max_h)
+  local example_h = math.min(#elines, max_h)
+  local panel_w = 46
+  local example_w = math.min(ui_w - panel_w - 10, 84)
+  local total_w = panel_w + example_w + 3
+  local col0 = math.max(0, math.floor((ui_w - total_w) / 2))
+  local row0 =
+    math.max(0, math.floor((ui_h - math.max(panel_h, example_h)) / 2))
+  session.panel_h = panel_h
+
+  -- example buffer (real syntax groups paint it via filetype/treesitter)
+  local ebuf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(ebuf, 0, -1, false, elines)
   vim.bo[ebuf].filetype = "lua"
   vim.bo[ebuf].modifiable = false
@@ -903,7 +1010,7 @@ function M.open()
     row = row0,
     col = col0 + panel_w + 3,
     width = example_w,
-    height = height,
+    height = example_h,
     title = " sample.lua ",
   })
   vim.wo[session.example.win].cursorline = false
@@ -919,6 +1026,15 @@ function M.open()
       sign_hl_group = d.sfg,
     })
   end
+  for i, d in ipairs(DIAG_DEMO) do
+    pcall(vim.api.nvim_buf_set_extmark, ebuf, NS, diag_row0 + i - 1, 0, {
+      line_hl_group = d.line,
+      sign_text = d.sign,
+      sign_hl_group = d.grp,
+      virt_text = { { "  ● " .. d.msg, d.vt } },
+      virt_text_pos = "eol",
+    })
+  end
 
   -- panel buffer (interactive)
   local pbuf = vim.api.nvim_create_buf(false, true)
@@ -930,7 +1046,7 @@ function M.open()
     row = row0,
     col = col0,
     width = panel_w,
-    height = height,
+    height = panel_h,
     title = " flavour ",
   })
   vim.wo[session.panel.win].cursorline = true
