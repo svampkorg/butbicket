@@ -96,7 +96,6 @@ colorscheme.slate = "#636363"
 colorscheme.slate_gray = "#757575"
 colorscheme.steel_gray = "#878787"
 colorscheme.hotpink = "#ff007c"
-colorscheme.bright_green = "#30FF91"
 
 if vim.o.background == "light" then
   -- LIGHT
@@ -123,7 +122,6 @@ if vim.o.background == "light" then
   colorscheme.green = "#22863a"
   colorscheme.red = "#c0392b"
   colorscheme.hotpink = "#d1006a" -- MatchParen / flash
-  colorscheme.bright_green = "#177a3a"
   colorscheme.selected = "#8a3d5f"
   -- surfaces
   colorscheme.base_1 = "#f0f0f0"
