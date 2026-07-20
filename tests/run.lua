@@ -52,6 +52,11 @@ local required_keys = {
   "added_bright",
   "added_dim",
   "added",
+  "errorBase",
+  "warnBase",
+  "infoBase",
+  "hintBase",
+  "successBase",
 }
 
 -- fg-on-bg pairs to grade. Comments are intentionally low-contrast, so they get
@@ -246,6 +251,29 @@ do
     circ(hue(spun.addedBase), hue(canonical.addedBase)) < 1,
     "locked addedBase keeps its hue through hue_shift + n_hues"
   )
+  -- Diagnostic/status identities are locked the same way: info (was `blue`) and
+  -- hint (was `method`) must not follow the wheel now they have their own keys.
+  for _, k in ipairs({
+    "errorBase",
+    "warnBase",
+    "infoBase",
+    "hintBase",
+    "successBase",
+  }) do
+    check(
+      circ(hue(spun[k]), hue(canonical[k])) < 1,
+      "locked " .. k .. " keeps its hue through hue_shift + n_hues"
+    )
+  end
+  local pinned_hint = flavour.generate_hues(canonical, {
+    background = "#101214",
+    foreground = "#e7e7e8",
+    accents = { hint = "#ff00ff" },
+  })
+  check(
+    pinned_hint.hintBase == "#ff00ff",
+    "an explicit pin still overrides a locked diagnostic identity"
+  )
   local pinned_diff = flavour.generate_hues(canonical, {
     background = "#101214",
     foreground = "#e7e7e8",
@@ -295,6 +323,11 @@ do
     added = { "addedBase" }, -- diff add identity (locked)
     changed = { "changedBase" }, -- diff change identity (locked)
     removed = { "removedBase" }, -- diff remove identity (locked)
+    error = { "errorBase" }, -- ErrorMsg, DiagnosticError (locked)
+    warn = { "warnBase" }, -- WarningMsg, DiagnosticWarn (locked)
+    info = { "infoBase" }, -- DiagnosticInfo (locked)
+    hint = { "hintBase" }, -- DiagnosticHint (locked)
+    success = { "successBase" }, -- git-staged / NOTE status (locked)
   }
   local PIN = "#3366cc"
   for role, keys in pairs(role_group_keys) do

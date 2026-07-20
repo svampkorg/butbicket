@@ -87,6 +87,18 @@ colorscheme.cursorline = "#2B2B2E"
 colorscheme.addedBase = "#1A5C41"
 colorscheme.changedBase = "#1F3E6B"
 colorscheme.removedBase = "#7B2922"
+-- Diagnostic identity colors + success status. Each diagnostic level owns a
+-- semantic key instead of borrowing a syntax/link/function color, so spinning a
+-- syntax role's hue no longer drags DiagnosticHint (was `method`) or
+-- DiagnosticInfo (was `blue`). Seeded from the canonical colors they used to
+-- read. Locked from the flavour hue wheel like the diff family; customizable via
+-- an explicit pin. The integration aliases errorText/warningText/successText are
+-- derived from these at the end of this file.
+colorscheme.errorBase = colorscheme.red
+colorscheme.warnBase = colorscheme.mustard
+colorscheme.infoBase = colorscheme.blue
+colorscheme.hintBase = colorscheme.method
+colorscheme.successBase = colorscheme.green
 colorscheme.abyss = "#171717"
 colorscheme.dark_charcoal = "#2A2A2A"
 colorscheme.charcoal = "#3D3D3D"
@@ -136,6 +148,12 @@ if vim.o.background == "light" then
   colorscheme.addedBase = "#1a7f37"
   colorscheme.changedBase = "#0969da"
   colorscheme.removedBase = "#cf222e"
+  -- diagnostic identities (light); AA on white. error unified to the AA red
+  colorscheme.errorBase = "#d32f2f"
+  colorscheme.warnBase = "#b26a00"
+  colorscheme.infoBase = "#1976d2"
+  colorscheme.hintBase = "#0f6e5a"
+  colorscheme.successBase = "#22863a"
 
   -- use #FDFDFD as white
   colorscheme.editorBackground = config.transparent and "none" or "#ffffff"
@@ -160,12 +178,9 @@ if vim.o.background == "light" then
   colorscheme.syntaxFunction = "#6871ff"
   colorscheme.syntaxError = "#d6656a"
   colorscheme.syntaxKeyword = "#9966cc"
-  colorscheme.errorText = "#d32f2f"
-  colorscheme.warningText = "#b26a00" -- darkened for >=4.0 contrast on white
   colorscheme.linkText = "#1976d2"
   colorscheme.commentText = "#848484"
   colorscheme.stringText = "#b35c00" -- darkened to AA (4.7) on white
-  colorscheme.successText = "#22863a"
   colorscheme.warningEmphasis = "#cd9731"
   colorscheme.specialKeyword = "#800080"
   colorscheme.syntaxOperator = "#a1a1a1"
@@ -196,13 +211,10 @@ else
 
   colorscheme.syntaxError = colorscheme.red
   colorscheme.syntaxFunction = colorscheme.method
-  colorscheme.warningText = colorscheme.mustard
   colorscheme.syntaxKeyword = colorscheme.keyword
   colorscheme.linkText = colorscheme.blue
   colorscheme.stringText = colorscheme.stringText
   colorscheme.warningEmphasis = colorscheme.yellow
-  colorscheme.successText = colorscheme.green
-  colorscheme.errorText = colorscheme.red
   colorscheme.specialKeyword = colorscheme.method
   colorscheme.commentText = colorscheme.slate
   colorscheme.syntaxOperator = colorscheme.parenthesis
@@ -247,5 +259,13 @@ do
     result[t .. "_dim"] = utils.mix(base, ebg, dim)
   end
 end
+
+-- Integration foreground aliases derived from the locked diagnostic/status
+-- identities, AFTER the flavour, so a pinned identity flows to every integration
+-- that reads errorText/warningText/successText and stays in lockstep with the
+-- diagnostic groups (which read *Base directly).
+result.errorText = result.errorBase
+result.warningText = result.warnBase
+result.successText = result.successBase
 
 return result

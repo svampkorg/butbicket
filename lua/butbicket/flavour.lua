@@ -30,8 +30,8 @@ end
 --     never move — `hue_shift`/`chroma_mult`/`n_hues`/`base_hue` all skip it, so
 --     it keeps its hue (only its lightness is remapped to fit a new background).
 --     It changes ONLY when the user explicitly pins it. Used for the diff
---     add/change/remove identities, which are intrinsically green/blue/red.
--- errorText/warningText/successText are still absent (handled elsewhere).
+--     add/change/remove identities, which are intrinsically green/blue/red,
+--     and the diagnostic/status identities (error/warn/info/hint/success).
 --
 -- `ROLE_KEYS`/`ROLE_ORDER`/`ROLE_SURFACE`/`ROLE_LOCKED` are all derived from this
 -- single source below, so they can never drift; a test asserts it.
@@ -69,6 +69,15 @@ M.ROLES = {
   { name = "added", keys = { "addedBase" }, locked = true },
   { name = "changed", keys = { "changedBase" }, locked = true },
   { name = "removed", keys = { "removedBase" }, locked = true },
+  -- diagnostic + status identities: locked so a hue change never turns an error
+  -- non-red or drags a hint off its own hue. Each owns a dedicated *Base key;
+  -- colorscheme.lua points the diagnostic groups (and the errorText/warningText/
+  -- successText integration aliases) at these, so a pin flows through everywhere.
+  { name = "error", keys = { "errorBase" }, locked = true },
+  { name = "warn", keys = { "warnBase" }, locked = true },
+  { name = "info", keys = { "infoBase" }, locked = true },
+  { name = "hint", keys = { "hintBase" }, locked = true },
+  { name = "success", keys = { "successBase" }, locked = true },
 }
 
 M.ROLE_KEYS = {}
@@ -131,8 +140,9 @@ end
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
 ---       or a number (hue degrees, hue-only). Roles: keyword, func, special,
 ---       type, number, string, link, accent, comment, variable, operator,
----       punctuation, annotation, search, incsearch, added, changed, removed
----       (the last three are locked identities — only an explicit pin moves them)
+---       punctuation, annotation, search, incsearch, added, changed, removed,
+---       error, warn, info, hint, success (added..success are locked identities
+---       — only an explicit pin moves them)
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
 

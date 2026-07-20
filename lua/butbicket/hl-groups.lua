@@ -29,7 +29,7 @@ return {
   EndOfBuffer = { fg = colorscheme.syntaxKeyword },
   TermCursor = { link = "Cursor" },
   TermCursorNC = { link = "Cursor" },
-  ErrorMsg = { fg = colorscheme.syntaxError },
+  ErrorMsg = { fg = colorscheme.errorBase },
   VertSplit = { fg = colorscheme.windowBorder, bg = bg },
   Winseparator = { link = "VertSplit" },
   SignColumn = { link = "Normal" },
@@ -91,14 +91,14 @@ return {
   CurSearch = {
     bg = utils.mix(colorscheme.searchBase, colorscheme.editorBackground, 0.8),
   },
-  SpellBad = { undercurl = true, sp = colorscheme.syntaxError },
+  SpellBad = { undercurl = true, sp = colorscheme.errorBase },
   SpellCap = { undercurl = true, sp = colorscheme.syntaxFunction },
   SpellLocal = { undercurl = true, sp = colorscheme.syntaxKeyword },
-  SpellRare = { undercurl = true, sp = colorscheme.warningText },
+  SpellRare = { undercurl = true, sp = colorscheme.warnBase },
   Title = { fg = colorscheme.syntaxFunction },
   Visual = { bg = colorscheme.menuOptionBackground },
   VisualNOS = { link = "Visual" },
-  WarningMsg = { fg = colorscheme.warningText },
+  WarningMsg = { fg = colorscheme.warnBase },
   Whitespace = { fg = colorscheme.syntaxOperator },
   WildMenu = { bg = colorscheme.menuOptionBackground },
   Comment = {
@@ -155,38 +155,30 @@ return {
   Italic = { italic = true },
   Ignore = { fg = colorscheme.editorBackground },
   Error = { link = "ErrorMsg" },
-  Todo = { fg = colorscheme.warningText, bold = true },
+  Todo = { fg = colorscheme.warnBase, bold = true },
   DiagnosticError = { link = "Error" },
   DiagnosticWarn = { link = "WarningMsg" },
-  DiagnosticInfo = { fg = colorscheme.blue },
-  DiagnosticHint = { fg = colorscheme.method },
+  DiagnosticInfo = { fg = colorscheme.infoBase },
+  DiagnosticHint = { fg = colorscheme.hintBase },
   DiagnosticVirtualTextError = { link = "DiagnosticError" },
   DiagnosticVirtualTextWarn = { link = "DiagnosticWarn" },
   DiagnosticVirtualTextInfo = { link = "DiagnosticInfo" },
   DiagnosticVirtualTextHint = { link = "DiagnosticHint" },
-  DiagnosticUnderlineError = { undercurl = true, fg = colorscheme.syntaxError },
-  DiagnosticUnderlineWarn = { undercurl = true, fg = colorscheme.warningText },
-  DiagnosticUnderlineInfo = { undercurl = true, fg = colorscheme.blue },
-  DiagnosticUnderlineHint = { undercurl = true, fg = colorscheme.method },
+  DiagnosticUnderlineError = { undercurl = true, fg = colorscheme.errorBase },
+  DiagnosticUnderlineWarn = { undercurl = true, fg = colorscheme.warnBase },
+  DiagnosticUnderlineInfo = { undercurl = true, fg = colorscheme.infoBase },
+  DiagnosticUnderlineHint = { undercurl = true, fg = colorscheme.hintBase },
   DiagnosticLineError = {
-    bg = utils.shade(
-      colorscheme.syntaxError,
-      0.1,
-      colorscheme.editorBackground
-    ),
+    bg = utils.shade(colorscheme.errorBase, 0.1, colorscheme.editorBackground),
   },
   DiagnosticLineWarn = {
-    bg = utils.shade(
-      colorscheme.warningText,
-      0.1,
-      colorscheme.editorBackground
-    ),
+    bg = utils.shade(colorscheme.warnBase, 0.1, colorscheme.editorBackground),
   },
   DiagnosticLineInfo = {
-    bg = utils.shade(colorscheme.blue, 0.1, colorscheme.editorBackground),
+    bg = utils.shade(colorscheme.infoBase, 0.1, colorscheme.editorBackground),
   },
   DiagnosticLineHint = {
-    bg = utils.shade(colorscheme.method, 0.1, colorscheme.editorBackground),
+    bg = utils.shade(colorscheme.hintBase, 0.1, colorscheme.editorBackground),
   },
   -- treesitter-context, neo-tree and lazy groups now live in their own
   -- auto-gated integration modules.

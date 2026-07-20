@@ -186,13 +186,16 @@ Syntax roles: `keyword`, `func`, `special`, `type`, `number`, `string`, `link`,
 (`IncSearch` + `Substitute`). Each search role has its own palette base, so
 tuning it never touches syntax or the diff tint.
 
-Diff-identity roles: `added`, `changed`, `removed` (green/blue/red). These are
+Locked identity roles: `added`, `changed`, `removed` (diff, green/blue/red) and
+`error`, `warn`, `info`, `hint`, `success` (diagnostics/status). These are
 **locked** — `hue_shift`/`chroma_mult`/`n_hues`/`base_hue` never move them (only
 their lightness remaps to fit a new background), so a diff stays green/blue/red
-whatever you do to the wheel. They change only when you pin one explicitly, and a
-pin flows through the whole diff family (the sign/text foreground and the derived
-line backgrounds). Diagnostic colors (error/warning/success) are never re-hued
-either.
+and an error stays red whatever you do to the wheel. They change only when you
+pin one explicitly, and a pin flows through the whole family: for diff, the
+sign/text foreground and the derived line backgrounds; for a diagnostic, every
+`Diagnostic*`/`*Msg` group plus the `errorText`/`warningText`/`successText`
+integration colors. Each diagnostic level owns a dedicated palette key, so tuning
+a syntax role (`func`, `link`, …) no longer drags `info` or `hint` with it.
 
 ```lua
 flavour = {
