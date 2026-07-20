@@ -409,19 +409,6 @@ end
 
 local close_color_editor -- forward decl (defined with the color editor below)
 
--- butbicket.colorscheme() applies highlights directly and does NOT fire the
--- ColorScheme event (the :colorscheme command normally does, after sourcing the
--- colors file). The playground drives colorscheme() directly, so fire the event
--- once on exit — after the final palette is in place — so ColorScheme listeners
--- resync (e.g. an incline refresh autocmd). It is intentionally NOT fired on
--- every live keystroke: that would thrash such listeners and flicker.
-local function emit_colorscheme()
-  pcall(vim.api.nvim_exec_autocmds, "ColorScheme", {
-    pattern = vim.g.colors_name or "butbicket",
-    modeline = false,
-  })
-end
-
 local function close(session, restore)
   if session.closing then
     return
@@ -442,23 +429,24 @@ local function close(session, restore)
     end
   end
 
-  local emitted = false
+  -- Re-apply through the :colorscheme COMMAND, not the bare colorscheme()
+  -- function. The function applies highlights directly and never fires the
+  -- ColorScheme autocmd, so listeners (incline's refresh, user autocmds) go
+  -- stale; :colorscheme sources the colors file — which re-reads config.flavour,
+  -- so the accepted/restored look is preserved — and fires ColorScheme natively,
+  -- exactly like a manual `:colorscheme butbicket`. Done once on exit only (not
+  -- per live keystroke, which would thrash those listeners and flicker).
+  --
+  -- On restore, reset config.flavour to its exact prior raw state first (nil
+  -- falls back to the setup metatable = the user's real flavour). On accept, the
+  -- raw shadow already holds the accepted opts and is intentionally kept.
   if restore then
-    -- restore the exact raw state of config.flavour (nil falls back to the
-    -- setup metatable, i.e. the user's real flavour) and re-apply.
     config.flavour = session.prev_flavour
-    if session.prev_colors_name and session.prev_colors_name ~= "butbicket" then
-      pcall(vim.cmd.colorscheme, session.prev_colors_name) -- fires ColorScheme
-      emitted = true
-    else
-      require("butbicket").colorscheme()
-    end
   end
-  -- On accept the final flavour is already applied (last live refresh); on a
-  -- restore to butbicket we just re-applied. Either way, notify listeners once.
-  if not emitted then
-    emit_colorscheme()
-  end
+  local target = (restore and session.prev_colors_name)
+    or vim.g.colors_name
+    or "butbicket"
+  pcall(vim.cmd.colorscheme, target)
   P = nil
 end
 
