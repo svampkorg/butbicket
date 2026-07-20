@@ -34,6 +34,12 @@ vim.api.nvim_create_user_command("ButbicketExtras", function(o)
     )
     return
   end
+  -- generate() collects the palette via the bare colorscheme() function, which
+  -- does `hi clear` + re-apply but never fires the ColorScheme event — so
+  -- listeners (incline's refresh, user autocmds) go stale. Re-apply through the
+  -- :colorscheme COMMAND to fire it natively, exactly like the playground on
+  -- close.
+  pcall(vim.cmd.colorscheme, vim.g.colors_name or "butbicket")
   vim.notify(
     ("butbicket: wrote %d files to %s"):format(#written, dir),
     vim.log.levels.INFO,
