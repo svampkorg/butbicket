@@ -253,6 +253,20 @@ nvim -l scripts/gen-terminals.lua dark         # both terminals, dark only
 nvim -l scripts/gen-terminals.lua dark kitty   # dark, kitty only
 ```
 
+### Match a flavour
+
+The committed `extras/` are the canonical palette. If you run a `flavour`, the
+files above won't match it — regenerate them from your live config with:
+
+```vim
+:ButbicketExtras            " -> ./butbicket-extras/, for the current background
+:ButbicketExtras ~/themes   " -> a directory of your choice
+```
+
+It reads whatever `flavour` is active in your `setup{}` and emits every target
+(terminals + bat + Claude Code) into `<dir>/<target>/butbicket-<bg>.*`, matching
+your editor. Point your terminal/bat at those files instead of the repo ones.
+
 Then point your terminal at the relevant file, e.g.:
 
 - **Ghostty**: `theme = /path/to/extras/ghostty/butbicket-dark`

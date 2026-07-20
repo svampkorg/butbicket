@@ -369,6 +369,38 @@ do
   )
 end
 
+-- Extras generator: emits one file per target, and the output reflects the
+-- active flavour (so :ButbicketExtras matches a user's pasted flavour).
+print("\n== extras ==")
+do
+  local extras = require("butbicket.extras")
+  check(
+    type(extras.generate) == "function" and #extras.TARGETS >= 7,
+    "extras exposes generate() + TARGETS"
+  )
+
+  local config = require("butbicket.config")
+  config.flavour = { background = "#1a1b26", foreground = "#c0caf5" }
+  local dir = vim.fn.tempname()
+  local written = extras.generate({ dir = dir, variants = { "dark" } })
+  config.flavour = nil
+  require("butbicket").colorscheme()
+
+  check(
+    #written == #extras.TARGETS,
+    "generate writes one file per target (" .. #written .. ")"
+  )
+  local f = io.open(dir .. "/ghostty/butbicket-dark", "r")
+  local body = f and f:read("*a")
+  if f then
+    f:close()
+  end
+  check(
+    body ~= nil and body:match("background = #1A1B26") ~= nil,
+    "generated extras reflect the active flavour background"
+  )
+end
+
 print("")
 if #failures > 0 then
   print(("%d check(s) failed"):format(#failures))
