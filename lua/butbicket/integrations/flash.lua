@@ -1,6 +1,7 @@
 local colorscheme = require("butbicket.colorscheme")
 local contrast = require("butbicket.contrast")
 local oklab = require("butbicket.oklab")
+local util = require("butbicket.utils")
 
 local M = {}
 
@@ -21,19 +22,17 @@ local function bg_is_dark()
   return l < 50
 end
 
--- A subtle raised surface for the current match (the one Enter jumps to).
--- Derived from editorBackground, NOT the search color: a small lightness lift on
--- a dark bg / dip on a light one marks the spot without needing readable text
--- (Enter jumps regardless). Returns nil when the background is transparent, so
--- FlashCurrent simply omits a bg then.
-local function current_bg(dark)
+-- Surface for the current match (the one Enter jumps to). A dimmed, desaturated
+-- version of the label chip: the SAME complementary hue as the labels, blended
+-- most of the way to editorBackground so it reads as "a label you reach with
+-- Enter" rather than a full keycap. Not the search color, so tuning search never
+-- muddies it. Returns nil on a transparent background (FlashCurrent omits a bg).
+local function current_bg(chip)
   local bg = colorscheme.editorBackground
   if type(bg) ~= "string" or not bg:match(HEX) then
     return nil
   end
-  local lch = oklab.hex_to_oklch(bg)
-  local l = math.min(math.max(lch.l + (dark and 12 or -10), 0), 100)
-  return oklab.oklch_to_hex({ l = l, c = lch.c, h = lch.h })
+  return util.mix(chip, bg, 0.32) -- mostly background, a clear hint of the chip
 end
 
 -- A bright, vivid foreground in the accent hue for the current match. Chroma
@@ -71,7 +70,7 @@ function M.highlights()
     -- accent so flash still renders something sane.
     return {
       FlashMatch = { fg = hp },
-      FlashCurrent = { fg = hp, bg = current_bg(bg_is_dark()) },
+      FlashCurrent = { fg = hp },
       FlashLabel = { fg = hp, bold = true },
     }
   end
@@ -83,7 +82,7 @@ function M.highlights()
     FlashMatch = { fg = hp },
     FlashCurrent = {
       fg = match_fg(lch, dark),
-      bg = current_bg(dark),
+      bg = current_bg(chip),
     },
     FlashLabel = { fg = letter, bg = chip, bold = true },
   }
