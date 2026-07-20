@@ -228,8 +228,12 @@ text, so an external color picker — e.g. [ccc.nvim](https://github.com/uga-ros
 any buffer edit.
 
 Accept copies the block to the `+` register; paste it into your `setup{}` to make
-it permanent. There is no default keymap — bind `<Plug>(butbicket-flavour)` if you
-want one:
+it permanent. On exit (accept or cancel) the playground fires a `ColorScheme`
+event once, so any `ColorScheme` autocmd you rely on re-runs against the final
+palette (e.g. refreshing a winbar plugin like incline). It is *not* fired on each
+live change, to avoid thrashing such listeners while you tune.
+
+There is no default keymap — bind `<Plug>(butbicket-flavour)` if you want one:
 
 ```lua
 vim.keymap.set("n", "<leader>bf", "<Plug>(butbicket-flavour)")

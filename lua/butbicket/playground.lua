@@ -409,6 +409,19 @@ end
 
 local close_color_editor -- forward decl (defined with the color editor below)
 
+-- butbicket.colorscheme() applies highlights directly and does NOT fire the
+-- ColorScheme event (the :colorscheme command normally does, after sourcing the
+-- colors file). The playground drives colorscheme() directly, so fire the event
+-- once on exit — after the final palette is in place — so ColorScheme listeners
+-- resync (e.g. an incline refresh autocmd). It is intentionally NOT fired on
+-- every live keystroke: that would thrash such listeners and flicker.
+local function emit_colorscheme()
+  pcall(vim.api.nvim_exec_autocmds, "ColorScheme", {
+    pattern = vim.g.colors_name or "butbicket",
+    modeline = false,
+  })
+end
+
 local function close(session, restore)
   if session.closing then
     return
@@ -428,14 +441,23 @@ local function close(session, restore)
       pcall(vim.api.nvim_buf_delete, b, { force = true })
     end
   end
+
+  local emitted = false
   if restore then
     -- restore the exact raw state of config.flavour (nil falls back to the
     -- setup metatable, i.e. the user's real flavour) and re-apply.
     config.flavour = session.prev_flavour
-    require("butbicket").colorscheme()
     if session.prev_colors_name and session.prev_colors_name ~= "butbicket" then
-      pcall(vim.cmd.colorscheme, session.prev_colors_name)
+      pcall(vim.cmd.colorscheme, session.prev_colors_name) -- fires ColorScheme
+      emitted = true
+    else
+      require("butbicket").colorscheme()
     end
+  end
+  -- On accept the final flavour is already applied (last live refresh); on a
+  -- restore to butbicket we just re-applied. Either way, notify listeners once.
+  if not emitted then
+    emit_colorscheme()
   end
   P = nil
 end
