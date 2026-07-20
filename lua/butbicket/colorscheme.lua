@@ -59,6 +59,7 @@ colorscheme.variable_member = "#96999E"
 colorscheme.parameter = "#AAABAF"
 colorscheme.selected = "#89576E"
 colorscheme.selected_inactive = "#464646"
+colorscheme.annotation = "#89576E" -- @attribute / PreCondit (own key, tunable)
 colorscheme.type = "#CFE1FD"
 colorscheme.blue = "#669CF0"
 colorscheme.green = "#73A130"
@@ -121,6 +122,7 @@ if vim.o.background == "light" then
   colorscheme.red = "#c0392b"
   colorscheme.hotpink = "#d1006a" -- MatchParen / flash
   colorscheme.selected = "#8a3d5f"
+  colorscheme.annotation = "#8a3d5f" -- @attribute / PreCondit
   -- surfaces
   colorscheme.base_1 = "#f0f0f0"
   colorscheme.base_2 = "#eaeaea"

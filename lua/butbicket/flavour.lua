@@ -53,6 +53,11 @@ M.ROLES = {
   },
   -- true operators only; brackets/punctuation are a separate color (light_red).
   { name = "operator", keys = { "syntaxOperator" } },
+  -- brackets / punctuation / delimiters (kept distinct from operator).
+  { name = "punctuation", keys = { "light_red" } },
+  -- attributes / decorators / annotations (@override etc.) + PreCondit; own key
+  -- so it doesn't drag the selection color it used to share.
+  { name = "annotation", keys = { "annotation" } },
   -- UI backgrounds: hlsearch matches, and the incremental-search / :substitute
   -- preview. Each has a dedicated single-purpose palette key so tuning it never
   -- touches syntax or the diff tint.
@@ -126,8 +131,8 @@ end
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
 ---       or a number (hue degrees, hue-only). Roles: keyword, func, special,
 ---       type, number, string, link, accent, comment, variable, operator,
----       search, incsearch, added, changed, removed (the last three are locked
----       identities — only an explicit pin here moves them)
+---       punctuation, annotation, search, incsearch, added, changed, removed
+---       (the last three are locked identities — only an explicit pin moves them)
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
 

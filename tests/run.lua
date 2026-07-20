@@ -288,6 +288,8 @@ do
     comment = { "commentText" }, -- Comment, SpecialComment, @comment
     variable = { "variable", "variable_member", "parameter" }, -- @variable(.member), Parameter
     operator = { "syntaxOperator" }, -- Operator, Delimiter, Special
+    punctuation = { "light_red" }, -- Punctuation / brackets
+    annotation = { "annotation" }, -- @attribute, PreCondit
     search = { "searchBase" }, -- Search, CurSearch (+ flash current label)
     incsearch = { "incSearchBase" }, -- IncSearch, Substitute
     added = { "addedBase" }, -- diff add identity (locked)

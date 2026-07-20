@@ -105,6 +105,32 @@ if not zoo[1] then
 end
 ]]
 
+-- A small git-diff demo appended to the sample so the diff.* roles (and the
+-- derived line backgrounds) are visible in the float without a real git buffer
+-- or a signs plugin. Each line gets a DiffAdd/Change/Delete line background and
+-- a sign coloured by the Added/Changed/Removed foreground groups; all recolor
+-- live with the flavour.
+local DIFF_DEMO = {
+  {
+    text = "  local inserted = true",
+    line = "DiffAdd",
+    sign = "+",
+    sfg = "Added",
+  },
+  {
+    text = '  local modified = "edit"',
+    line = "DiffChange",
+    sign = "~",
+    sfg = "Changed",
+  },
+  {
+    text = "  local deleted = nil",
+    line = "DiffDelete",
+    sign = "-",
+    sfg = "Removed",
+  },
+}
+
 local P -- the single active session, or nil
 
 local function clamp(x, lo, hi)
@@ -861,13 +887,14 @@ function M.open()
 
   -- example buffer (real syntax groups paint it via filetype/treesitter)
   local ebuf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_lines(
-    ebuf,
-    0,
-    -1,
-    false,
-    vim.split(SAMPLE:gsub("^\n", ""), "\n", { plain = true })
-  )
+  local elines = vim.split(SAMPLE:gsub("^\n", ""), "\n", { plain = true })
+  elines[#elines + 1] = ""
+  elines[#elines + 1] = "-- git diff preview"
+  local diff_row0 = #elines -- 0-based row of the first demo line
+  for _, d in ipairs(DIFF_DEMO) do
+    elines[#elines + 1] = d.text
+  end
+  vim.api.nvim_buf_set_lines(ebuf, 0, -1, false, elines)
   vim.bo[ebuf].filetype = "lua"
   vim.bo[ebuf].modifiable = false
   session.example.buf = ebuf
@@ -880,6 +907,18 @@ function M.open()
     title = " sample.lua ",
   })
   vim.wo[session.example.win].cursorline = false
+  vim.wo[session.example.win].signcolumn = "yes" -- 'minimal' float hides it
+
+  -- Paint the diff demo: line background + a gutter sign per line. Extmarks
+  -- reference the hl groups by name, so they re-resolve when the flavour applies
+  -- (no need to redo this on every refresh).
+  for i, d in ipairs(DIFF_DEMO) do
+    pcall(vim.api.nvim_buf_set_extmark, ebuf, NS, diff_row0 + i - 1, 0, {
+      line_hl_group = d.line,
+      sign_text = d.sign,
+      sign_hl_group = d.sfg,
+    })
+  end
 
   -- panel buffer (interactive)
   local pbuf = vim.api.nvim_create_buf(false, true)

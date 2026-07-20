@@ -180,7 +180,8 @@ normal. A pin is either:
   own lightness/chroma (grading preserved).
 
 Syntax roles: `keyword`, `func`, `special`, `type`, `number`, `string`, `link`,
-`accent`, `comment`, `variable`, `operator`. UI-background roles: `search`
+`accent`, `comment`, `variable`, `operator`, `punctuation` (brackets/delimiters),
+`annotation` (attributes/decorators like `@override`). UI-background roles: `search`
 (`Search` + `CurSearch`, and flash's current-match label) and `incsearch`
 (`IncSearch` + `Substitute`). Each search role has its own palette base, so
 tuning it never touches syntax or the diff tint.
