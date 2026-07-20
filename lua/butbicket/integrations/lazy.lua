@@ -4,7 +4,7 @@ local M = {}
 
 function M.highlights()
   return {
-    LazyLocal = { fg = c.green },
+    LazyLocal = { fg = c.successText },
     LazySpecial = { fg = c.blue },
   }
 end

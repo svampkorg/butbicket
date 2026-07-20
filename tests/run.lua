@@ -46,7 +46,6 @@ local required_keys = {
   "floatBorder",
   "searchBase",
   "incSearchBase",
-  "diffTextBase",
   "addedBase",
   "changedBase",
   "removedBase",

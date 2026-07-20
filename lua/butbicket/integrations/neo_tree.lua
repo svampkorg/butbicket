@@ -8,9 +8,9 @@ function M.highlights()
     NeoTreeGitConflict = { fg = c.errorText },
     NeoTreeGitDeleted = { fg = c.removed_bright },
     NeoTreeGitIgnored = { fg = c.slate_gray },
-    NeoTreeGitModified = { fg = c.mustard }, -- unstaged
-    NeoTreeGitStaged = { fg = c.green },
-    NeoTreeGitRenamed = { fg = c.mustard },
+    NeoTreeGitModified = { fg = c.warningText }, -- unstaged
+    NeoTreeGitStaged = { fg = c.successText },
+    NeoTreeGitRenamed = { fg = c.warningText },
     NeoTreeGitUntracked = { fg = c.slate_gray },
   }
 end

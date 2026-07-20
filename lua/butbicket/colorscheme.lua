@@ -67,10 +67,8 @@ colorscheme.red = "#E78178"
 colorscheme.light_red = "#FEC195"
 colorscheme.searchBase = "#7B6215" -- Search / CurSearch + flash current label
 colorscheme.incSearchBase = "#DA70D6" -- IncSearch / Substitute
-colorscheme.diffTextBase = "#7B6215" -- DiffText intra-line change tint
 colorscheme.mustard = "#BA9420"
 colorscheme.yellow = "#FBC828"
-colorscheme.light_yellow = "#FFD700"
 colorscheme.dark_purple = "#BF63F3"
 colorscheme.purple = "#DA70D6"
 colorscheme.base = "#101214"
@@ -143,7 +141,6 @@ if vim.o.background == "light" then
   colorscheme.cursorline = "#e8e8e8"
   colorscheme.searchBase = "#d9b23a" -- Search / CurSearch + flash current label
   colorscheme.incSearchBase = "#9b2393" -- IncSearch / Substitute
-  colorscheme.diffTextBase = "#d9b23a" -- DiffText intra-line change tint
   -- diff identities (GitHub-light); backgrounds derived at end of file
   colorscheme.addedBase = "#1a7f37"
   colorscheme.changedBase = "#0969da"
@@ -164,7 +161,6 @@ if vim.o.background == "light" then
 
   colorscheme.mainText = "#616161"
   colorscheme.emphasisText = "#212121"
-  colorscheme.commandText = "#333333"
   colorscheme.inactiveText = "#9e9e9e"
   colorscheme.disabledText = "#d0d0d0"
   colorscheme.lineNumberText = "#a1a1a1"
@@ -184,7 +180,6 @@ if vim.o.background == "light" then
   colorscheme.accentEmphasis = "#cd9731"
   colorscheme.specialKeyword = "#800080"
   colorscheme.syntaxOperator = "#a1a1a1"
-  colorscheme.foregroundEmphasis = "#000000"
   colorscheme.terminalGray = "#333333"
   colorscheme.syntaxNumber = colorscheme.number
 else
@@ -198,7 +193,6 @@ else
 
   colorscheme.mainText = colorscheme.text_dark
   colorscheme.emphasisText = colorscheme.text
-  colorscheme.commandText = colorscheme.variable
   colorscheme.inactiveText = colorscheme.slate
   colorscheme.disabledText = colorscheme.variable_member
   colorscheme.lineNumberText = colorscheme.dark_slate
@@ -218,7 +212,6 @@ else
   colorscheme.specialKeyword = colorscheme.method
   colorscheme.commentText = colorscheme.slate
   colorscheme.syntaxOperator = colorscheme.parenthesis
-  colorscheme.foregroundEmphasis = colorscheme.type
   colorscheme.syntaxNumber = colorscheme.number
   colorscheme.terminalGray = colorscheme.base
 end

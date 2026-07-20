@@ -28,7 +28,7 @@ function M.highlights()
       bg = c.syntaxKeyword,
       bold = true,
     },
-    NvimTreeGitDirty = { fg = c.mustard },
+    NvimTreeGitDirty = { fg = c.warningText },
     NvimTreeGitNew = { fg = c.added_bright },
     NvimTreeGitStaged = { fg = c.successText },
     NvimTreeGitDeleted = { fg = c.removed_bright },

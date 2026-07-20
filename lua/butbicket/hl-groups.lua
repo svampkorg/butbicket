@@ -2,8 +2,6 @@ local colorscheme = require("butbicket.colorscheme")
 local config = require("butbicket.config")
 local utils = require("butbicket.utils")
 local bg = config.transparent and "NONE" or colorscheme.editorBackground
-local diff_text =
-  utils.shade(colorscheme.diffTextBase, 0.5, colorscheme.editorBackground)
 
 return {
   Normal = { fg = colorscheme.mainText, bg = bg },
@@ -25,7 +23,9 @@ return {
   DiffChange = { bg = colorscheme.changed_dim },
   DiffDelete = { bg = colorscheme.removed_dim },
   -- GitSigns groups now live in integrations/gitsigns.lua (auto-gated).
-  DiffText = { bg = diff_text },
+  -- Intra-line change tint: the brighter `changed` mid, so it pops out of the
+  -- DiffChange (changed_dim) line and tracks the locked changed identity.
+  DiffText = { bg = colorscheme.changed },
   EndOfBuffer = { fg = colorscheme.syntaxKeyword },
   TermCursor = { link = "Cursor" },
   TermCursorNC = { link = "Cursor" },
