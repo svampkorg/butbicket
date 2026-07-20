@@ -46,6 +46,12 @@ local required_keys = {
   "searchBase",
   "incSearchBase",
   "diffTextBase",
+  "addedBase",
+  "changedBase",
+  "removedBase",
+  "added_bright",
+  "added_dim",
+  "added",
 }
 
 -- fg-on-bg pairs to grade. Comments are intentionally low-contrast, so they get
@@ -227,6 +233,29 @@ do
   )
   check(hued.editorBackground ~= nil, "generate_hues keeps a complete palette")
 
+  -- Locked diff identities: hue_shift + n_hues must NOT rotate their hue (only
+  -- lightness may remap). An explicit pin is the only thing that moves them.
+  local spun = flavour.generate_hues(canonical, {
+    background = "#101214",
+    foreground = "#e7e7e8",
+    hue_shift = 120,
+    n_hues = 3,
+    base_hue = 47,
+  })
+  check(
+    circ(hue(spun.addedBase), hue(canonical.addedBase)) < 1,
+    "locked addedBase keeps its hue through hue_shift + n_hues"
+  )
+  local pinned_diff = flavour.generate_hues(canonical, {
+    background = "#101214",
+    foreground = "#e7e7e8",
+    accents = { removed = "#ff00ff" },
+  })
+  check(
+    pinned_diff.removedBase == "#ff00ff",
+    "an explicit pin still overrides a locked diff identity"
+  )
+
   -- Regression: the `number` role must move `syntaxNumber` too — the Number /
   -- Float / @number highlight groups read that alias, not `number`. Pinning the
   -- role and leaving syntaxNumber behind is an invisible-no-op bug.
@@ -261,6 +290,9 @@ do
     operator = { "syntaxOperator" }, -- Operator, Delimiter, Special
     search = { "searchBase" }, -- Search, CurSearch (+ flash current label)
     incsearch = { "incSearchBase" }, -- IncSearch, Substitute
+    added = { "addedBase" }, -- diff add identity (locked)
+    changed = { "changedBase" }, -- diff change identity (locked)
+    removed = { "removedBase" }, -- diff remove identity (locked)
   }
   local PIN = "#3366cc"
   for role, keys in pairs(role_group_keys) do

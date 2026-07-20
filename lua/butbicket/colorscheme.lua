@@ -79,15 +79,13 @@ colorscheme.base_3 = "#2D2D2D"
 colorscheme.base_4 = "#303134"
 colorscheme.separator = "#46474B"
 colorscheme.cursorline = "#2B2B2E"
-colorscheme.added = "#164B35"
-colorscheme.removed = "#5D1F1A"
-colorscheme.changed = "#183053"
-colorscheme.added_dim = "#212A27"
-colorscheme.removed_dim = "#2E2322"
-colorscheme.changed_dim = "#20252B"
-colorscheme.added_bright = "#1A5C41"
-colorscheme.removed_bright = "#7B2922"
-colorscheme.changed_bright = "#1F3E6B"
+-- Diff identity colors (green/blue/red). The fg (`*_bright`) and the mid/dim
+-- backgrounds (`*`, `*_dim`) are derived from these at the end of this file, so
+-- everything diff-related tracks one source and stays in lockstep with a flavour
+-- customization. These identities are locked from the flavour hue wheel.
+colorscheme.addedBase = "#1A5C41"
+colorscheme.changedBase = "#1F3E6B"
+colorscheme.removedBase = "#7B2922"
 colorscheme.abyss = "#171717"
 colorscheme.dark_charcoal = "#2A2A2A"
 colorscheme.charcoal = "#3D3D3D"
@@ -132,16 +130,10 @@ if vim.o.background == "light" then
   colorscheme.searchBase = "#d9b23a" -- Search / CurSearch + flash current label
   colorscheme.incSearchBase = "#9b2393" -- IncSearch / Substitute
   colorscheme.diffTextBase = "#d9b23a" -- DiffText intra-line change tint
-  -- diff (GitHub-light palette)
-  colorscheme.added = "#c4e7d4"
-  colorscheme.removed = "#f7d4d0"
-  colorscheme.changed = "#cfe2fb"
-  colorscheme.added_dim = "#e6f4ea"
-  colorscheme.removed_dim = "#fbe9e7"
-  colorscheme.changed_dim = "#e3f0fd"
-  colorscheme.added_bright = "#1a7f37"
-  colorscheme.removed_bright = "#cf222e"
-  colorscheme.changed_bright = "#0969da"
+  -- diff identities (GitHub-light); backgrounds derived at end of file
+  colorscheme.addedBase = "#1a7f37"
+  colorscheme.changedBase = "#0969da"
+  colorscheme.removedBase = "#cf222e"
 
   -- use #FDFDFD as white
   colorscheme.editorBackground = config.transparent and "none" or "#ffffff"
@@ -221,13 +213,37 @@ colorscheme.floatBorder = colorscheme.dark_slate
 -- Opt-in flavour: re-tone the whole palette onto a new base while keeping
 -- butbicket's hue relationships (see butbicket.flavour). Applied last so it
 -- transforms the fully-resolved palette, then transparency is re-honoured.
+local result = colorscheme
 if type(config.flavour) == "table" then
-  local flavoured =
+  result =
     require("butbicket.flavour").generate_hues(colorscheme, config.flavour)
   if config.transparent then
-    flavoured.editorBackground = "none"
+    result.editorBackground = "none"
   end
-  return flavoured
 end
 
-return colorscheme
+-- Derive the diff family from the three locked identity colors, AFTER the
+-- flavour so it operates on the final palette. `*_bright` is the identity fg;
+-- the mid (`*`) and dim (`*_dim`) backgrounds are the identity blended toward
+-- the editor background. Every diff highlight + integration reads these, so a
+-- pinned identity flows through the whole family. Lighter alphas on a light
+-- background keep the backgrounds pale; heavier on dark keep them readable.
+do
+  local utils = require("butbicket.utils")
+  local ebg = result.editorBackground
+  if type(ebg) ~= "string" or not ebg:match("^#%x%x%x%x%x%x$") then
+    ebg = (vim.o.background == "light") and "#ffffff" or "#101214"
+  end
+  local mid, dim = 0.72, 0.42
+  if vim.o.background == "light" then
+    mid, dim = 0.24, 0.1
+  end
+  for _, t in ipairs({ "added", "changed", "removed" }) do
+    local base = result[t .. "Base"]
+    result[t .. "_bright"] = base
+    result[t] = utils.mix(base, ebg, mid)
+    result[t .. "_dim"] = utils.mix(base, ebg, dim)
+  end
+end
+
+return result

@@ -21,18 +21,20 @@ local function clamp(x, lo, hi)
   return math.min(math.max(x, lo), hi)
 end
 
--- Roles that `n_hues` / `accents` may re-hue, in display / serialize order. Each
--- entry owns one or more palette `keys` and declares its `surface`:
---   * "fg" (default) — a syntax foreground; the playground previews it as a solid
---     swatch and grades its contrast against the background.
---   * "bg" — a UI background (search, incsearch); the playground previews text on
---     it and grades text-on-background contrast instead.
--- Semantic-meaning colors (errorText/warningText/successText and the diff
--- added/removed/changed families) are intentionally absent: they stay locked to
--- their hue so "error is red" survives any flavour.
+-- Roles that the playground exposes, in display / serialize order. Each entry
+-- owns one or more palette `keys` and declares:
+--   * `surface`: "fg" (default) — a syntax foreground, previewed as a solid
+--     swatch, graded color-on-background; or "bg" — a UI background (search,
+--     incsearch), previewed as text-on-color and graded text-on-background.
+--   * `locked` (optional): a semantic-identity color the flavour hue wheel must
+--     never move — `hue_shift`/`chroma_mult`/`n_hues`/`base_hue` all skip it, so
+--     it keeps its hue (only its lightness is remapped to fit a new background).
+--     It changes ONLY when the user explicitly pins it. Used for the diff
+--     add/change/remove identities, which are intrinsically green/blue/red.
+-- errorText/warningText/successText are still absent (handled elsewhere).
 --
--- `ROLE_KEYS` (role -> keys) and `ROLE_ORDER` (the name list) are derived from
--- this single source below, so the two can never drift; a test asserts it.
+-- `ROLE_KEYS`/`ROLE_ORDER`/`ROLE_SURFACE`/`ROLE_LOCKED` are all derived from this
+-- single source below, so they can never drift; a test asserts it.
 M.ROLES = {
   { name = "keyword", keys = { "keyword", "syntaxKeyword" } },
   { name = "func", keys = { "method", "syntaxFunction" } },
@@ -56,17 +58,36 @@ M.ROLES = {
   -- touches syntax or the diff tint.
   { name = "search", keys = { "searchBase" }, surface = "bg" },
   { name = "incsearch", keys = { "incSearchBase" }, surface = "bg" },
+  -- diff identities: locked so hue changes never turn green/blue/red into
+  -- something confusing. colorscheme.lua derives the dim/mid backgrounds from
+  -- these, so pinning one flows through the whole diff family.
+  { name = "added", keys = { "addedBase" }, locked = true },
+  { name = "changed", keys = { "changedBase" }, locked = true },
+  { name = "removed", keys = { "removedBase" }, locked = true },
 }
 
 M.ROLE_KEYS = {}
 M.ROLE_ORDER = {}
 M.ROLE_SURFACE = {}
+M.ROLE_LOCKED = {}
 for _, r in ipairs(M.ROLES) do
   M.ROLE_KEYS[r.name] = r.keys
   M.ROLE_ORDER[#M.ROLE_ORDER + 1] = r.name
   M.ROLE_SURFACE[r.name] = r.surface or "fg"
+  M.ROLE_LOCKED[r.name] = r.locked or false
 end
 local ROLE_KEYS = M.ROLE_KEYS
+
+-- Palette keys whose hue + chroma are locked (identity colors): generate() only
+-- remaps their lightness. Built from the locked roles above.
+local LOCKED_KEYS = {}
+for _, r in ipairs(M.ROLES) do
+  if r.locked then
+    for _, k in ipairs(r.keys) do
+      LOCKED_KEYS[k] = true
+    end
+  end
+end
 
 local function circ_dist(a, b)
   local d = math.abs((a - b) % 360)
@@ -105,7 +126,8 @@ end
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
 ---       or a number (hue degrees, hue-only). Roles: keyword, func, special,
 ---       type, number, string, link, accent, comment, variable, operator,
----       search, incsearch
+---       search, incsearch, added, changed, removed (the last three are locked
+---       identities — only an explicit pin here moves them)
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
 
@@ -148,10 +170,13 @@ function M.generate(palette, opts)
   for key, value in pairs(palette) do
     if type(value) == "string" and value:match(HEX) then
       local lch = oklab.hex_to_oklch(value)
+      local locked = LOCKED_KEYS[key]
       out[key] = oklab.oklch_to_hex({
+        -- lightness always remaps (so identity colors stay visible on the new
+        -- background); locked keys keep their hue + chroma verbatim.
         l = remap(lch.l),
-        c = lch.c * chroma_mult,
-        h = lch.h and (lch.h + hue_shift) % 360 or nil,
+        c = locked and lch.c or lch.c * chroma_mult,
+        h = locked and lch.h or (lch.h and (lch.h + hue_shift) % 360 or nil),
       })
     else
       out[key] = value
@@ -209,6 +234,10 @@ function M.generate_hues(palette, opts)
       if type(hex) == "string" and hex:match(HEX) then
         if exact then
           out[key] = exact
+        elseif pinned == nil and M.ROLE_LOCKED[role] then
+          -- Locked identity, no explicit pin: leave it as generate() produced
+          -- (lightness-remapped, hue kept). n_hues/base_hue never touch it.
+          out[key] = hex
         else
           local lch = oklab.hex_to_oklch(hex)
           local hue, chroma = lch.h, lch.c

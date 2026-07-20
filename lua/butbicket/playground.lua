@@ -69,12 +69,15 @@ local KNOBS = {
 }
 for _, role in ipairs(ACCENT_ROLES) do
   local surface = flavour.ROLE_SURFACE[role]
+  local locked = flavour.ROLE_LOCKED[role]
+  local prefix = locked and "diff." or (surface == "bg" and "ui." or "accent.")
   KNOBS[#KNOBS + 1] = {
     name = role,
-    label = (surface == "bg" and "ui." or "accent.") .. role,
+    label = prefix .. role,
     kind = "accent",
     step = 5,
     surface = surface, -- "fg" (solid swatch) or "bg" (text-on-color swatch)
+    locked = locked, -- diff identities: frozen from the hue wheel until pinned
   }
 end
 

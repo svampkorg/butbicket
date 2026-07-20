@@ -16,10 +16,10 @@
     "success": "#73A130",
     "error": "#E78178",
     "warning": "#BA9420",
-    "diffAdded": "#164B35",
-    "diffRemoved": "#5D1F1A",
-    "diffAddedDimmed": "#212A27",
-    "diffRemovedDimmed": "#2E2322",
+    "diffAdded": "#174734",
+    "diffRemoved": "#5D231E",
+    "diffAddedDimmed": "#143127",
+    "diffRemovedDimmed": "#3D1C1A",
     "diffAddedWord": "#1A5C41",
     "diffRemovedWord": "#7B2922"
   }
