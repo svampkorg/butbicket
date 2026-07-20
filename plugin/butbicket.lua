@@ -11,19 +11,20 @@ vim.api.nvim_create_user_command("ButbicketFlavour", function()
 end, { desc = "Open the butbicket flavour playground" })
 
 -- Generate terminal / bat / Claude Code theme files matching the ACTIVE flavour
--- (whatever is in your setup{ flavour = … }), for the current background. Writes
--- to the given dir, or a stable per-user data dir (stdpath("data")/butbicket/
--- extras) that survives plugin updates — regenerated in place, so anything you
--- symlink to those files picks up the new colors. NOT the plugin's own extras/,
--- which stays git-tracked. Use it after tuning a flavour so your terminal + bat
--- match your editor.
+-- (whatever is in your setup{ flavour = … }), for BOTH backgrounds. A flavour is
+-- per-background (`{ dark = …, light = … }`), so each variant is emitted with its
+-- own recipe; a legacy flat flavour applies on its polarity and the other side is
+-- canonical. Writes to the given dir, or a stable per-user data dir (stdpath
+-- ("data")/butbicket/extras) that survives plugin updates — regenerated in place,
+-- so anything you symlink to those files picks up the new colors. NOT the plugin's
+-- own extras/, which stays git-tracked. Use it after tuning a flavour so your
+-- terminal + bat match your editor.
 vim.api.nvim_create_user_command("ButbicketExtras", function(o)
   local dir = (o.args ~= "" and vim.fn.fnamemodify(o.args, ":p"))
     or (vim.fn.stdpath("data") .. "/butbicket/extras")
   local ok, written = pcall(function()
     return require("butbicket.extras").generate({
-      dir = dir,
-      variants = { vim.o.background }, -- the base the active flavour targets
+      dir = dir, -- both dark + light variants (extras.generate default)
     })
   end)
   if not ok then

@@ -319,13 +319,15 @@ The committed `extras/` are the canonical palette. If you run a `flavour`, the
 files above won't match it — regenerate them from your live config with:
 
 ```vim
-:ButbicketExtras            " -> stdpath('data')/butbicket/extras, current background
+:ButbicketExtras            " -> stdpath('data')/butbicket/extras, both variants
 :ButbicketExtras ~/themes   " -> a directory of your choice
 ```
 
 It reads whatever `flavour` is active in your `setup{}` and emits every target
-(terminals + bat + Claude Code) into `<dir>/<target>/butbicket-<bg>.*`, matching
-your editor. The default lives under Neovim's data dir (e.g.
+(terminals + bat + Claude Code) into `<dir>/<target>/butbicket-<bg>.*` for **both**
+the dark and light variants, matching your editor. A per-background flavour
+(`{ dark = …, light = … }`) emits each side with its own recipe; a flat flavour
+applies on its polarity and the other side is canonical. The default lives under Neovim's data dir (e.g.
 `~/.local/share/nvim/butbicket/extras`) — a stable location that survives plugin
 updates and is regenerated in place, so a terminal/bat config you symlink there
 picks up new colors every time you re-run the command. (It deliberately does
