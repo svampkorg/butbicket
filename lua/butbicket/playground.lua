@@ -70,6 +70,13 @@ local KNOBS = {
 -- Locked roles split into two display families: the diff identities and the
 -- diagnostic/status identities. Everything else is a normal accent (or a bg role).
 local DIFF_ROLES = { added = true, changed = true, removed = true }
+local DIAG_ROLES = {
+  error = true,
+  warn = true,
+  info = true,
+  hint = true,
+  success = true,
+}
 for _, role in ipairs(ACCENT_ROLES) do
   local surface = flavour.ROLE_SURFACE[role]
   local locked = flavour.ROLE_LOCKED[role]
@@ -420,9 +427,34 @@ local function render_panel(session)
   end
 end
 
+-- Scroll the (non-focused, non-scrollable) example float so the preview relevant
+-- to the focused knob is on screen. On a short screen the diff/diagnostics demos
+-- sit below the fold; focusing a diff.* / diag.* role scrolls them into view (we
+-- target the demo's LAST line so the whole block shows above it). Other roles
+-- live in the top code sample, so we return to the top. On a tall screen the
+-- target is already visible and set_cursor scrolls nothing — no jump.
+local function sync_example(session)
+  local win = session.example.win
+  if not (win and vim.api.nvim_win_is_valid(win)) then
+    return
+  end
+  local k = KNOBS[session.focus]
+  local line = 1
+  if k and k.kind == "accent" then
+    if DIFF_ROLES[k.name] then
+      line = session.example_diff_line
+    elseif DIAG_ROLES[k.name] then
+      line = session.example_diag_line
+    end
+  end
+  local last = vim.api.nvim_buf_line_count(session.example.buf)
+  pcall(vim.api.nvim_win_set_cursor, win, { math.min(line or 1, last), 0 })
+end
+
 local function refresh(session)
   apply(session)
   render_panel(session)
+  sync_example(session)
 end
 
 -- ── interaction ──────────────────────────────────────────────────────────--
@@ -430,6 +462,7 @@ end
 local function move(session, delta)
   session.focus = ((session.focus - 1 + delta) % #KNOBS) + 1
   render_panel(session)
+  sync_example(session)
 end
 
 local function nudge(session, dir)
@@ -980,6 +1013,10 @@ function M.open()
   for _, d in ipairs(DIAG_DEMO) do
     elines[#elines + 1] = d.text
   end
+  -- 1-based last line of each demo block, so sync_example can scroll the whole
+  -- block into view when its role family is focused.
+  session.example_diff_line = diff_row0 + #DIFF_DEMO
+  session.example_diag_line = diag_row0 + #DIAG_DEMO
 
   -- geometry: panel (narrow) on the left, example (wide) on the right. Each
   -- float sizes to its own content, capped to the screen. Neovim floats have no

@@ -309,6 +309,7 @@ do
     keyword = { "keyword", "syntaxKeyword" }, -- Statement, Boolean, Define
     func = { "syntaxFunction" }, -- Function, Method
     type = { "type" }, -- Type
+    constant = { "syntaxError" }, -- Constant, Conditional, Exception, cmp kinds
     number = { "syntaxNumber" }, -- Number, Float, @number
     string = { "stringText" }, -- String, Character
     link = { "blue" }, -- Tag

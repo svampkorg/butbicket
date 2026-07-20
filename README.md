@@ -179,8 +179,9 @@ normal. A pin is either:
 - a **number** — a hue angle in degrees; only the hue moves, each role keeps its
   own lightness/chroma (grading preserved).
 
-Syntax roles: `keyword`, `func`, `special`, `type`, `number`, `string`, `link`,
-`accent`, `comment`, `variable`, `operator`, `punctuation` (brackets/delimiters),
+Syntax roles: `keyword`, `func`, `special`, `type`, `constant` (Constant/
+Conditional/Exception — syntax red), `number`, `string`, `link`, `accent`,
+`comment`, `variable`, `operator`, `punctuation` (brackets/delimiters),
 `annotation` (attributes/decorators like `@override`), `emphasis` (the accent
 yellow — match highlights, icons, prompt keys). UI-background roles: `search`
 (`Search` + `CurSearch`, and flash's current-match label) and `incsearch`

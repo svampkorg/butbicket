@@ -40,6 +40,10 @@ M.ROLES = {
   { name = "func", keys = { "method", "syntaxFunction" } },
   { name = "special", keys = { "specialKeyword", "purple", "dark_purple" } },
   { name = "type", keys = { "type" } },
+  -- syntax red: Constant / Conditional / Exception / SpecialChar / @punctuation
+  -- .special + several cmp kinds + terminal color 1. Distinct from diagnostic
+  -- error red (`error`/`errorBase`) since that lift — free to rotate/pin.
+  { name = "constant", keys = { "syntaxError" } },
   { name = "number", keys = { "number", "syntaxNumber" } },
   { name = "string", keys = { "stringText" } },
   { name = "link", keys = { "linkText", "blue" } },
@@ -143,10 +147,10 @@ end
 ---@field base_hue? number degrees: where the hue slots start (default 0)
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
 ---       or a number (hue degrees, hue-only). Roles: keyword, func, special,
----       type, number, string, link, accent, comment, variable, operator,
----       punctuation, annotation, emphasis, search, incsearch, added, changed,
----       removed, error, warn, info, hint, success (added..success are locked
----       identities — only an explicit pin moves them)
+---       type, constant, number, string, link, accent, comment, variable,
+---       operator, punctuation, annotation, emphasis, search, incsearch, added,
+---       changed, removed, error, warn, info, hint, success (added..success are
+---       locked identities — only an explicit pin moves them)
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
 
