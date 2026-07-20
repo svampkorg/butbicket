@@ -25,6 +25,7 @@ local HEX = "^#%x%x%x%x%x%x$"
 local AA = 4.5 -- WCAG AA floor for normal text
 local NS = vim.api.nvim_create_namespace("butbicket_flavour_playground")
 local SWATCH = "██" -- two full blocks; U+2588 is 3 bytes each
+local BG_SWATCH = "Ab" -- text on a background swatch, to preview fg/bg contrast
 
 -- Accent-role order comes straight from flavour, so the knob list and serialize
 -- output can never drift from the roles the generator actually supports.
@@ -67,8 +68,14 @@ local KNOBS = {
   },
 }
 for _, role in ipairs(ACCENT_ROLES) do
-  KNOBS[#KNOBS + 1] =
-    { name = role, label = "accent." .. role, kind = "accent", step = 5 }
+  local surface = flavour.ROLE_SURFACE[role]
+  KNOBS[#KNOBS + 1] = {
+    name = role,
+    label = (surface == "bg" and "ui." or "accent.") .. role,
+    kind = "accent",
+    step = 5,
+    surface = surface, -- "fg" (solid swatch) or "bg" (text-on-color swatch)
+  }
 end
 
 local SAMPLE = [[
@@ -194,6 +201,12 @@ local function render_panel(session)
   local bg = is_hex(gen.editorBackground) and gen.editorBackground
     or session.opts.background
 
+  -- Normal buffer text, used both as the readout numerator for bg roles and as
+  -- the glyph color painted on their swatches (what sits on a real match).
+  local text = (is_hex(gen.mainText) and gen.mainText)
+    or (is_hex(gen.emphasisText) and gen.emphasisText)
+    or "#ffffff"
+
   local lines, warn = {}, false
   lines[#lines + 1] = " butbicket · flavour playground"
   lines[#lines + 1] = ""
@@ -220,15 +233,23 @@ local function render_panel(session)
     local val = knob_value_str(session, k)
     local suffix = ""
     local color = knob_color(k)
+    local is_bg = k.surface == "bg"
     if k.kind == "accent" and is_hex(color) then
-      local r = contrast.ratio(color, bg)
+      -- fg roles grade the color on the background; bg roles grade normal text
+      -- painted on the color (the readable-match question).
+      local r = is_bg and contrast.ratio(text, color)
+        or contrast.ratio(color, bg)
       if r < AA then
         warn = true
       end
       suffix = ("  %4.1f%s"):format(r, r < AA and " ⚠" or "")
     end
-    -- swatch cell: colored block for color knobs, blank for numeric knobs
-    local cell = is_hex(color) and SWATCH or "  "
+    -- swatch cell: fg roles show a solid block; bg roles show text on the color
+    -- (so you see the fg/bg contrast); numeric knobs are blank.
+    local cell = "  "
+    if is_hex(color) then
+      cell = is_bg and BG_SWATCH or SWATCH
+    end
     lines[#lines + 1] = ("%s %s %-14s %s%s"):format(
       marker,
       cell,
@@ -238,7 +259,8 @@ local function render_panel(session)
     )
     session.knob_line[i] = #lines
     if is_hex(color) then
-      swatches[#swatches + 1] = { row = #lines - 1, hex = color, idx = i }
+      swatches[#swatches + 1] =
+        { row = #lines - 1, hex = color, idx = i, bg = is_bg }
     end
   end
 
@@ -260,10 +282,15 @@ local function render_panel(session)
   vim.api.nvim_buf_clear_namespace(buf, NS, 0, -1)
   for _, s in ipairs(swatches) do
     local grp = "ButbicketPgSwatch" .. s.idx
-    pcall(vim.api.nvim_set_hl, 0, grp, { fg = s.hex })
-    -- swatch starts at byte col 2 ("> "); SWATCH is #SWATCH bytes wide
+    if s.bg then
+      pcall(vim.api.nvim_set_hl, 0, grp, { bg = s.hex, fg = text })
+    else
+      pcall(vim.api.nvim_set_hl, 0, grp, { fg = s.hex })
+    end
+    -- swatch starts at byte col 2 ("> "); the cell is SWATCH / BG_SWATCH wide
+    local width = s.bg and #BG_SWATCH or #SWATCH
     pcall(vim.api.nvim_buf_set_extmark, buf, NS, s.row, 2, {
-      end_col = 2 + #SWATCH,
+      end_col = 2 + width,
       hl_group = grp,
     })
   end

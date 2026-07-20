@@ -179,9 +179,12 @@ normal. A pin is either:
 - a **number** — a hue angle in degrees; only the hue moves, each role keeps its
   own lightness/chroma (grading preserved).
 
-Roles: `keyword`, `func`, `special`, `type`, `number`, `string`, `link`,
-`accent`, `comment`, `variable`, `operator`. (Diagnostic/diff colors are never
-re-hued.)
+Syntax roles: `keyword`, `func`, `special`, `type`, `number`, `string`, `link`,
+`accent`, `comment`, `variable`, `operator`. UI-background roles: `search`
+(`Search` + `CurSearch`, and flash's current-match label) and `incsearch`
+(`IncSearch` + `Substitute`). Each search role has its own palette base, so
+tuning it never touches syntax or the diff tint. (Diagnostic/diff colors are
+never re-hued.)
 
 ```lua
 flavour = {
@@ -206,10 +209,13 @@ nvim -l scripts/gen-flavour.lua
 
 `:ButbicketFlavour` opens a live editor: a control panel with every flavour knob
 (background/foreground, `hue_shift`, `chroma_mult`, `n_hues`, `base_hue`, and the
-per-role accents) beside a sample buffer that recolors instantly as you tune. Every
-color knob shows a live swatch, and each accent shows its WCAG contrast against the
-background, flagged `⚠` below AA. If a flavour is already set (in `setup{}` or from
-a previous accept), the playground opens with those values instead of from scratch.
+per-role accents, plus the `search`/`incsearch` background roles) beside a sample
+buffer that recolors instantly as you tune. Foreground knobs show a solid swatch;
+the background roles show sample text (`Ab`) painted on the color so you can see
+the fg/bg contrast. Each shows its WCAG contrast (color-on-background for syntax,
+text-on-color for the background roles), flagged `⚠` below AA. If a flavour is
+already set (in `setup{}` or from a previous accept), the playground opens with
+those values instead of from scratch.
 
 | key       | action                                                |
 | --------- | ----------------------------------------------------- |

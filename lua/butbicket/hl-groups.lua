@@ -3,7 +3,7 @@ local config = require("butbicket.config")
 local utils = require("butbicket.utils")
 local bg = config.transparent and "NONE" or colorscheme.editorBackground
 local diff_text =
-  utils.shade(colorscheme.old_mustard, 0.5, colorscheme.editorBackground)
+  utils.shade(colorscheme.diffTextBase, 0.5, colorscheme.editorBackground)
 
 return {
   Normal = { fg = colorscheme.mainText, bg = bg },
@@ -37,9 +37,9 @@ return {
   FoldColumn = { link = "SignColumn" },
   IncSearch = {
     bg = utils.mix(
-      colorscheme.purple,
+      colorscheme.incSearchBase,
       colorscheme.editorBackground,
-      math.abs(0.30)
+      0.30
     ),
   },
   Substitute = { link = "IncSearch" },
@@ -85,9 +85,11 @@ return {
     fg = colorscheme.text_dark,
     bold = true,
   },
-  Search = { bg = utils.mix(colorscheme.old_mustard, colorscheme.base_2, 0.4) },
+  Search = {
+    bg = utils.mix(colorscheme.searchBase, colorscheme.editorBackground, 0.4),
+  },
   CurSearch = {
-    bg = utils.mix(colorscheme.old_mustard, colorscheme.base_2, 0.8),
+    bg = utils.mix(colorscheme.searchBase, colorscheme.editorBackground, 0.8),
   },
   SpellBad = { undercurl = true, sp = colorscheme.syntaxError },
   SpellCap = { undercurl = true, sp = colorscheme.syntaxFunction },

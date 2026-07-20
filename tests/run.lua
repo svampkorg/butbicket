@@ -43,6 +43,9 @@ local required_keys = {
   "specialKeyword",
   "windowBorder",
   "floatBorder",
+  "searchBase",
+  "incSearchBase",
+  "diffTextBase",
 }
 
 -- fg-on-bg pairs to grade. Comments are intentionally low-contrast, so they get
@@ -256,6 +259,8 @@ do
     comment = { "commentText" }, -- Comment, SpecialComment, @comment
     variable = { "variable", "variable_member", "parameter" }, -- @variable(.member), Parameter
     operator = { "syntaxOperator" }, -- Operator, Delimiter, Special
+    search = { "searchBase" }, -- Search, CurSearch (+ flash current label)
+    incsearch = { "incSearchBase" }, -- IncSearch, Substitute
   }
   local PIN = "#3366cc"
   for role, keys in pairs(role_group_keys) do

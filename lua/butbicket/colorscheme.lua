@@ -64,7 +64,9 @@ colorscheme.blue = "#669CF0"
 colorscheme.green = "#73A130"
 colorscheme.red = "#E78178"
 colorscheme.light_red = "#FEC195"
-colorscheme.old_mustard = "#7B6215"
+colorscheme.searchBase = "#7B6215" -- Search / CurSearch + flash current label
+colorscheme.incSearchBase = "#DA70D6" -- IncSearch / Substitute
+colorscheme.diffTextBase = "#7B6215" -- DiffText intra-line change tint
 colorscheme.mustard = "#BA9420"
 colorscheme.yellow = "#FBC828"
 colorscheme.light_yellow = "#FFD700"
@@ -129,7 +131,9 @@ if vim.o.background == "light" then
   colorscheme.base_3 = "#dcdcdc"
   colorscheme.base_4 = "#ededed"
   colorscheme.cursorline = "#e8e8e8"
-  colorscheme.old_mustard = "#d9b23a" -- search-highlight base
+  colorscheme.searchBase = "#d9b23a" -- Search / CurSearch + flash current label
+  colorscheme.incSearchBase = "#9b2393" -- IncSearch / Substitute
+  colorscheme.diffTextBase = "#d9b23a" -- DiffText intra-line change tint
   -- diff (GitHub-light palette)
   colorscheme.added = "#c4e7d4"
   colorscheme.removed = "#f7d4d0"

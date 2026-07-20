@@ -21,44 +21,52 @@ local function clamp(x, lo, hi)
   return math.min(math.max(x, lo), hi)
 end
 
--- Syntax-identity roles that `n_hues` / `accents` may re-hue, and the palette
--- keys each role owns. Semantic-meaning colors (errorText/warningText/
--- successText and the diff added/removed/changed families) are intentionally
--- absent: they stay locked to their hue so "error is red" survives any flavour.
-M.ROLE_KEYS = {
-  keyword = { "keyword", "syntaxKeyword" },
-  func = { "method", "syntaxFunction" },
-  special = { "specialKeyword", "purple", "dark_purple" },
-  type = { "type" },
-  number = { "number", "syntaxNumber" },
-  string = { "stringText" },
-  link = { "linkText", "blue" },
-  accent = { "hotpink" },
-  comment = { "commentText" },
+-- Roles that `n_hues` / `accents` may re-hue, in display / serialize order. Each
+-- entry owns one or more palette `keys` and declares its `surface`:
+--   * "fg" (default) — a syntax foreground; the playground previews it as a solid
+--     swatch and grades its contrast against the background.
+--   * "bg" — a UI background (search, incsearch); the playground previews text on
+--     it and grades text-on-background contrast instead.
+-- Semantic-meaning colors (errorText/warningText/successText and the diff
+-- added/removed/changed families) are intentionally absent: they stay locked to
+-- their hue so "error is red" survives any flavour.
+--
+-- `ROLE_KEYS` (role -> keys) and `ROLE_ORDER` (the name list) are derived from
+-- this single source below, so the two can never drift; a test asserts it.
+M.ROLES = {
+  { name = "keyword", keys = { "keyword", "syntaxKeyword" } },
+  { name = "func", keys = { "method", "syntaxFunction" } },
+  { name = "special", keys = { "specialKeyword", "purple", "dark_purple" } },
+  { name = "type", keys = { "type" } },
+  { name = "number", keys = { "number", "syntaxNumber" } },
+  { name = "string", keys = { "stringText" } },
+  { name = "link", keys = { "linkText", "blue" } },
+  { name = "accent", keys = { "hotpink" } },
+  { name = "comment", keys = { "commentText" } },
   -- variable family, minus text_dark (that is body text / mainText — re-hueing
   -- it would tint all normal text, not just variables).
-  variable = { "variable", "variable_member", "parameter" },
+  {
+    name = "variable",
+    keys = { "variable", "variable_member", "parameter" },
+  },
   -- true operators only; brackets/punctuation are a separate color (light_red).
-  operator = { "syntaxOperator" },
+  { name = "operator", keys = { "syntaxOperator" } },
+  -- UI backgrounds: hlsearch matches, and the incremental-search / :substitute
+  -- preview. Each has a dedicated single-purpose palette key so tuning it never
+  -- touches syntax or the diff tint.
+  { name = "search", keys = { "searchBase" }, surface = "bg" },
+  { name = "incsearch", keys = { "incSearchBase" }, surface = "bg" },
 }
-local ROLE_KEYS = M.ROLE_KEYS
 
--- Display / serialize order for the roles (a map has none). The playground reads
--- this so its knob list can never drift from ROLE_KEYS; a test asserts the two
--- stay in sync.
-M.ROLE_ORDER = {
-  "keyword",
-  "func",
-  "special",
-  "type",
-  "number",
-  "string",
-  "link",
-  "accent",
-  "comment",
-  "variable",
-  "operator",
-}
+M.ROLE_KEYS = {}
+M.ROLE_ORDER = {}
+M.ROLE_SURFACE = {}
+for _, r in ipairs(M.ROLES) do
+  M.ROLE_KEYS[r.name] = r.keys
+  M.ROLE_ORDER[#M.ROLE_ORDER + 1] = r.name
+  M.ROLE_SURFACE[r.name] = r.surface or "fg"
+end
+local ROLE_KEYS = M.ROLE_KEYS
 
 local function circ_dist(a, b)
   local d = math.abs((a - b) % 360)
@@ -96,7 +104,8 @@ end
 ---@field base_hue? number degrees: where the hue slots start (default 0)
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
 ---       or a number (hue degrees, hue-only). Roles: keyword, func, special,
----       type, number, string, link, accent, comment, variable, operator
+---       type, number, string, link, accent, comment, variable, operator,
+---       search, incsearch
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
 

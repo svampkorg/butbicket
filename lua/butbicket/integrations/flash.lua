@@ -7,7 +7,7 @@ function M.highlights()
     FlashMatch = { fg = colorscheme.hotpink },
     FlashCurrent = {
       fg = colorscheme.bright_green,
-      bg = colorscheme.old_mustard,
+      bg = colorscheme.searchBase,
     },
     FlashLabel = { fg = colorscheme.bright_green },
   }
