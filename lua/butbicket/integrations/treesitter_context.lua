@@ -7,9 +7,9 @@ function M.highlights()
     TreesitterContext = { bg = c.base_1 },
     TreesitterContextLineNumber = { bg = c.base_2, fg = c.separator },
     TreesitterContextBottom = {
-      cterm = { underline = true },
+      cterm = { underline = false },
       sp = c.base_3,
-      underline = true,
+      underline = false,
     },
     TreesitterContextLineNumberBottom = { link = "TreesitterContextBottom" },
     TreesitterContextSeparator = { bg = c.base_2, fg = c.base_3 },
