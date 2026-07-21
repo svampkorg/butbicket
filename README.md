@@ -245,6 +245,8 @@ nvim -l scripts/gen-flavour.lua
 ### Flavour playground
 
 ![preview](assets/playground.png)
+*The ButBicket playground, some roles pinned, some rotated. Some still auto
+(affected by the global settings further up in the flavour window)*
 
 `:ButbicketFlavour` opens a live editor: a control panel with every flavour knob
 (background/foreground, `hue_shift`, `chroma_mult`, `n_hues`, `base_hue`, and the
@@ -296,8 +298,7 @@ place the unpinned roles, `p` each one you like, then keep spinning the rest.
 Accept copies the block to the `+` register; paste it into your `setup{}` to make
 it permanent. On exit (accept or cancel) the playground fires a `ColorScheme`
 event once, so any `ColorScheme` autocmd you rely on re-runs against the final
-palette (e.g. refreshing a winbar plugin like incline). It is *not* fired on each
-live change, to avoid thrashing such listeners while you tune.
+palette (e.g. refreshing a winbar plugin like incline).
 
 There is no default keymap — bind `<Plug>(butbicket-flavour)` if you want one:
 
