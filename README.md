@@ -5,7 +5,17 @@ palette — the colors you stare at for hours reviewing pull requests, now in yo
 editor. Ships **dark** and **light** variants and integrates with a handful of
 popular plugins.
 
+---
+
 ![preview](assets/sample-preview.png)
+*Canonical palette*
+
+---
+
+![preview](assets/sample-preview2.png)
+*With some playground tuning*
+
+---
 
 ## Requirements
 
@@ -185,8 +195,7 @@ Conditional/Exception — syntax red), `number`, `string`, `link`, `accent`,
 `annotation` (attributes/decorators like `@override`), `emphasis` (the accent
 yellow — match highlights, icons, prompt keys). UI-background roles: `search`
 (`Search` + `CurSearch`, and flash's current-match label) and `incsearch`
-(`IncSearch` + `Substitute`). Each search role has its own palette base, so
-tuning it never touches syntax or the diff tint.
+(`IncSearch` + `Substitute`). Each search role has its own palette base.
 
 Locked identity roles: `added`, `changed`, `removed` (diff, green/blue/red) and
 `error`, `warn`, `info`, `hint`, `success` (diagnostics/status). These are
@@ -196,8 +205,7 @@ and an error stays red whatever you do to the wheel. They change only when you
 pin one explicitly, and a pin flows through the whole family: for diff, the
 sign/text foreground and the derived line backgrounds; for a diagnostic, every
 `Diagnostic*`/`*Msg` group plus the `errorText`/`warningText`/`successText`
-integration colors. Each diagnostic level owns a dedicated palette key, so tuning
-a syntax role (`func`, `link`, …) no longer drags `info` or `hint` with it.
+integration colors. Each diagnostic level owns a dedicated palette key.
 
 ```lua
 flavour = {
@@ -297,28 +305,78 @@ There is no default keymap — bind `<Plug>(butbicket-flavour)` if you want one:
 vim.keymap.set("n", "<leader>bf", "<Plug>(butbicket-flavour)")
 ```
 
-## Terminal colors
+## Extras — terminal, bat & Claude Code themes
 
-The scheme exports a 16-color palette to `vim.g.terminal_color_*`. Matching
-terminal themes are generated from that same palette and committed under
-`extras/`, one directory per terminal:
+ButBicket also themes tools outside the editor, generated from the same 16-color
+palette and committed under `extras/` (one directory per target). What it can
+and can't theme:
+
+- **Terminals** — full palette, exact match.
+- **bat** — full palette (a real Sublime/`.tmTheme`).
+- **Claude Code** — its UI chrome takes the palette; its *code* syntax
+  highlighting can't (highlight.js won't load custom themes — see below).
+
+### Terminal themes
+
+Generated for **Alacritty, Ghostty, Kitty, WezTerm, and Warp**:
 
 ```
-extras/ghostty/    extras/kitty/    extras/alacritty/    extras/wezterm/    extras/warp/
+extras/alacritty/   extras/ghostty/   extras/kitty/   extras/wezterm/   extras/warp/
 ```
 
-Regenerate them all (or a subset):
+Point your terminal at the relevant file:
+
+- **Alacritty**: `[general] import = ["/path/to/extras/alacritty/butbicket-dark.toml"]`
+- **Ghostty**: `theme = /path/to/extras/ghostty/butbicket-dark`
+- **Kitty**: `include /path/to/extras/kitty/butbicket-dark.conf`
+- **WezTerm**: copy into `~/.config/wezterm/colors/` and `config.color_scheme = 'butbicket-dark'`
+- **Warp**: copy into `~/.warp/themes/`
+
+The scheme also exports the palette to `vim.g.terminal_color_*` for `:terminal`.
+The ANSI slot mapping is aesthetic (chosen to look right in a shell), not a
+literal red/green/blue mapping — e.g. slot 4 carries a mint tone — and mirrors
+`set_terminal_colors()` in `lua/butbicket/init.lua`, so `:terminal` inside Neovim
+and your host terminal stay in sync.
+
+Regenerate the committed themes (all, or a subset):
 
 ```sh
 nvim -l scripts/gen-terminals.lua              # all terminals, both variants
-nvim -l scripts/gen-terminals.lua dark         # both terminals, dark only
+nvim -l scripts/gen-terminals.lua dark         # all terminals, dark only
 nvim -l scripts/gen-terminals.lua dark kitty   # dark, kitty only
+```
+
+### bat
+
+`extras/bat/butbicket-*.tmTheme` is a genuine bat/Sublime theme:
+
+```sh
+cp extras/bat/*.tmTheme "$(bat --config-dir)/themes/" && bat cache --build
+bat --theme=butbicket-dark file.lua
+```
+
+### Claude Code
+
+`extras/claude-code/butbicket-*.json` themes Claude Code's **UI chrome** (diffs,
+borders, status, accent). Copy to `~/.claude/themes/`, then set
+`"theme": "custom:butbicket-dark"` in `~/.claude/settings.json`.
+
+Code **syntax highlighting** is separate. Claude Code colors code with an
+internal engine (highlight.js) that accepts only built-in theme names via
+`CLAUDE_CODE_SYNTAX_HIGHLIGHT` (`Monokai Extended`, `GitHub`, `ansi`) and loads
+no custom themes — so the butbicket palette can't reach code blocks. Pick
+`ansi` (on-palette from your terminal's ANSI slots, but coarse — comments can't
+be dimmed) or `Monokai Extended` (off-palette, but separates tokens properly):
+
+```jsonc
+// ~/.claude/settings.json  (restart Claude Code after changing)
+"env": { "CLAUDE_CODE_SYNTAX_HIGHLIGHT": "Monokai Extended" }
 ```
 
 ### Match a flavour
 
-The committed `extras/` are the canonical palette. If you run a `flavour`, the
-files above won't match it — regenerate them from your live config with:
+The committed `extras/` reflect the canonical palette. If you run a `flavour`,
+regenerate matching extras from your live config:
 
 ```vim
 :ButbicketExtras            " -> stdpath('data')/butbicket/extras, both variants
@@ -326,61 +384,26 @@ files above won't match it — regenerate them from your live config with:
 ```
 
 It reads whatever `flavour` is active in your `setup{}` and emits every target
-(terminals + bat + Claude Code) into `<dir>/<target>/butbicket-<bg>.*` for **both**
-the dark and light variants, matching your editor. A per-background flavour
+(terminals + bat + Claude Code) for **both** dark and light into
+`<dir>/<target>/butbicket-<bg>.*`. A per-background flavour
 (`{ dark = …, light = … }`) emits each side with its own recipe; a flat flavour
-applies on its polarity and the other side is canonical. The default lives under Neovim's data dir (e.g.
-`~/.local/share/nvim/butbicket/extras`) — a stable location that survives plugin
-updates and is regenerated in place, so a terminal/bat config you symlink there
-picks up new colors every time you re-run the command. (It deliberately does
-**not** touch the plugin's own git-tracked `extras/`.) Point your terminal/bat at
-those files instead of the repo ones.
+applies on its polarity and the other side stays canonical. The default dir
+lives under Neovim's data dir (e.g. `~/.local/share/nvim/butbicket/extras`) — a
+stable location that survives plugin updates and is regenerated in place, so a
+terminal/bat config you symlink there picks up new colors each run. It never
+touches the plugin's git-tracked `extras/`.
 
-Then point your terminal at the relevant file, e.g.:
+## Acknowledgements
 
-- **Ghostty**: `theme = /path/to/extras/ghostty/butbicket-dark`
-- **Kitty**: `include /path/to/extras/kitty/butbicket-dark.conf`
-- **Alacritty**: `[general] import = ["/path/to/extras/alacritty/butbicket-dark.toml"]`
-- **WezTerm**: copy into `~/.config/wezterm/colors/` and `config.color_scheme = 'butbicket-dark'`
-- **Warp**: copy into `~/.warp/themes/`
-
-Note: the ANSI slot mapping is aesthetic (chosen to look right in a shell), not a
-literal red/green/blue mapping — e.g. slot 4 carries a mint tone. It mirrors
-`set_terminal_colors()` in `lua/butbicket/init.lua`, so `:terminal` inside Neovim
-and your host terminal stay in sync.
-
-## Claude Code
-
-The generator emits two kinds of artifact under `extras/` (dark + light):
-
-**UI chrome** — `extras/claude-code/butbicket-*.json` is a Claude Code custom
-theme (diffs, borders, status, accent). Copy to `~/.claude/themes/`, then set
-`"theme": "custom:butbicket-dark"` in `~/.claude/settings.json`.
-
-**Code syntax highlighting.** Claude Code highlights code with an internal
-engine (highlight.js), *not* bat — it only accepts a small set of built-in
-theme names via `CLAUDE_CODE_SYNTAX_HIGHLIGHT` (`Monokai Extended`, `GitHub`,
-`ansi`), and does **not** load custom `.tmTheme` files.
-
-```jsonc
-// ~/.claude/settings.json  (restart Claude Code after changing)
-"env": { "CLAUDE_CODE_SYNTAX_HIGHLIGHT": "Monokai Extended" }
-```
-
-- `ansi` colours code from the terminal's ANSI slots 0–15 — on-palette if your
-  terminal runs a butbicket theme, but **coarse**: highlight.js collapses
-  keyword/comment/number onto a single ANSI slot, and comments can't be dimmed.
-- `Monokai Extended` gives proper token separation (dim comments, distinct
-  keyword/string/number) at the cost of not being the butbicket palette.
-
-There's no way to get the full butbicket treesitter palette into Claude Code's
-code blocks — pick on-palette-but-coarse (`ansi`) or readable-but-off-palette
-(`Monokai Extended`).
-
-**`extras/bat/butbicket-*.tmTheme`** is a genuine bat/Sublime theme for actual
-`bat` usage in the terminal (`bat --theme=butbicket-dark`); install with
-`cp extras/bat/*.tmTheme "$(bat --config-dir)/themes/" && bat cache --build`.
-It is *not* used by Claude Code.
+- **[mini.nvim](https://github.com/nvim-mini/mini.nvim)** by Evgeni Chasnovski
+  (MIT):
+  - `mini.colors` — the OKLab/OKLch conversion math and gamut clipping in
+    `lua/butbicket/oklab.lua`, which carries the full attribution inline. Those
+    conversions originate with
+    [Björn Ottosson](https://bottosson.github.io/posts/oklab/).
+  - `mini.hues` — inspiration for the accent-hue generator (`n_hues` / `base_hue`
+    slot snapping) in `lua/butbicket/flavour.lua`.
+- Palette inspired by [Bitbucket](https://bitbucket.org)'s code-review UI.
 
 ## Contributing
 

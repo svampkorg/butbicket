@@ -1150,6 +1150,10 @@ function M.open()
   })
   vim.wo[session.example.win].cursorline = false
   vim.wo[session.example.win].signcolumn = "yes" -- 'minimal' float hides it
+  -- Preview the true editor background: remap the float's Normal group to the
+  -- editor Normal, so the sample shows the real editor bg rather than
+  -- NormalFloat (which the editor auto-assigns to floating windows).
+  vim.wo[session.example.win].winhighlight = "NormalFloat:Normal"
 
   -- Paint the diff demo: line background + a gutter sign per line. Extmarks
   -- reference the hl groups by name, so they re-resolve when the flavour applies
