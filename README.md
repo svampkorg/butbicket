@@ -296,9 +296,16 @@ place the unpinned roles, `p` each one you like, then keep spinning the rest.
 `P` pins them all at once. `p` again on a pinned role clears it back to auto.
 
 Accept copies the block to the `+` register; paste it into your `setup{}` to make
-it permanent. On exit (accept or cancel) the playground fires a `ColorScheme`
-event once, so any `ColorScheme` autocmd you rely on re-runs against the final
-palette (e.g. refreshing a winbar plugin like incline).
+it permanent.
+
+The live preview applies **silently** (no `ColorScheme` event) while you edit —
+opening the playground and every knob nudge re-tone without firing the event, so
+a `ColorScheme` autocmd doesn't thrash on each keystroke. The playground fires
+`ColorScheme` **once** only when the applied palette genuinely changes: the `t`
+light/dark toggle, and on exit (accept or cancel). So any `ColorScheme` autocmd
+you rely on re-runs against the new palette (e.g. refreshing a winbar plugin like
+incline). `:ButbicketExtras` behaves the same — its internal background flips are
+silent and it fires `ColorScheme` once when done.
 
 There is no default keymap — bind `<Plug>(butbicket-flavour)` if you want one:
 
