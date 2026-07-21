@@ -558,7 +558,20 @@ function M.open()
     vim.o.background = prev
     return p
   end
-  local bases = { dark = capture("dark"), light = capture("light") }
+  -- Capturing each polarity flips vim.o.background, and with a colorscheme
+  -- active Neovim auto-re-sources it on every background change — which fires
+  -- ColorScheme. These flips are internal machinery (we only read the palette
+  -- table), so suppress the event; the one intentional notification happens
+  -- below when the initial preview is applied.
+  local ei = vim.o.eventignore
+  vim.o.eventignore = (ei ~= "" and (ei .. ",") or "") .. "ColorScheme"
+  local ok_cap, bases = pcall(function()
+    return { dark = capture("dark"), light = capture("light") }
+  end)
+  vim.o.eventignore = ei
+  if not ok_cap then
+    error(bases)
+  end
 
   local cur = (vim.o.background == "light") and "light" or "dark"
   if not is_hex(bases[cur].editorBackground) then
@@ -773,7 +786,15 @@ function M.open()
   })
 
   P = session
-  refresh(session)
+  -- Apply the initial preview and fire ColorScheme ONCE, so listeners (incline,
+  -- user autocmds) sync to the session. Re-source via the :colorscheme command
+  -- (which fires the event natively) THEN render the panel, so the swatch
+  -- highlights survive the command's `hi clear`. Subsequent live nudges use
+  -- refresh()'s bare apply and stay silent — one exit notification on close.
+  config.flavour = session.variants
+  pcall(vim.cmd.colorscheme, vim.g.colors_name or "butbicket")
+  render_panel(session)
+  sync_example(session)
 end
 
 ---Close the playground if open, restoring the pre-open look (cancel semantics).

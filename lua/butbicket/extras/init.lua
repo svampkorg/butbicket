@@ -112,27 +112,41 @@ function M.generate(opts)
   -- run inside a session.
   local saved_bg = vim.o.background
 
+  -- collect()'s background flips auto-re-source the active colorscheme, each
+  -- firing ColorScheme — spurious noise for in-session listeners. Suppress the
+  -- event for the whole generation (including the restore below); the command
+  -- handler re-applies via :colorscheme afterwards for the single intended fire.
+  local ei = vim.o.eventignore
+  vim.o.eventignore = (ei ~= "" and (ei .. ",") or "") .. "ColorScheme"
+
   local written = {}
-  for _, v in ipairs(variants) do
-    local t = collect(v)
-    for _, term in ipairs(targets) do
-      local emit = emitters[term]
-      if not emit then
-        error("unknown target: " .. term)
-      end
-      local out = emit(t)
-      local path = ("%s/%s/%s%s"):format(dir, term, t.name, out.ext)
-      write(path, out.body)
-      written[#written + 1] = path
-      if opts.on_write then
-        opts.on_write(path)
+  local ok, err = pcall(function()
+    for _, v in ipairs(variants) do
+      local t = collect(v)
+      for _, term in ipairs(targets) do
+        local emit = emitters[term]
+        if not emit then
+          error("unknown target: " .. term)
+        end
+        local out = emit(t)
+        local path = ("%s/%s/%s%s"):format(dir, term, t.name, out.ext)
+        write(path, out.body)
+        written[#written + 1] = path
+        if opts.on_write then
+          opts.on_write(path)
+        end
       end
     end
-  end
 
-  if vim.o.background ~= saved_bg then
-    vim.o.background = saved_bg
-    require("butbicket").colorscheme()
+    if vim.o.background ~= saved_bg then
+      vim.o.background = saved_bg
+      require("butbicket").colorscheme()
+    end
+  end)
+
+  vim.o.eventignore = ei
+  if not ok then
+    error(err)
   end
 
   return written
