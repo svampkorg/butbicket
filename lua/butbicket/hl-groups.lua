@@ -105,7 +105,13 @@ return {
     fg = colorscheme.commentText,
     italic = config.italics.comments or false,
   },
-  Dimmed = { fg = colorscheme.dark_charcoal },
+  Dimmed = {
+    fg = utils.mix(
+      colorscheme.commentText,
+      colorscheme.editorBackground,
+      0.50
+    ),
+  },
   SpecialComment = { fg = colorscheme.commentText },
   Constant = { fg = colorscheme.syntaxError },
   String = {
