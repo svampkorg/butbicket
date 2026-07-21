@@ -786,15 +786,13 @@ function M.open()
   })
 
   P = session
-  -- Apply the initial preview and fire ColorScheme ONCE, so listeners (incline,
-  -- user autocmds) sync to the session. Re-source via the :colorscheme command
-  -- (which fires the event natively) THEN render the panel, so the swatch
-  -- highlights survive the command's `hi clear`. Subsequent live nudges use
-  -- refresh()'s bare apply and stay silent — one exit notification on close.
-  config.flavour = session.variants
-  pcall(vim.cmd.colorscheme, vim.g.colors_name or "butbicket")
-  render_panel(session)
-  sync_example(session)
+  -- Apply the initial preview with the bare colorscheme() (via refresh -> apply),
+  -- which fires NO ColorScheme event: opening the playground doesn't change the
+  -- visible colors (the session seeds from the current look), so there's nothing
+  -- for listeners to resync to. Live nudges stay silent likewise; the one exit
+  -- notification happens on close (:colorscheme). Captures above are already
+  -- suppressed, so open fires zero ColorScheme events.
+  refresh(session)
 end
 
 ---Close the playground if open, restoring the pre-open look (cancel semantics).
