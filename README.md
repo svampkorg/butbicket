@@ -5,17 +5,18 @@ palette — the colors you stare at for hours reviewing pull requests, now in yo
 editor. Ships **dark** and **light** variants and integrates with a handful of
 popular plugins.
 
+**Jump to:** [Preview](#preview) · [Requirements](#requirements) · [Installation](#installation) · [Usage](#usage) · [Configuration](#configuration) · [Integrations](#integrations) · [Flavours](#flavours) · [Extras](#extras--terminal-bat--claude-code-themes) · [Acknowledgements](#acknowledgements) · [Contributing](#contributing) · [License](#license)
+
 ---
+
+## Preview
 
 ![preview](assets/sample-preview.png)
 *Canonical palette*
 
----
-
 ![preview](assets/sample-preview2.png)
 *With some playground tuning*
 
----
 
 ## Requirements
 
