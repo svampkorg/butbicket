@@ -1,46 +1,8 @@
 local config = require("butbicket.config")
 
--- NOTE: saved for reference
--- local fromBitBucket = {
---   keyword = '#FD9891',
---   method = '#7EE2B8',
---   number = '#8FB8F6',
---   stringText = '#FBC828',
---   abyss = '#151A17',
---   dark_charcoal = '#262E2A',
---   charcoal = '#37423F',
---   dark_slate = '#495554',
---   slate = '#5B6768',
---   slate_gray = '#6E777B',
---   steel_gray = '#81888D',
---   annotation = '#96999E',
---   comment = '#AAABAF',
---   variable = '#B6B7BA',
---   parenthesis = '#CECFD2',
---   text = '#E7E7E8',
---   selected = '#89576E',
---   selected_inactive = '#464646',
---   type = '#CFE1FD',
---   blue = '#669CF0',
---   green = '#73A130',
---   red = '#E78178',
---   mustard = '#BA9420',
---   yellow = '#FBC828',
---   purple = '#BF63F3',
---   base = '#101214',
---   base_1 = '#18191A', -- ts context
---   base_2 = '#1F1F21', -- panels
---   base_3 = '#2D2D2D', -- dead area
---   base_4 = '#303134', -- floats/pum
---   separator = '#46474B',
---   cursorline = '#2B2B2E',
---   added = '#164B35',
---   added_dim = '#212A27',
---   removed = '#5D1F1A',
---   removed_dim = '#2E2322',
---   changed = '#183053',
---   changed_dim = '#20252B',
--- }
+-- Palette seeded from the Bitbucket code-review theme; the shipping values have
+-- since diverged (light re-hue, OKLab-derived diff/diagnostic families, flavour
+-- grading). See git history for the original `fromBitBucket` reference hexes.
 
 local colorscheme = {
   standardWhite = "#ffffff",

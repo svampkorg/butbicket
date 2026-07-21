@@ -14,6 +14,11 @@ local function hex_to_rgb(hex)
   return { tonumber(red, 16), tonumber(green, 16), tonumber(blue, 16) }
 end
 
+---Alpha-blend two hex colors: `alpha` of `fg` over `(1 - alpha)` of `bg`.
+---@param fg string foreground hex (`#rrggbb`)
+---@param bg string background hex (`#rrggbb`)
+---@param alpha number blend weight of `fg`, 0..1
+---@return string mixed hex (`#RRGGBB`)
 function M.mix(fg, bg, alpha)
   bg = hex_to_rgb(bg)
   fg = hex_to_rgb(fg)
@@ -31,6 +36,13 @@ function M.mix(fg, bg, alpha)
   )
 end
 
+---Shade a color toward black (light background) or white (dark background) by
+---`|value|`. The polarity is chosen from `vim.o.background` so the same call
+---darkens on light themes and lightens on dark themes.
+---@param color string hex to shade (`#rrggbb`)
+---@param value number blend magnitude, 0..1 (sign ignored)
+---@param base? string override the shade target (defaults to black/white by bg)
+---@return string shaded hex (`#RRGGBB`)
 function M.shade(color, value, base)
   if vim.o.background == "light" then
     if base == nil then

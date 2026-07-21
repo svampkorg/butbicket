@@ -66,6 +66,10 @@ local function set_groups()
   end
 end
 
+---Merge user options over the defaults (via the `config` metatable, so later
+---`colorscheme()` reloads keep reading the live values) and rebuild the
+---bufferline highlight table. Safe to call repeatedly.
+---@param values? butbicket.Config user overrides (nil = defaults only)
 function theme.setup(values)
   values = values or {}
   setmetatable(
@@ -77,6 +81,10 @@ function theme.setup(values)
   theme.bufferline = { highlights = bufferline.highlights(config) }
 end
 
+---Apply the colorscheme: clear existing highlights, reload the palette-dependent
+---modules (so a `vim.o.background` toggle or config change takes effect), set the
+---terminal ANSI colors, and define every highlight group. This is what
+---`colors/butbicket.lua` calls.
 function theme.colorscheme()
   if vim.fn.has("nvim-0.8") == 0 then
     vim.notify(
