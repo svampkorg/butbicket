@@ -11,11 +11,11 @@ popular plugins.
 
 ## Preview
 
-![preview](assets/sample-preview.png)
 *Canonical palette*
+![preview](assets/sample-preview.png)
 
-![preview](assets/sample-preview2.png)
 *With some playground tuning*
+![preview](assets/sample-preview2.png)
 
 
 ## Requirements
