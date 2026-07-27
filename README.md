@@ -14,7 +14,7 @@ popular plugins.
 *Canonical palette*
 ![preview](assets/sample-preview.png)
 
-*With some playground tuning*
+*With some playground tuning (can you even see the difference?)*
 ![preview](assets/sample-preview2.png)
 
 
