@@ -26,6 +26,7 @@ local flavour = require("butbicket.flavour")
 local oklab = require("butbicket.oklab")
 local sample = require("butbicket.playground.sample")
 local serialize = require("butbicket.playground.serialize")
+local terminal = require("butbicket.terminal")
 local util = require("butbicket.playground.util")
 
 local KNOBS = sample.KNOBS
@@ -232,6 +233,82 @@ local function render_panel(session)
   end
 end
 
+-- ── terminal preview ────────────────────────────────────────────────────────
+
+-- Render the read-only terminal-theme preview float: the exact colors
+-- `:ButbicketExtras` would emit for the current flavour (background, foreground,
+-- cursor, selection bg/fg, and the 16 ANSI slots), each with a live swatch. The
+-- palette mapping comes from butbicket.terminal, the same source the generator
+-- and set_terminal_colors() use, so what you see is what gets written. Preview
+-- only — the float is never entered.
+local function render_preview(session)
+  local pv = session.preview
+  if not (pv and pv.buf and vim.api.nvim_buf_is_valid(pv.buf)) then
+    return
+  end
+  local spec = terminal.spec(graded_palette(session))
+
+  local lines = { " terminal preview", "" }
+  local swatches = {} -- { row, col, width, fg_hex, bg_hex? }
+
+  -- background/foreground/cursor + selection. The selection-bg row uses a
+  -- text-on-color chip (selection-fg on selection-bg) so the pairing's
+  -- readability is visible; the others are solid blocks.
+  local specials = {
+    { "background", spec.bg },
+    { "foreground", spec.fg },
+    { "cursor-color", spec.cursor },
+    { "selection-bg", spec.sel_bg, spec.sel_fg },
+    { "selection-fg", spec.sel_fg },
+  }
+  for _, s in ipairs(specials) do
+    local chip = s[3] ~= nil
+    local cell = chip and BG_SWATCH or SWATCH
+    lines[#lines + 1] = (" %s %s %s"):format(cell, pad_disp(s[1], 12), s[2])
+    if is_hex(s[2]) then
+      swatches[#swatches + 1] = {
+        row = #lines - 1,
+        col = 1,
+        width = #cell,
+        fg_hex = chip and s[3] or s[2],
+        bg_hex = chip and s[2] or nil,
+      }
+    end
+  end
+
+  lines[#lines + 1] = ""
+  lines[#lines + 1] = " ansi palette"
+  for i = 0, 15 do
+    local hex = spec.ansi[i]
+    local prefix = ("%2d "):format(i)
+    lines[#lines + 1] = (" %s%s %s"):format(prefix, SWATCH, terminal.ANSI[i])
+    if is_hex(hex) then
+      swatches[#swatches + 1] =
+        { row = #lines - 1, col = 1 + #prefix, width = #SWATCH, fg_hex = hex }
+    end
+  end
+
+  local buf = pv.buf
+  vim.bo[buf].modifiable = true
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].modifiable = false
+
+  -- Repaint every swatch; colorscheme()'s `hi clear` wipes these each apply.
+  vim.api.nvim_buf_clear_namespace(buf, NS, 0, -1)
+  for idx, s in ipairs(swatches) do
+    local grp = "ButbicketPgTerm" .. idx
+    if s.bg_hex then
+      pcall(vim.api.nvim_set_hl, 0, grp, { bg = s.bg_hex, fg = s.fg_hex })
+    else
+      pcall(vim.api.nvim_set_hl, 0, grp, { fg = s.fg_hex })
+    end
+    pcall(vim.api.nvim_buf_set_extmark, buf, NS, s.row, s.col, {
+      end_col = s.col + s.width,
+      hl_group = grp,
+    })
+  end
+end
+
 -- Scroll the (non-focused, non-scrollable) example float so the preview relevant
 -- to the focused knob is on screen. On a short screen the diff/diagnostics demos
 -- sit below the fold; focusing a diff.* / diag.* role scrolls them into view (we
@@ -259,6 +336,7 @@ end
 local function refresh(session)
   apply(session)
   render_panel(session)
+  render_preview(session)
   sync_example(session)
 end
 
@@ -472,12 +550,20 @@ local function close(session, restore)
     color_editor.close(session.color_editor, true)
   end
   pcall(vim.api.nvim_del_augroup_by_id, session.augroup)
-  for _, w in ipairs({ session.panel.win, session.example.win }) do
+  for _, w in ipairs({
+    session.panel.win,
+    session.example.win,
+    session.preview.win,
+  }) do
     if w and vim.api.nvim_win_is_valid(w) then
       pcall(vim.api.nvim_win_close, w, true)
     end
   end
-  for _, b in ipairs({ session.panel.buf, session.example.buf }) do
+  for _, b in ipairs({
+    session.panel.buf,
+    session.example.buf,
+    session.preview.buf,
+  }) do
     if b and vim.api.nvim_buf_is_valid(b) then
       pcall(vim.api.nvim_buf_delete, b, { force = true })
     end
@@ -623,6 +709,7 @@ function M.open()
     prev_background = vim.o.background,
     panel = {},
     example = {},
+    preview = {},
     refresh = refresh, -- injected so color_editor can re-apply without a cycle
   }
 
@@ -646,7 +733,8 @@ function M.open()
   session.example_diff_line = diff_row0 + #sample.DIFF_DEMO
   session.example_diag_line = diag_row0 + #sample.DIAG_DEMO
 
-  -- geometry: panel (narrow) on the left, example (wide) on the right. Each
+  -- geometry: panel (narrow) on the left, example (wide) in the middle, and the
+  -- terminal preview (narrow) on the right when the screen is wide enough. Each
   -- float sizes to its own content, capped to the screen. Neovim floats have no
   -- native scrollbar, so a too-tall panel scrolls with the focused knob and
   -- render_panel draws an overflow footer showing how many rows are hidden.
@@ -658,11 +746,31 @@ function M.open()
   local panel_h = math.min(panel_content, max_h)
   local example_h = math.min(#elines, max_h)
   local panel_w = 46
-  local example_w = math.min(ui_w - panel_w - 10, 84)
-  local total_w = panel_w + example_w + 3
+  local preview_w = 26
+  -- preview rows: header + blank + 5 specials + blank + ansi header + 16 slots
+  local preview_h = math.min(25, max_h)
+  local GAP = 3
+
+  -- Show the preview column only when the screen can still fit a readable sample
+  -- alongside it; otherwise keep the original two-float layout.
+  local show_preview = ui_w >= (panel_w + 40 + preview_w + GAP * 2)
+  local example_w
+  if show_preview then
+    example_w = math.min(ui_w - panel_w - preview_w - GAP * 2, 84)
+  else
+    example_w = math.min(ui_w - panel_w - 10, 84)
+  end
+
+  local total_w = panel_w
+    + GAP
+    + example_w
+    + (show_preview and (GAP + preview_w) or 0)
   local col0 = math.max(0, math.floor((ui_w - total_w) / 2))
-  local row0 =
-    math.max(0, math.floor((ui_h - math.max(panel_h, example_h)) / 2))
+  local content_h = math.max(panel_h, example_h)
+  if show_preview then
+    content_h = math.max(content_h, preview_h)
+  end
+  local row0 = math.max(0, math.floor((ui_h - content_h) / 2))
   session.panel_h = panel_h
 
   -- example buffer (real syntax groups paint it via filetype/treesitter)
@@ -674,7 +782,7 @@ function M.open()
   session.example.win = make_float(ebuf, {
     enter = false,
     row = row0,
-    col = col0 + panel_w + 3,
+    col = col0 + panel_w + GAP,
     width = example_w,
     height = example_h,
     title = " sample.lua ",
@@ -704,6 +812,22 @@ function M.open()
       virt_text = { { "  ● " .. d.msg, d.vt } },
       virt_text_pos = "eol",
     })
+  end
+
+  -- terminal preview buffer (read-only; never entered) — the third column
+  if show_preview then
+    local vbuf = vim.api.nvim_create_buf(false, true)
+    vim.bo[vbuf].modifiable = false
+    session.preview.buf = vbuf
+    session.preview.win = make_float(vbuf, {
+      enter = false,
+      row = row0,
+      col = col0 + panel_w + GAP + example_w + GAP,
+      width = preview_w,
+      height = preview_h,
+      title = " terminal ",
+    })
+    vim.wo[session.preview.win].cursorline = false
   end
 
   -- panel buffer (interactive)
@@ -779,7 +903,11 @@ function M.open()
     group = session.augroup,
     callback = function(ev)
       local w = tonumber(ev.match)
-      if w == session.panel.win or w == session.example.win then
+      if
+        w == session.panel.win
+        or w == session.example.win
+        or w == session.preview.win
+      then
         close(session, not session.closing and true)
       end
     end,

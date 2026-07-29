@@ -192,11 +192,14 @@ normal. A pin is either:
 
 Syntax roles: `keyword`, `func`, `special`, `type`, `constant` (Constant/
 Conditional/Exception — syntax red), `number`, `string`, `link`, `accent`,
-`comment`, `variable`, `operator`, `punctuation` (brackets/delimiters),
-`annotation` (attributes/decorators like `@override`), `emphasis` (the accent
-yellow — match highlights, icons, prompt keys). UI-background roles: `search`
-(`Search` + `CurSearch`, and flash's current-match label) and `incsearch`
-(`IncSearch` + `Substitute`). Each search role has its own palette base.
+`comment`, `variable` (`@variable`), `member` (`@variable.member`), `parameter`
+(`@variable.parameter`/`Parameter`), `operator`, `punctuation`
+(brackets/delimiters), `annotation` (attributes/decorators like `@override`),
+`emphasis` (the accent yellow — match highlights, icons, prompt keys).
+UI-background roles: `search` (`Search` + `CurSearch`, and flash's current-match
+label), `incsearch` (`IncSearch` + `Substitute`), and `selection` — the terminal
+selection background (see [Extras](#extras--terminal-bat--claude-code-themes)),
+with `selection_fg` for the text drawn on it. Each has its own palette base.
 
 Locked identity roles: `added`, `changed`, `removed` (diff, green/blue/red) and
 `error`, `warn`, `info`, `hint`, `success` (diagnostics/status). These are
@@ -260,6 +263,12 @@ are grouped as `diff.*` and `diag.*`. The sample ends with a git-diff and a
 diagnostics preview (line backgrounds, gutter signs, virtual-text messages) so
 those roles are visible too. If a flavour is already set (in `setup{}` or from a
 previous accept), the playground opens with those values instead of from scratch.
+
+On a wide-enough screen a third **terminal preview** column shows the exact
+colors `:ButbicketExtras` would emit for the current flavour — `background`,
+`foreground`, `cursor-color`, `selection-background`/`-foreground`, and the 16
+ANSI slots (with the palette key each is drawn from) — so you can see the
+generated terminal theme update as you tune. It is preview-only.
 
 `t` toggles the preview between dark and light. Each background has its own
 recipe; the first switch to a side seeds it from the side you were on (same
@@ -343,9 +352,14 @@ Point your terminal at the relevant file:
 
 The scheme also exports the palette to `vim.g.terminal_color_*` for `:terminal`.
 The ANSI slot mapping is aesthetic (chosen to look right in a shell), not a
-literal red/green/blue mapping — e.g. slot 4 carries a mint tone — and mirrors
-`set_terminal_colors()` in `lua/butbicket/init.lua`, so `:terminal` inside Neovim
-and your host terminal stay in sync.
+literal red/green/blue mapping — e.g. slot 4 carries a mint tone. The mapping —
+16 ANSI slots plus `background`/`foreground`/`cursor`/`selection` — lives in one
+place, `lua/butbicket/terminal.lua`, shared by `set_terminal_colors()`, the extras
+generator, and the playground's terminal-preview column, so `:terminal`, the
+generated theme files, and the preview always agree. `foreground` (and the
+cursor) is the emphasis foreground — the flavour's `foreground` knob; the
+selection background/foreground come from the `selection`/`selection_fg` flavour
+roles, so a flavour flows into the generated terminal theme.
 
 Regenerate the committed themes (all, or a subset):
 

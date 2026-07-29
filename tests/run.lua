@@ -46,6 +46,8 @@ local required_keys = {
   "floatBorder",
   "searchBase",
   "incSearchBase",
+  "selected",
+  "selectionText",
   "addedBase",
   "changedBase",
   "removedBase",
@@ -315,13 +317,17 @@ do
     special = { "specialKeyword" }, -- Debug, @debug
     accent = { "hotpink" }, -- MatchParen
     comment = { "commentText" }, -- Comment, SpecialComment, @comment
-    variable = { "variable", "variable_member", "parameter" }, -- @variable(.member), Parameter
+    variable = { "variable" }, -- @variable
+    member = { "variable_member" }, -- @variable.member
+    parameter = { "parameter" }, -- @variable.parameter, Parameter, @parameter
     operator = { "syntaxOperator" }, -- Operator, Delimiter, Special
     punctuation = { "light_red" }, -- Punctuation / brackets
     annotation = { "annotation" }, -- @attribute, PreCondit
     emphasis = { "accentEmphasis" }, -- TelescopeMatching, icons, keys
     search = { "searchBase" }, -- Search, CurSearch (+ flash current label)
     incsearch = { "incSearchBase" }, -- IncSearch, Substitute
+    selection = { "selected" }, -- terminal selection-background
+    selection_fg = { "selectionText" }, -- terminal selection-foreground
     added = { "addedBase" }, -- diff add identity (locked)
     changed = { "changedBase" }, -- diff change identity (locked)
     removed = { "removedBase" }, -- diff remove identity (locked)

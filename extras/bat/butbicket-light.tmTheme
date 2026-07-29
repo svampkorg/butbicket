@@ -12,11 +12,11 @@
         <key>background</key>
         <string>#FFFFFF</string>
         <key>foreground</key>
-        <string>#616161</string>
+        <string>#212121</string>
         <key>caret</key>
-        <string>#616161</string>
+        <string>#212121</string>
         <key>selection</key>
-        <string>#8A3D5F</string>
+        <string>#E0C4D2</string>
         <key>lineHighlight</key>
         <string>#E8E8E8</string>
       </dict>

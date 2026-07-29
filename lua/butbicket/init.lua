@@ -22,25 +22,15 @@ local function reload()
 end
 
 local function set_terminal_colors()
-  local colorscheme = require("butbicket.colorscheme")
-  vim.g.terminal_color_0 = colorscheme.editorBackground
-  vim.g.terminal_color_1 = colorscheme.syntaxError
-  vim.g.terminal_color_2 = colorscheme.successText
-  vim.g.terminal_color_3 = colorscheme.accentEmphasis
-  vim.g.terminal_color_4 = colorscheme.syntaxFunction
-  vim.g.terminal_color_5 = colorscheme.syntaxKeyword
-  vim.g.terminal_color_6 = colorscheme.linkText
-  vim.g.terminal_color_7 = colorscheme.mainText
-  vim.g.terminal_color_8 = colorscheme.inactiveText
-  vim.g.terminal_color_9 = colorscheme.errorText
-  vim.g.terminal_color_10 = colorscheme.stringText
-  vim.g.terminal_color_11 = colorscheme.warningText
-  vim.g.terminal_color_12 = colorscheme.syntaxOperator
-  vim.g.terminal_color_13 = colorscheme.specialKeyword
-  vim.g.terminal_color_14 = colorscheme.stringText
-  vim.g.terminal_color_15 = colorscheme.commentText
-  vim.g.terminal_color_background = colorscheme.editorBackground
-  vim.g.terminal_color_foreground = colorscheme.mainText
+  -- The ANSI slots + terminal bg/fg mapping lives in butbicket.terminal, shared
+  -- with the extras generator and the playground preview (single source of truth).
+  local spec =
+    require("butbicket.terminal").spec(require("butbicket.colorscheme"))
+  for i = 0, 15 do
+    vim.g["terminal_color_" .. i] = spec.ansi[i]
+  end
+  vim.g.terminal_color_background = spec.bg
+  vim.g.terminal_color_foreground = spec.fg
 end
 
 local function set_groups()

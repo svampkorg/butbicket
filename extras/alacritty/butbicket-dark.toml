@@ -2,11 +2,11 @@
 
 [colors.primary]
 background = "#101214"
-foreground = "#D4D4D4"
+foreground = "#E7E7E8"
 
 [colors.cursor]
 text = "#101214"
-cursor = "#D4D4D4"
+cursor = "#E7E7E8"
 
 [colors.selection]
 text = "#E7E7E8"

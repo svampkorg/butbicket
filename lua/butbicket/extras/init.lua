@@ -28,21 +28,24 @@ local function collect(background)
   package.loaded["butbicket.colorscheme"] = nil
   local c = require("butbicket.colorscheme")
 
+  -- Terminal / ANSI mapping is shared with set_terminal_colors() and the
+  -- playground preview (butbicket.terminal), so every consumer agrees.
+  local term = require("butbicket.terminal").spec(c)
   local ansi = {}
   for i = 0, 15 do
-    ansi[i] = upper(vim.g["terminal_color_" .. i])
+    ansi[i] = upper(term.ansi[i])
   end
 
   return {
     name = "butbicket-" .. background,
     light = background == "light",
     ansi = ansi, -- 0..15
-    bg = upper(vim.g.terminal_color_background),
-    fg = upper(vim.g.terminal_color_foreground),
-    cursor = upper(c.mainText),
-    sel_bg = upper(c.selected),
-    sel_fg = upper(c.emphasisText),
-    accent = upper(c.linkText),
+    bg = upper(term.bg),
+    fg = upper(term.fg),
+    cursor = upper(term.cursor),
+    sel_bg = upper(term.sel_bg),
+    sel_fg = upper(term.sel_fg),
+    accent = upper(term.accent),
 
     -- syntax palette (bat .tmTheme)
     keyword = upper(c.keyword),

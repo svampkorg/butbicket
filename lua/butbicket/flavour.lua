@@ -49,12 +49,14 @@ M.ROLES = {
   { name = "link", keys = { "linkText", "blue" } },
   { name = "accent", keys = { "hotpink" } },
   { name = "comment", keys = { "commentText" } },
-  -- variable family, minus text_dark (that is body text / mainText — re-hueing
-  -- it would tint all normal text, not just variables).
-  {
-    name = "variable",
-    keys = { "variable", "variable_member", "parameter" },
-  },
+  -- variable family, split into three tunable roles so @variable, @variable
+  -- .member and @variable.parameter keep their own identity under a flavour
+  -- (text_dark is excluded — that is body text / mainText, re-hueing it would
+  -- tint all normal text). @variable.builtin reads emphasisText (the fg anchor,
+  -- = terminal foreground) and is intentionally not a role here.
+  { name = "variable", keys = { "variable" } },
+  { name = "member", keys = { "variable_member" } },
+  { name = "parameter", keys = { "parameter" } },
   -- true operators only; brackets/punctuation are a separate color (light_red).
   { name = "operator", keys = { "syntaxOperator" } },
   -- brackets / punctuation / delimiters (kept distinct from operator).
@@ -71,6 +73,12 @@ M.ROLES = {
   -- touches syntax or the diff tint.
   { name = "search", keys = { "searchBase" }, surface = "bg" },
   { name = "incsearch", keys = { "incSearchBase" }, surface = "bg" },
+  -- selection: the terminal (and, historically, editor) selection background +
+  -- the text drawn on it. Own keys so both are independently tunable; the extras
+  -- generator emits `selected` as selection-background and `selectionText` as
+  -- selection-foreground. `selected` is read only by the terminal theme.
+  { name = "selection", keys = { "selected" }, surface = "bg" },
+  { name = "selection_fg", keys = { "selectionText" } },
   -- diff identities: locked so hue changes never turn green/blue/red into
   -- something confusing. colorscheme.lua derives the dim/mid backgrounds from
   -- these, so pinning one flows through the whole diff family.
@@ -148,9 +156,10 @@ end
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
 ---       or a number (hue degrees, hue-only). Roles: keyword, func, special,
 ---       type, constant, number, string, link, accent, comment, variable,
----       operator, punctuation, annotation, emphasis, search, incsearch, added,
----       changed, removed, error, warn, info, hint, success (added..success are
----       locked identities — only an explicit pin moves them)
+---       member, parameter, operator, punctuation, annotation, emphasis, search,
+---       incsearch, selection, selection_fg, added, changed, removed, error,
+---       warn, info, hint, success (added..success are locked identities — only
+---       an explicit pin moves them)
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
 

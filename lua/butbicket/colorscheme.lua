@@ -19,8 +19,7 @@ colorscheme.parenthesis = "#CECFD2"
 colorscheme.variable = "#B6B7BA"
 colorscheme.variable_member = "#96999E"
 colorscheme.parameter = "#AAABAF"
-colorscheme.selected = "#89576E"
-colorscheme.selected_inactive = "#464646"
+colorscheme.selected = "#89576E" -- selection background (terminal sel_bg)
 colorscheme.annotation = "#89576E" -- @attribute / PreCondit (own key, tunable)
 colorscheme.type = "#CFE1FD"
 colorscheme.blue = "#669CF0"
@@ -93,7 +92,10 @@ if vim.o.background == "light" then
   colorscheme.green = "#22863a"
   colorscheme.red = "#c0392b"
   colorscheme.hotpink = "#d1006a" -- MatchParen / flash
-  colorscheme.selected = "#8a3d5f"
+  -- selection background: a pale mauve (keeps the dark side's hue family) so the
+  -- dark selection-foreground below reads on it — the old #8a3d5f was a dark
+  -- mauve that rendered dark-on-dark with the near-black selection text.
+  colorscheme.selected = "#e0c4d2"
   colorscheme.annotation = "#8a3d5f" -- @attribute / PreCondit
   -- surfaces
   colorscheme.base_1 = "#f0f0f0"
@@ -126,8 +128,7 @@ if vim.o.background == "light" then
   colorscheme.inactiveText = "#9e9e9e"
   colorscheme.disabledText = "#d0d0d0"
   colorscheme.lineNumberText = "#a1a1a1"
-  colorscheme.selectedText = "#424242"
-  colorscheme.inactiveSelectionText = "#757575"
+  colorscheme.selectionText = "#2a2a2a" -- selection foreground (dark on pale selected)
 
   colorscheme.windowBorder = "#c2c3c5"
   colorscheme.focusedBorder = "#aaaaaa"
@@ -158,8 +159,7 @@ else
   colorscheme.inactiveText = colorscheme.slate
   colorscheme.disabledText = colorscheme.variable_member
   colorscheme.lineNumberText = colorscheme.dark_slate
-  colorscheme.selectedText = colorscheme.selected
-  colorscheme.inactiveSelectionText = colorscheme.selected_inactive
+  colorscheme.selectionText = colorscheme.text -- selection foreground (on selected)
 
   colorscheme.windowBorder = colorscheme.separator
   colorscheme.focusedBorder = colorscheme.slate
