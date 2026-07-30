@@ -56,7 +56,6 @@ local function label_chip(lch, dark)
     c = math.max(lch.c, 34),
     h = ((lch.h or 0) + 180) % 360,
   })
-  -- local black, white = "#0a0a0a", "#f5f5f5"
   local black, white = colorscheme.editorBackground, colorscheme.text
   local letter = contrast.ratio(white, chip) >= contrast.ratio(black, chip)
       and white
