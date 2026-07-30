@@ -116,8 +116,7 @@ if vim.o.background == "light" then
   colorscheme.hintBase = "#0f6e5a"
   colorscheme.successBase = "#22863a"
 
-  -- use #FDFDFD as white
-  colorscheme.editorBackground = config.transparent and "none" or "#ffffff"
+  colorscheme.editorBackground = config.transparent and "none" or "#FDFDFD"
   colorscheme.sidebarBackground = "#dddddd"
   colorscheme.popupBackground = "#f6f6f6"
   colorscheme.floatingWindowBackground = "#e0e0e0"
