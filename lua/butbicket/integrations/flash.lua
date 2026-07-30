@@ -77,6 +77,7 @@ function M.highlights()
 
   local lch = oklab.hex_to_oklch(hp)
   local dark = bg_is_dark()
+---@diagnostic disable-next-line: unused-local
   local chip, letter = label_chip(lch, dark)
   return {
     FlashMatch = { fg = hp },
@@ -84,7 +85,7 @@ function M.highlights()
       fg = match_fg(lch, dark),
       bg = current_bg(chip),
     },
-    FlashLabel = { fg = letter, bg = chip, bold = true },
+    FlashLabel = { fg = match_fg(lch, dark), bg = chip, bold = true },
   }
 end
 
