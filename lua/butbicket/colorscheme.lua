@@ -124,7 +124,7 @@ if vim.o.background == "light" then
 
   colorscheme.mainText = "#616161"
   colorscheme.emphasisText = "#212121"
-  colorscheme.inactiveText = "#9e9e9e"
+  colorscheme.inactiveText = "#e9e9e9"
   colorscheme.disabledText = "#d0d0d0"
   colorscheme.lineNumberText = "#a1a1a1"
   colorscheme.selectionText = "#2a2a2a" -- selection foreground (dark on pale selected)
