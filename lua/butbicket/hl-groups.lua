@@ -81,7 +81,7 @@ return {
   TabLine = { bg = colorscheme.floatingWindowBackground, fg = colorscheme.mainText },
   TabLineFill = { bg = colorscheme.windowBorder },
   TabLineSel = {
-    bg = colorscheme.sidebarBackground,
+    bg = colorscheme.editorBackground,
     fg = colorscheme.mainText,
     bold = true,
   },
