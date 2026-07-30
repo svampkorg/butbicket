@@ -121,7 +121,7 @@ return {
   Identifier = { fg = colorscheme.steel_gray },
   Function = { fg = colorscheme.syntaxFunction },
   Method = { fg = colorscheme.syntaxFunction },
-  Property = { fg = colorscheme.text_dark },
+  Property = { fg = colorscheme.variable_member },
   Field = { link = "Property" },
   Parameter = { fg = colorscheme.parameter },
   Statement = {
