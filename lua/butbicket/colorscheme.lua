@@ -193,6 +193,7 @@ colorscheme.floatBorder = colorscheme.dark_slate
 -- A missing / mismatched side renders the canonical palette, so the light/dark
 -- toggle always changes the background.
 local result = colorscheme
+local flavour_variant -- the applied flavour recipe, if any (for the ansi deltas)
 if type(config.flavour) == "table" then
   local fl = config.flavour
   local variant = fl[vim.o.background] -- fl.dark / fl.light
@@ -205,11 +206,19 @@ if type(config.flavour) == "table" then
   end
   if type(variant) == "table" then
     result = require("butbicket.flavour").generate_hues(colorscheme, variant)
+    flavour_variant = variant
     if config.transparent then
       result.editorBackground = "none"
     end
   end
 end
+
+-- Bright ANSI derivation deltas: terminal.spec derives slots 8-15 from 0-7 using
+-- these (an OKLCh lightness delta + chroma multiplier). Stamped on the palette so
+-- every terminal consumer (set_terminal_colors, extras, the playground preview)
+-- agrees. Per-polarity defaults; a flavour overrides via ansi_bright_l/_c.
+result.ansiBrightL, result.ansiBrightC =
+  require("butbicket.terminal").bright_deltas(vim.o.background, flavour_variant)
 
 -- Derive the diff family from the three locked identity colors, AFTER the
 -- flavour so it operates on the final palette. `*_bright` is the identity fg;

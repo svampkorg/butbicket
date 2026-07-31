@@ -11,14 +11,14 @@ palette = 6=#669CF0
 palette = 7=#D4D4D4
 
 # bright colors
-palette = 8=#636363
-palette = 9=#E78178
-palette = 10=#FBC828
-palette = 11=#BA9420
-palette = 12=#CECFD2
-palette = 13=#7EE2B8
-palette = 14=#FBC828
-palette = 15=#636363
+palette = 8=#2D2F32
+palette = 9=#FFA9A0
+palette = 10=#8FC446
+palette = 11=#FFF0C9
+palette = 12=#B5FFDE
+palette = 13=#FFCBC6
+palette = 14=#93BEFF
+palette = 15=#F6F6F6
 
 background = #101214
 foreground = #E7E7E8

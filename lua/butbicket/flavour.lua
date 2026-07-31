@@ -26,85 +26,189 @@ end
 --   * `surface`: "fg" (default) — a syntax foreground, previewed as a solid
 --     swatch, graded color-on-background; or "bg" — a UI background (search,
 --     incsearch), previewed as text-on-color and graded text-on-background.
---   * `locked` (optional): a semantic-identity color the flavour hue wheel must
---     never move — `hue_shift`/`chroma_mult`/`n_hues`/`base_hue` all skip it, so
---     it keeps its hue (only its lightness is remapped to fit a new background).
---     It changes ONLY when the user explicitly pins it. Used for the diff
---     add/change/remove identities, which are intrinsically green/blue/red,
---     and the diagnostic/status identities (error/warn/info/hint/success).
+--   * `locked` (optional): a color the flavour hue wheel must never move —
+--     `hue_shift`/`chroma_mult`/`n_hues`/`base_hue` all skip it, so it keeps its
+--     hue + chroma (only its lightness is remapped to fit a new background). It
+--     changes ONLY when the user explicitly pins it. Used for the semantic
+--     identities (diff green/blue/red, diagnostics error/warn/info/hint/success)
+--     AND for the UI chrome (window backgrounds, borders, body/inactive text) —
+--     spinning the accent wheel should not tint the editor's surfaces.
+--   * `group`: the playground section a role is displayed under — "syntax",
+--     "ui", "state" (search/selection), "diff", or "diagnostic". Roles are
+--     ordered by group below so each section is contiguous.
 --
--- `ROLE_KEYS`/`ROLE_ORDER`/`ROLE_SURFACE`/`ROLE_LOCKED` are all derived from this
--- single source below, so they can never drift; a test asserts it.
+-- `ROLE_KEYS`/`ROLE_ORDER`/`ROLE_SURFACE`/`ROLE_LOCKED`/`ROLE_GROUP` are all
+-- derived from this single source below, so they can never drift; a test asserts it.
 M.ROLES = {
-  { name = "keyword", keys = { "keyword", "syntaxKeyword" } },
-  { name = "func", keys = { "method", "syntaxFunction" } },
-  { name = "special", keys = { "specialKeyword", "purple", "dark_purple" } },
-  { name = "type", keys = { "type" } },
+  -- ── syntax ────────────────────────────────────────────────────────────────
+  { name = "keyword", keys = { "keyword", "syntaxKeyword" }, group = "syntax" },
+  { name = "func", keys = { "method", "syntaxFunction" }, group = "syntax" },
+  {
+    name = "special",
+    keys = { "specialKeyword", "purple", "dark_purple" },
+    group = "syntax",
+  },
+  { name = "type", keys = { "type" }, group = "syntax" },
   -- syntax red: Constant / Conditional / Exception / SpecialChar / @punctuation
   -- .special + several cmp kinds + terminal color 1. Distinct from diagnostic
   -- error red (`error`/`errorBase`) since that lift — free to rotate/pin.
-  { name = "constant", keys = { "syntaxError" } },
-  { name = "number", keys = { "number", "syntaxNumber" } },
-  { name = "string", keys = { "stringText" } },
-  { name = "link", keys = { "linkText", "blue" } },
-  { name = "accent", keys = { "hotpink" } },
-  { name = "comment", keys = { "commentText" } },
+  { name = "constant", keys = { "syntaxError" }, group = "syntax" },
+  { name = "number", keys = { "number", "syntaxNumber" }, group = "syntax" },
+  { name = "string", keys = { "stringText" }, group = "syntax" },
+  { name = "link", keys = { "linkText", "blue" }, group = "syntax" },
+  { name = "accent", keys = { "hotpink" }, group = "syntax" },
+  { name = "comment", keys = { "commentText" }, group = "syntax" },
   -- variable family, split into three tunable roles so @variable, @variable
   -- .member and @variable.parameter keep their own identity under a flavour
   -- (text_dark is excluded — that is body text / mainText, re-hueing it would
   -- tint all normal text). @variable.builtin reads emphasisText (the fg anchor,
   -- = terminal foreground) and is intentionally not a role here.
-  { name = "variable", keys = { "variable" } },
-  { name = "member", keys = { "variable_member" } },
-  { name = "parameter", keys = { "parameter" } },
+  { name = "variable", keys = { "variable" }, group = "syntax" },
+  { name = "member", keys = { "variable_member" }, group = "syntax" },
+  { name = "parameter", keys = { "parameter" }, group = "syntax" },
   -- true operators only; brackets/punctuation are a separate color (light_red).
-  { name = "operator", keys = { "syntaxOperator" } },
+  { name = "operator", keys = { "syntaxOperator" }, group = "syntax" },
   -- brackets / punctuation / delimiters (kept distinct from operator).
-  { name = "punctuation", keys = { "light_red" } },
+  { name = "punctuation", keys = { "light_red" }, group = "syntax" },
   -- attributes / decorators / annotations (@override etc.) + PreCondit; own key
   -- so it doesn't drag the selection color it used to share.
-  { name = "annotation", keys = { "annotation" } },
+  { name = "annotation", keys = { "annotation" }, group = "syntax" },
   -- the accent yellow: match emphasis (Telescope/Snacks/MiniPick/GrugFar),
   -- icons, prompt prefixes, which-key keys, terminal color 3. Not a warning
   -- (that is `warn`); a plain decorative accent, free to rotate/pin.
-  { name = "emphasis", keys = { "accentEmphasis" } },
+  { name = "emphasis", keys = { "accentEmphasis" }, group = "syntax" },
+  -- ── ui chrome ─────────────────────────────────────────────────────────────
+  -- Editor surfaces / borders / non-syntax text. All locked: the hue wheel must
+  -- not tint the chrome. Several also feed a terminal ANSI slot (text -> 7,
+  -- inactive -> 8), so exposing them lets the generated terminal theme be tuned.
+  { name = "text", keys = { "mainText" }, group = "ui", locked = true },
+  { name = "inactive", keys = { "inactiveText" }, group = "ui", locked = true },
+  { name = "disabled", keys = { "disabledText" }, group = "ui", locked = true },
+  {
+    name = "line_number",
+    keys = { "lineNumberText" },
+    group = "ui",
+    locked = true,
+  },
+  {
+    name = "cursorline",
+    keys = { "cursorline" },
+    group = "ui",
+    surface = "bg",
+    locked = true,
+  },
+  {
+    name = "bg_sidebar",
+    keys = { "sidebarBackground" },
+    group = "ui",
+    surface = "bg",
+    locked = true,
+  },
+  {
+    name = "bg_popup",
+    keys = { "popupBackground" },
+    group = "ui",
+    surface = "bg",
+    locked = true,
+  },
+  {
+    name = "bg_float",
+    keys = { "floatingWindowBackground" },
+    group = "ui",
+    surface = "bg",
+    locked = true,
+  },
+  {
+    name = "bg_menu",
+    keys = { "menuOptionBackground" },
+    group = "ui",
+    surface = "bg",
+    locked = true,
+  },
+  { name = "border", keys = { "windowBorder" }, group = "ui", locked = true },
+  {
+    name = "border_focused",
+    keys = { "focusedBorder" },
+    group = "ui",
+    locked = true,
+  },
+  {
+    name = "border_emphasized",
+    keys = { "emphasizedBorder" },
+    group = "ui",
+    locked = true,
+  },
+  {
+    name = "border_float",
+    keys = { "floatBorder" },
+    group = "ui",
+    locked = true,
+  },
+  -- ── search & selection (UI state) ─────────────────────────────────────────
   -- UI backgrounds: hlsearch matches, and the incremental-search / :substitute
   -- preview. Each has a dedicated single-purpose palette key so tuning it never
   -- touches syntax or the diff tint.
-  { name = "search", keys = { "searchBase" }, surface = "bg" },
-  { name = "incsearch", keys = { "incSearchBase" }, surface = "bg" },
+  { name = "search", keys = { "searchBase" }, group = "state", surface = "bg" },
+  {
+    name = "incsearch",
+    keys = { "incSearchBase" },
+    group = "state",
+    surface = "bg",
+  },
   -- selection: the terminal (and, historically, editor) selection background +
   -- the text drawn on it. Own keys so both are independently tunable; the extras
   -- generator emits `selected` as selection-background and `selectionText` as
   -- selection-foreground. `selected` is read only by the terminal theme.
-  { name = "selection", keys = { "selected" }, surface = "bg" },
-  { name = "selection_fg", keys = { "selectionText" } },
-  -- diff identities: locked so hue changes never turn green/blue/red into
-  -- something confusing. colorscheme.lua derives the dim/mid backgrounds from
-  -- these, so pinning one flows through the whole diff family.
-  { name = "added", keys = { "addedBase" }, locked = true },
-  { name = "changed", keys = { "changedBase" }, locked = true },
-  { name = "removed", keys = { "removedBase" }, locked = true },
-  -- diagnostic + status identities: locked so a hue change never turns an error
-  -- non-red or drags a hint off its own hue. Each owns a dedicated *Base key;
-  -- colorscheme.lua points the diagnostic groups (and the errorText/warningText/
-  -- successText integration aliases) at these, so a pin flows through everywhere.
-  { name = "error", keys = { "errorBase" }, locked = true },
-  { name = "warn", keys = { "warnBase" }, locked = true },
-  { name = "info", keys = { "infoBase" }, locked = true },
-  { name = "hint", keys = { "hintBase" }, locked = true },
-  { name = "success", keys = { "successBase" }, locked = true },
+  {
+    name = "selection",
+    keys = { "selected" },
+    group = "state",
+    surface = "bg",
+  },
+  { name = "selection_fg", keys = { "selectionText" }, group = "state" },
+  -- ── diff identities ───────────────────────────────────────────────────────
+  -- locked so hue changes never turn green/blue/red into something confusing.
+  -- colorscheme.lua derives the dim/mid backgrounds from these, so pinning one
+  -- flows through the whole diff family.
+  { name = "added", keys = { "addedBase" }, group = "diff", locked = true },
+  { name = "changed", keys = { "changedBase" }, group = "diff", locked = true },
+  { name = "removed", keys = { "removedBase" }, group = "diff", locked = true },
+  -- ── diagnostic + status identities ────────────────────────────────────────
+  -- locked so a hue change never turns an error non-red or drags a hint off its
+  -- own hue. Each owns a dedicated *Base key; colorscheme.lua points the
+  -- diagnostic groups (and the errorText/warningText/successText integration
+  -- aliases) at these, so a pin flows through everywhere.
+  {
+    name = "error",
+    keys = { "errorBase" },
+    group = "diagnostic",
+    locked = true,
+  },
+  { name = "warn", keys = { "warnBase" }, group = "diagnostic", locked = true },
+  { name = "info", keys = { "infoBase" }, group = "diagnostic", locked = true },
+  { name = "hint", keys = { "hintBase" }, group = "diagnostic", locked = true },
+  {
+    name = "success",
+    keys = { "successBase" },
+    group = "diagnostic",
+    locked = true,
+  },
 }
+
+-- Playground section order (each role's `group` maps to one of these).
+M.GROUP_ORDER = { "syntax", "ui", "state", "diff", "diagnostic" }
 
 M.ROLE_KEYS = {}
 M.ROLE_ORDER = {}
 M.ROLE_SURFACE = {}
 M.ROLE_LOCKED = {}
+M.ROLE_GROUP = {}
 for _, r in ipairs(M.ROLES) do
   M.ROLE_KEYS[r.name] = r.keys
   M.ROLE_ORDER[#M.ROLE_ORDER + 1] = r.name
   M.ROLE_SURFACE[r.name] = r.surface or "fg"
   M.ROLE_LOCKED[r.name] = r.locked or false
+  M.ROLE_GROUP[r.name] = r.group or "syntax"
 end
 local ROLE_KEYS = M.ROLE_KEYS
 
@@ -154,14 +258,21 @@ end
 ---@field n_hues? number snap accent roles to N evenly-spaced hues (0 = grayscale)
 ---@field base_hue? number degrees: where the hue slots start (default 0)
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
----       or a number (hue degrees, hue-only). Roles: keyword, func, special,
----       type, constant, number, string, link, accent, comment, variable,
----       member, parameter, operator, punctuation, annotation, emphasis, search,
----       incsearch, selection, selection_fg, added, changed, removed, error,
----       warn, info, hint, success (added..success are locked identities — only
----       an explicit pin moves them)
+---       or a number (hue degrees, hue-only). Roles by section — syntax:
+---       keyword, func, special, type, constant, number, string, link, accent,
+---       comment, variable, member, parameter, operator, punctuation, annotation,
+---       emphasis; ui: text, inactive, disabled, line_number, cursorline,
+---       bg_sidebar, bg_popup, bg_float, bg_menu, border, border_focused,
+---       border_emphasized, border_float; state: search, incsearch, selection,
+---       selection_fg; diff: added, changed, removed; diagnostic: error, warn,
+---       info, hint, success. The ui + diff + diagnostic roles are locked — the
+---       hue wheel skips them, only an explicit pin (or the lightness remap) moves
+---       them.
 ---@field anchor_bg? string canonical bg key (default "editorBackground")
 ---@field anchor_fg? string canonical fg key (default "emphasisText")
+---@field ansi_bright_l? number OKLCh lightness delta deriving bright ANSI 8-15
+---       from normal 0-7 (per-polarity default; see butbicket.terminal)
+---@field ansi_bright_c? number chroma multiplier for the bright ANSI derivation
 
 ---Generate a re-toned copy of `palette`.
 ---@param palette table<string, any> the canonical palette (hex string values)

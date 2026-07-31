@@ -2,14 +2,14 @@
 
 [colors]
 foreground = "#212121"
-background = "#FFFFFF"
+background = "#FDFDFD"
 cursor_bg = "#212121"
-cursor_fg = "#FFFFFF"
+cursor_fg = "#FDFDFD"
 cursor_border = "#212121"
 selection_bg = "#E0C4D2"
 selection_fg = "#2A2A2A"
-ansi = ["#FFFFFF", "#D6656A", "#22863A", "#CD9731", "#6871FF", "#9966CC", "#1976D2", "#616161"]
-brights = ["#9E9E9E", "#D32F2F", "#B35C00", "#B26A00", "#A1A1A1", "#800080", "#B35C00", "#848484"]
+ansi = ["#FDFDFD", "#D6656A", "#22863A", "#CD9731", "#6871FF", "#9966CC", "#1976D2", "#616161"]
+brights = ["#ECECEC", "#CF4954", "#00762A", "#BE8600", "#5957FF", "#8D4EC7", "#0066BE", "#525252"]
 
 [metadata]
 name = "butbicket-light"

@@ -27,6 +27,8 @@ function M.default_opts(recipe, base)
     chroma_mult = recipe.chroma_mult or 1,
     n_hues = recipe.n_hues,
     base_hue = recipe.base_hue or 0,
+    ansi_bright_l = recipe.ansi_bright_l, -- nil = per-polarity default
+    ansi_bright_c = recipe.ansi_bright_c,
     accents = vim.deepcopy(recipe.accents or {}),
   }
 end
@@ -52,6 +54,12 @@ function M.serialize(opts)
   end
   if opts.base_hue and opts.base_hue ~= 0 then
     kv("base_hue", fmt_num(opts.base_hue))
+  end
+  if opts.ansi_bright_l ~= nil then
+    kv("ansi_bright_l", fmt_num(opts.ansi_bright_l))
+  end
+  if opts.ansi_bright_c ~= nil then
+    kv("ansi_bright_c", fmt_num(opts.ansi_bright_c))
   end
   if opts.accents and next(opts.accents) ~= nil then
     lines[#lines + 1] = "  accents = {"

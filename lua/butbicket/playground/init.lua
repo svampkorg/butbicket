@@ -33,11 +33,13 @@ local KNOBS = sample.KNOBS
 local ACCENT_ROLES = sample.ACCENT_ROLES
 local DIFF_ROLES = sample.DIFF_ROLES
 local DIAG_ROLES = sample.DIAG_ROLES
+local GROUP_LABELS = sample.GROUP_LABELS
 
 local HEX = util.HEX
 local NS = util.NS
 local SWATCH = util.SWATCH
 local BG_SWATCH = util.BG_SWATCH
+local TERM_GLYPH = util.TERM_GLYPH
 local clamp = util.clamp
 local notify = util.notify
 local is_hex = util.is_hex
@@ -53,10 +55,12 @@ M.serialize_variants = serialize.serialize_variants -- exposed for tests
 
 local AA = 4.5 -- WCAG AA floor for normal text
 
--- Column widths for the knob rows. LABEL_W fits the longest label
--- ("accent.punctuation" = 18); VAL_W fits a hex/`(auto)`/degrees value.
-local LABEL_W = 18
+-- Column widths for the knob rows. LABEL_W fits the longest role name
+-- ("border_emphasized" = 17); VAL_W fits a hex/`(auto)`/degrees value. PANEL_W
+-- is the panel float width (shared by geometry + the section-header fill).
+local LABEL_W = 17
 local VAL_W = 8
+local PANEL_W = 52
 
 local P -- the single active session, or nil
 
@@ -131,9 +135,22 @@ local function render_panel(session)
     end
   end
 
+  -- A section divider: " ── <label> ──────" filled to the panel width.
+  local function section_header(group)
+    local left = " ── " .. (GROUP_LABELS[group] or group) .. " "
+    local fill = math.max(0, (PANEL_W - 2) - vim.fn.strdisplaywidth(left))
+    return left .. string.rep("─", fill)
+  end
+
   session.knob_line = {}
   local swatches = {}
+  local cur_group
   for i, k in ipairs(KNOBS) do
+    if k.group ~= cur_group then
+      cur_group = k.group
+      lines[#lines + 1] = ""
+      lines[#lines + 1] = section_header(cur_group)
+    end
     local marker = (i == session.focus) and ">" or " "
     local val = knob_value_str(session, k)
     local suffix = ""
@@ -155,12 +172,18 @@ local function render_panel(session)
     if is_hex(color) then
       cell = is_bg and BG_SWATCH or SWATCH
     end
-    lines[#lines + 1] = ("%s %s %s %s%s"):format(
+    -- ANSI indicator: roles that feed a terminal slot get a terminal glyph +
+    -- the slot number(s) they drive.
+    local ansi = k.ansi
+        and ("  " .. TERM_GLYPH .. " " .. table.concat(k.ansi, ","))
+      or ""
+    lines[#lines + 1] = ("%s %s %s %s%s%s"):format(
       marker,
       cell,
       pad_disp(k.label, LABEL_W),
       pad_disp(val, VAL_W),
-      suffix
+      suffix,
+      ansi
     )
     session.knob_line[i] = #lines
     if is_hex(color) then
@@ -235,77 +258,31 @@ end
 
 -- ── terminal preview ────────────────────────────────────────────────────────
 
--- Render the read-only terminal-theme preview float: the exact colors
--- `:ButbicketExtras` would emit for the current flavour (background, foreground,
--- cursor, selection bg/fg, and the 16 ANSI slots), each with a live swatch. The
--- palette mapping comes from butbicket.terminal, the same source the generator
--- and set_terminal_colors() use, so what you see is what gets written. Preview
--- only — the float is never entered.
-local function render_preview(session)
-  local pv = session.preview
-  if not (pv and pv.buf and vim.api.nvim_buf_is_valid(pv.buf)) then
+-- Recolor the terminal-preview swatches at the bottom of the sample float: the
+-- exact colors `:ButbicketExtras` would emit for the current flavour (bg/fg/
+-- cursor/selection + the 16 ANSI slots). The mapping comes from butbicket
+-- .terminal — the same source the generator and set_terminal_colors() use, so
+-- the preview matches what gets written. The swatch text + extmarks are placed
+-- once at build (session.term_marks); here we only (re)define the hl groups the
+-- extmarks point at, because colorscheme()'s `hi clear` wipes them each apply.
+local function render_terminal(session)
+  if not session.term_marks then
     return
   end
   local spec = terminal.spec(graded_palette(session))
-
-  local lines = { " terminal preview", "" }
-  local swatches = {} -- { row, col, width, fg_hex, bg_hex? }
-
-  -- background/foreground/cursor + selection. The selection-bg row uses a
-  -- text-on-color chip (selection-fg on selection-bg) so the pairing's
-  -- readability is visible; the others are solid blocks.
-  local specials = {
-    { "background", spec.bg },
-    { "foreground", spec.fg },
-    { "cursor-color", spec.cursor },
-    { "selection-bg", spec.sel_bg, spec.sel_fg },
-    { "selection-fg", spec.sel_fg },
-  }
-  for _, s in ipairs(specials) do
-    local chip = s[3] ~= nil
-    local cell = chip and BG_SWATCH or SWATCH
-    lines[#lines + 1] = (" %s %s %s"):format(cell, pad_disp(s[1], 12), s[2])
-    if is_hex(s[2]) then
-      swatches[#swatches + 1] = {
-        row = #lines - 1,
-        col = 1,
-        width = #cell,
-        fg_hex = chip and s[3] or s[2],
-        bg_hex = chip and s[2] or nil,
-      }
+  local function hl(group, fg, bg)
+    if is_hex(bg) then
+      pcall(vim.api.nvim_set_hl, 0, group, { bg = bg, fg = fg })
+    elseif is_hex(fg) then
+      pcall(vim.api.nvim_set_hl, 0, group, { fg = fg })
     end
   end
-
-  lines[#lines + 1] = ""
-  lines[#lines + 1] = " ansi palette"
+  hl("ButbicketPgTermBg", spec.bg)
+  hl("ButbicketPgTermFg", spec.fg)
+  hl("ButbicketPgTermCursor", spec.cursor)
+  hl("ButbicketPgTermSel", spec.sel_fg, spec.sel_bg) -- chip: fg on bg
   for i = 0, 15 do
-    local hex = spec.ansi[i]
-    local prefix = ("%2d "):format(i)
-    lines[#lines + 1] = (" %s%s %s"):format(prefix, SWATCH, terminal.ANSI[i])
-    if is_hex(hex) then
-      swatches[#swatches + 1] =
-        { row = #lines - 1, col = 1 + #prefix, width = #SWATCH, fg_hex = hex }
-    end
-  end
-
-  local buf = pv.buf
-  vim.bo[buf].modifiable = true
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-  vim.bo[buf].modifiable = false
-
-  -- Repaint every swatch; colorscheme()'s `hi clear` wipes these each apply.
-  vim.api.nvim_buf_clear_namespace(buf, NS, 0, -1)
-  for idx, s in ipairs(swatches) do
-    local grp = "ButbicketPgTerm" .. idx
-    if s.bg_hex then
-      pcall(vim.api.nvim_set_hl, 0, grp, { bg = s.bg_hex, fg = s.fg_hex })
-    else
-      pcall(vim.api.nvim_set_hl, 0, grp, { fg = s.fg_hex })
-    end
-    pcall(vim.api.nvim_buf_set_extmark, buf, NS, s.row, s.col, {
-      end_col = s.col + s.width,
-      hl_group = grp,
-    })
+    hl("ButbicketPgTermAnsi" .. i, spec.ansi[i])
   end
 end
 
@@ -336,7 +313,7 @@ end
 local function refresh(session)
   apply(session)
   render_panel(session)
-  render_preview(session)
+  render_terminal(session)
   sync_example(session)
 end
 
@@ -550,20 +527,12 @@ local function close(session, restore)
     color_editor.close(session.color_editor, true)
   end
   pcall(vim.api.nvim_del_augroup_by_id, session.augroup)
-  for _, w in ipairs({
-    session.panel.win,
-    session.example.win,
-    session.preview.win,
-  }) do
+  for _, w in ipairs({ session.panel.win, session.example.win }) do
     if w and vim.api.nvim_win_is_valid(w) then
       pcall(vim.api.nvim_win_close, w, true)
     end
   end
-  for _, b in ipairs({
-    session.panel.buf,
-    session.example.buf,
-    session.preview.buf,
-  }) do
+  for _, b in ipairs({ session.panel.buf, session.example.buf }) do
     if b and vim.api.nvim_buf_is_valid(b) then
       pcall(vim.api.nvim_buf_delete, b, { force = true })
     end
@@ -709,7 +678,6 @@ function M.open()
     prev_background = vim.o.background,
     panel = {},
     example = {},
-    preview = {},
     refresh = refresh, -- injected so color_editor can re-apply without a cycle
   }
 
@@ -733,44 +701,69 @@ function M.open()
   session.example_diff_line = diff_row0 + #sample.DIFF_DEMO
   session.example_diag_line = diag_row0 + #sample.DIAG_DEMO
 
-  -- geometry: panel (narrow) on the left, example (wide) in the middle, and the
-  -- terminal preview (narrow) on the right when the screen is wide enough. Each
-  -- float sizes to its own content, capped to the screen. Neovim floats have no
-  -- native scrollbar, so a too-tall panel scrolls with the focused knob and
-  -- render_panel draws an overflow footer showing how many rows are hidden.
+  -- geometry: panel (narrow) on the left, sample (wide) on the right. Floats
+  -- have no native scrollbar, so a too-tall panel scrolls with the focused knob
+  -- and render_panel draws an overflow footer showing how many rows are hidden.
   local ui_w, ui_h = vim.o.columns, vim.o.lines
   local max_h = math.max(8, ui_h - 4)
-  -- panel rows: title + polarity + blank + contrast + blank + knobs + blank +
-  -- warn(2) + help(3)
-  local panel_content = #KNOBS + 11
+  local GAP = 3
+  local panel_w = PANEL_W
+  local example_w = math.max(24, math.min(ui_w - panel_w - GAP - 4, 84))
+
+  -- Terminal-preview section appended to the sample float (below a horizontal
+  -- rule): a bg/fg/cursor/selection row + the 16 ANSI slots on two rows. The
+  -- swatch glyphs are static text; render_terminal recolors the hl groups the
+  -- extmarks (placed just below) target, so the preview tracks the flavour.
+  elines[#elines + 1] = ""
+  elines[#elines + 1] = string.rep("─", math.max(4, example_w - 2))
+  elines[#elines + 1] = (" terminal preview  %s"):format(TERM_GLYPH)
+  local term_marks = {}
+  do
+    -- special row: bg / fg / cursor (solid blocks) + selection (Ab chip)
+    local segs = {
+      { "bg", "ButbicketPgTermBg", false },
+      { "fg", "ButbicketPgTermFg", false },
+      { "cur", "ButbicketPgTermCursor", false },
+      { "sel", "ButbicketPgTermSel", true },
+    }
+    local line, col = " ", 1
+    for _, s in ipairs(segs) do
+      local lbl = s[1] .. " "
+      local cell = s[3] and BG_SWATCH or SWATCH
+      term_marks[#term_marks + 1] =
+        { row = #elines, col = col + #lbl, width = #cell, group = s[2] }
+      line = line .. lbl .. cell .. "  "
+      col = col + #lbl + #cell + 2
+    end
+    elines[#elines + 1] = line
+    -- ANSI rows: 0-7 (normal) then 8-15 (bright)
+    for _, base in ipairs({ 0, 8 }) do
+      local l2, c2 = " ", 1
+      for i = base, base + 7 do
+        local num = ("%2d "):format(i)
+        term_marks[#term_marks + 1] = {
+          row = #elines,
+          col = c2 + #num,
+          width = #SWATCH,
+          group = "ButbicketPgTermAnsi" .. i,
+        }
+        l2 = l2 .. num .. SWATCH .. " "
+        c2 = c2 + #num + #SWATCH + 1
+      end
+      elines[#elines + 1] = l2
+    end
+  end
+  session.term_marks = term_marks
+
+  -- panel rows: title + polarity + blank + contrast + blank + knobs + per-group
+  -- section header (blank + rule) + blank + warn(2) + help(3)
+  local panel_content = #KNOBS + #sample.GROUP_ORDER * 2 + 11
   local panel_h = math.min(panel_content, max_h)
   local example_h = math.min(#elines, max_h)
-  local panel_w = 46
-  local preview_w = 26
-  -- preview rows: header + blank + 5 specials + blank + ansi header + 16 slots
-  local preview_h = math.min(25, max_h)
-  local GAP = 3
-
-  -- Show the preview column only when the screen can still fit a readable sample
-  -- alongside it; otherwise keep the original two-float layout.
-  local show_preview = ui_w >= (panel_w + 40 + preview_w + GAP * 2)
-  local example_w
-  if show_preview then
-    example_w = math.min(ui_w - panel_w - preview_w - GAP * 2, 84)
-  else
-    example_w = math.min(ui_w - panel_w - 10, 84)
-  end
-
-  local total_w = panel_w
-    + GAP
-    + example_w
-    + (show_preview and (GAP + preview_w) or 0)
+  local total_w = panel_w + GAP + example_w
   local col0 = math.max(0, math.floor((ui_w - total_w) / 2))
-  local content_h = math.max(panel_h, example_h)
-  if show_preview then
-    content_h = math.max(content_h, preview_h)
-  end
-  local row0 = math.max(0, math.floor((ui_h - content_h) / 2))
+  local row0 =
+    math.max(0, math.floor((ui_h - math.max(panel_h, example_h)) / 2))
   session.panel_h = panel_h
 
   -- example buffer (real syntax groups paint it via filetype/treesitter)
@@ -814,20 +807,13 @@ function M.open()
     })
   end
 
-  -- terminal preview buffer (read-only; never entered) — the third column
-  if show_preview then
-    local vbuf = vim.api.nvim_create_buf(false, true)
-    vim.bo[vbuf].modifiable = false
-    session.preview.buf = vbuf
-    session.preview.win = make_float(vbuf, {
-      enter = false,
-      row = row0,
-      col = col0 + panel_w + GAP + example_w + GAP,
-      width = preview_w,
-      height = preview_h,
-      title = " terminal ",
+  -- Terminal-preview swatches: placed once, recolored each refresh by
+  -- render_terminal (which redefines the hl groups these point at).
+  for _, m in ipairs(session.term_marks) do
+    pcall(vim.api.nvim_buf_set_extmark, ebuf, NS, m.row, m.col, {
+      end_col = m.col + m.width,
+      hl_group = m.group,
     })
-    vim.wo[session.preview.win].cursorline = false
   end
 
   -- panel buffer (interactive)
@@ -903,11 +889,7 @@ function M.open()
     group = session.augroup,
     callback = function(ev)
       local w = tonumber(ev.match)
-      if
-        w == session.panel.win
-        or w == session.example.win
-        or w == session.preview.win
-      then
+      if w == session.panel.win or w == session.example.win then
         close(session, not session.closing and true)
       end
     end,

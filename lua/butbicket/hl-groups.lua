@@ -73,12 +73,18 @@ return {
   Question = { fg = colorscheme.syntaxFunction },
   QuickFixLine = { bg = colorscheme.cursorline },
   SpecialKey = { fg = colorscheme.syntaxOperator },
-  StatusLine = { fg = colorscheme.mainText, bg = colorscheme.floatingWindowBackground },
+  StatusLine = {
+    fg = colorscheme.mainText,
+    bg = colorscheme.floatingWindowBackground,
+  },
   StatusLineNC = {
     bg = colorscheme.sidebarBackground,
     fg = colorscheme.slate_gray,
   },
-  TabLine = { bg = colorscheme.floatingWindowBackground, fg = colorscheme.mainText },
+  TabLine = {
+    bg = colorscheme.floatingWindowBackground,
+    fg = colorscheme.mainText,
+  },
   TabLineFill = { bg = colorscheme.windowBorder },
   TabLineSel = {
     bg = colorscheme.editorBackground,

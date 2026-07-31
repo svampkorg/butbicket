@@ -4,8 +4,8 @@
   "overrides": {
     "claude": "#1976D2",
     "text": "#212121",
-    "inverseText": "#FFFFFF",
-    "inactive": "#9E9E9E",
+    "inverseText": "#FDFDFD",
+    "inactive": "#CDCDCD",
     "subtle": "#C2C3C5",
     "suggestion": "#848484",
     "permission": "#999999",
@@ -16,10 +16,10 @@
     "success": "#22863A",
     "error": "#D32F2F",
     "warning": "#B26A00",
-    "diffAdded": "#C8E0CF",
-    "diffRemoved": "#F3CACD",
-    "diffAddedDimmed": "#E8F2EB",
-    "diffRemovedDimmed": "#FAE9EA",
+    "diffAdded": "#C7DFCD",
+    "diffRemoved": "#F2C8CB",
+    "diffAddedDimmed": "#E6F0E9",
+    "diffRemovedDimmed": "#F8E7E8",
     "diffAddedWord": "#1A7F37",
     "diffRemovedWord": "#CF222E"
   }

@@ -48,6 +48,19 @@ local required_keys = {
   "incSearchBase",
   "selected",
   "selectionText",
+  -- UI chrome exposed as locked flavour roles (present in both bg blocks)
+  "inactiveText",
+  "disabledText",
+  "lineNumberText",
+  "cursorline",
+  "sidebarBackground",
+  "popupBackground",
+  "floatingWindowBackground",
+  "menuOptionBackground",
+  "windowBorder",
+  "focusedBorder",
+  "emphasizedBorder",
+  "floatBorder",
   "addedBase",
   "changedBase",
   "removedBase",
@@ -328,6 +341,20 @@ do
     incsearch = { "incSearchBase" }, -- IncSearch, Substitute
     selection = { "selected" }, -- terminal selection-background
     selection_fg = { "selectionText" }, -- terminal selection-foreground
+    -- UI chrome (locked); an exact-hex pin still overrides a locked role
+    text = { "mainText" }, -- body text / ANSI 7
+    inactive = { "inactiveText" }, -- inactive UI / ANSI 8
+    disabled = { "disabledText" },
+    line_number = { "lineNumberText" },
+    cursorline = { "cursorline" },
+    bg_sidebar = { "sidebarBackground" },
+    bg_popup = { "popupBackground" },
+    bg_float = { "floatingWindowBackground" },
+    bg_menu = { "menuOptionBackground" },
+    border = { "windowBorder" },
+    border_focused = { "focusedBorder" },
+    border_emphasized = { "emphasizedBorder" },
+    border_float = { "floatBorder" },
     added = { "addedBase" }, -- diff add identity (locked)
     changed = { "changedBase" }, -- diff change identity (locked)
     removed = { "removedBase" }, -- diff remove identity (locked)
@@ -416,6 +443,7 @@ do
     chroma_mult = 1, -- neutral: must be omitted from output
     n_hues = 0, -- present (0 = grayscale) must survive
     base_hue = 0, -- neutral: omitted
+    ansi_bright_l = 8, -- set: must round-trip
     accents = { keyword = "#c678dd", func = 140 },
   }
   local body = pg.serialize(opts)
@@ -427,6 +455,8 @@ do
   check(t and t.chroma_mult == nil, "serialize omits neutral chroma_mult")
   check(t and t.n_hues == 0, "serialize keeps n_hues = 0 (grayscale)")
   check(t and t.base_hue == nil, "serialize omits neutral base_hue")
+  check(t and t.ansi_bright_l == 8, "serialize round-trips ansi_bright_l")
+  check(t and t.ansi_bright_c == nil, "serialize omits unset ansi_bright_c")
   check(
     t and t.accents and t.accents.keyword == "#c678dd" and t.accents.func == 140,
     "serialize round-trips accents (hex + degrees)"
@@ -486,6 +516,40 @@ do
   check(
     after == resolved,
     "pinned accent survives a base_hue change (frozen at its resolved hex)"
+  )
+end
+
+-- Terminal palette: 16 ANSI slots, with 8-15 derived as brighter shades of 0-7.
+print("\n== terminal ==")
+do
+  local terminal = require("butbicket.terminal")
+  local oklab = require("butbicket.oklab")
+  vim.o.background = "dark"
+  package.loaded["butbicket.colorscheme"] = nil
+  local c = require("butbicket.colorscheme")
+  local spec = terminal.spec(c)
+
+  local full = true
+  for i = 0, 15 do
+    full = full and type(spec.ansi[i]) == "string"
+  end
+  check(full, "terminal.spec resolves all 16 ANSI slots")
+
+  -- dark: a color slot's bright variant (i+8) is lighter than the normal (i)
+  local lighter = true
+  for i = 1, 6 do -- the 6 hue slots (skip 0/7 grayscale endpoints)
+    if oklab.lightness(spec.ansi[i + 8]) <= oklab.lightness(spec.ansi[i]) then
+      lighter = false
+    end
+  end
+  check(lighter, "dark bright ANSI (9-14) are lighter than their normals (1-6)")
+
+  -- a bigger lightness delta lifts the brights further (the knob has effect)
+  c.ansiBrightL = 30
+  local hi = terminal.spec(c)
+  check(
+    oklab.lightness(hi.ansi[10]) > oklab.lightness(spec.ansi[10]),
+    "ansi_bright_l delta lifts the derived bright lightness"
   )
 end
 

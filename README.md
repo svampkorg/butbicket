@@ -190,18 +190,28 @@ normal. A pin is either:
 - a **number** — a hue angle in degrees; only the hue moves, each role keeps its
   own lightness/chroma (grading preserved).
 
-Syntax roles: `keyword`, `func`, `special`, `type`, `constant` (Constant/
+Roles are grouped into sections (the same sections the playground shows).
+
+**syntax:** `keyword`, `func`, `special`, `type`, `constant` (Constant/
 Conditional/Exception — syntax red), `number`, `string`, `link`, `accent`,
 `comment`, `variable` (`@variable`), `member` (`@variable.member`), `parameter`
 (`@variable.parameter`/`Parameter`), `operator`, `punctuation`
 (brackets/delimiters), `annotation` (attributes/decorators like `@override`),
 `emphasis` (the accent yellow — match highlights, icons, prompt keys).
-UI-background roles: `search` (`Search` + `CurSearch`, and flash's current-match
-label), `incsearch` (`IncSearch` + `Substitute`), and `selection` — the terminal
-selection background (see [Extras](#extras--terminal-bat--claude-code-themes)),
-with `selection_fg` for the text drawn on it. Each has its own palette base.
 
-Locked identity roles: `added`, `changed`, `removed` (diff, green/blue/red) and
+**ui** (surfaces, borders, non-syntax text — all locked, see below): `text`
+(body text / terminal ANSI 7), `inactive` (dimmed UI / ANSI 8), `disabled`,
+`line_number`, `cursorline`, `bg_sidebar`, `bg_popup`, `bg_float`, `bg_menu`,
+`border`, `border_focused`, `border_emphasized`, `border_float`.
+
+**state** (search & selection): `search` (`Search` + `CurSearch`, and flash's
+current-match label), `incsearch` (`IncSearch` + `Substitute`), `selection` — the
+terminal selection background (see
+[Extras](#extras--terminal-bat--claude-code-themes)) — and `selection_fg` for the
+text drawn on it.
+
+Locked roles: the **ui** section above, plus the identity roles `added`,
+`changed`, `removed` (diff, green/blue/red) and
 `error`, `warn`, `info`, `hint`, `success` (diagnostics/status). These are
 **locked** — `hue_shift`/`chroma_mult`/`n_hues`/`base_hue` never move them (only
 their lightness remaps to fit a new background), so a diff stays green/blue/red
@@ -253,22 +263,26 @@ nvim -l scripts/gen-flavour.lua
 (affected by the global settings further up in the flavour window)*
 
 `:ButbicketFlavour` opens a live editor: a control panel with every flavour knob
-(background/foreground, `hue_shift`, `chroma_mult`, `n_hues`, `base_hue`, and the
-per-role accents, plus the `search`/`incsearch` background roles) beside a sample
-buffer that recolors instantly as you tune. Foreground knobs show a solid swatch;
-the background roles show sample text (`Ab`) painted on the color so you can see
-the fg/bg contrast. Each shows its WCAG contrast (color-on-background for syntax,
-text-on-color for the background roles), flagged `⚠` below AA. Locked identities
-are grouped as `diff.*` and `diag.*`. The sample ends with a git-diff and a
-diagnostics preview (line backgrounds, gutter signs, virtual-text messages) so
-those roles are visible too. If a flavour is already set (in `setup{}` or from a
-previous accept), the playground opens with those values instead of from scratch.
+beside a sample buffer that recolors instantly as you tune. The knobs are grouped
+into labelled sections — **global** (background/foreground, `hue_shift`,
+`chroma_mult`, `n_hues`, `base_hue`), **syntax**, **ui** (surfaces, borders,
+text), **search & selection**, **diff**, and **diagnostics**. Foreground knobs
+show a solid swatch; background roles show sample text (`Ab`) painted on the color
+so you can see the fg/bg contrast. Each shows its WCAG contrast (color-on-
+background for foregrounds, text-on-color for backgrounds), flagged `⚠` below AA.
+A role that drives a terminal ANSI slot is marked with a terminal glyph and the
+slot number(s) — e.g. `success` shows ` 2,10`, `link` shows ` 6,14` (the normal
+slot and its derived bright; needs a Nerd Font). The two `ansi_bright_*` knobs in
+the global section control that derivation (below). If a flavour is already set
+(in `setup{}` or from a previous accept), the playground opens with those values
+instead of from scratch.
 
-On a wide-enough screen a third **terminal preview** column shows the exact
-colors `:ButbicketExtras` would emit for the current flavour — `background`,
-`foreground`, `cursor-color`, `selection-background`/`-foreground`, and the 16
-ANSI slots (with the palette key each is drawn from) — so you can see the
-generated terminal theme update as you tune. It is preview-only.
+Below the code sample, under a horizontal rule, a **terminal preview** shows the
+exact colors `:ButbicketExtras` would emit for the current flavour —
+background/foreground/cursor/selection plus the 16 ANSI slots — so the generated
+terminal theme updates live as you tune. The sample also ends with a git-diff and
+a diagnostics block (line backgrounds, gutter signs, virtual-text messages) so
+those roles are visible in situ.
 
 `t` toggles the preview between dark and light. Each background has its own
 recipe; the first switch to a side seeds it from the side you were on (same
@@ -351,11 +365,16 @@ Point your terminal at the relevant file:
 - **Warp**: copy into `~/.warp/themes/`
 
 The scheme also exports the palette to `vim.g.terminal_color_*` for `:terminal`.
-The ANSI slot mapping is aesthetic (chosen to look right in a shell), not a
-literal red/green/blue mapping — e.g. slot 4 carries a mint tone. The mapping —
-16 ANSI slots plus `background`/`foreground`/`cursor`/`selection` — lives in one
-place, `lua/butbicket/terminal.lua`, shared by `set_terminal_colors()`, the extras
-generator, and the playground's terminal-preview column, so `:terminal`, the
+The 8 normal slots (0–7) are aesthetic picks (chosen to look right in a shell,
+not a literal red/green/blue mapping — e.g. slot 4 carries a mint tone). The 8
+bright slots (8–15) are **derived**: each is its 0–7 counterpart nudged in OKLCh
+(a lightness delta + chroma multiplier), so bright N is a genuine brighter shade
+of normal N. The delta is per-polarity (on a light background "brighter" means
+more saturated, not lighter) and flavour-tunable via `ansi_bright_l` /
+`ansi_bright_c`. The whole mapping — the 8 normal keys, the derivation, plus
+`background`/`foreground`/`cursor`/`selection` — lives in one place,
+`lua/butbicket/terminal.lua`, shared by `set_terminal_colors()`, the extras
+generator, and the playground's terminal-preview section, so `:terminal`, the
 generated theme files, and the preview always agree. `foreground` (and the
 cursor) is the emphasis foreground — the flavour's `foreground` knob; the
 selection background/foreground come from the `selection`/`selection_fg` flavour
