@@ -195,39 +195,84 @@ normal. A pin is either:
 - a **number** — a hue angle in degrees; only the hue moves, each role keeps its
   own lightness/chroma (grading preserved).
 
-Roles are grouped into sections (the same sections the playground shows).
+Roles are grouped into the same sections the playground shows. Each role name is
+chosen to reflect what it actually recolors; the tables below map every role to a
+representative set of the highlight groups it drives (🔒 = locked, see note after).
 
-**syntax:** `keyword`, `func`, `special`, `type`, `constant` (Constant/
-Conditional/Exception — syntax red), `number`, `string`, `link`, `accent`,
-`comment`, `variable` (`@variable`), `member` (`@variable.member`), `parameter`
-(`@variable.parameter`/`Parameter`), `operator`, `punctuation`
-(brackets/delimiters), `annotation` (attributes/decorators like `@override`),
-`emphasis` (the accent yellow — match highlights, icons, prompt keys).
+**syntax**
 
-**ui** (surfaces, borders, non-syntax text — all locked, see below): `text`
-(body text / terminal ANSI 7), `inactive` (dimmed UI / ANSI 8), `disabled`,
-`line_number`, `bg_cursorline` (`CursorLine` + all picker/tree current-item
-lines), `bg_sidebar` (trees, sidebars, `StatusLine`, `TabLineFill`), `bg_float`
-(floats, `Pmenu` body, inactive `TabLine`), `bg_selected` (`PmenuSel`, `Visual`,
-`WildMenu`, active `TabLineSel`, `QuickFixLine`), `border`, `border_focused`,
-`border_emphasized`, `border_float`.
+| Role | Recolors |
+|---|---|
+| `keyword` | `Statement`, `Keyword`, `Boolean`, `Define`, `PreProc` |
+| `func` | `Function`, `Method`, `Directory`, `Title`, `@constructor` |
+| `special` | `Debug`, `@debug`, CSS/SCSS brackets, indent-scope symbol |
+| `type` | `Type`, `Struct`, `Class` |
+| `syntax_red` | `Constant`, `Conditional`, `Exception`, `SpecialChar` (the syntax red — distinct from the diagnostic `error` red) |
+| `number` | `Number`, `Float`, `@number` |
+| `string` | `String`, `Character`, `@string.escape` |
+| `link` | `Tag`, links/URLs, directory & folder names/icons |
+| `match` | `MatchParen`, `MatchWord`, `MiniJump`, Flash match (hotpink) |
+| `comment` | `Comment`, `SpecialComment`, dimmed UI subtext |
+| `variable` | `@variable`, `@type.definition` |
+| `member` | `Property`, `Field`, `@variable.member` |
+| `parameter` | `Parameter`, `@variable.parameter` |
+| `operator` | `Operator`, `Delimiter`, `Special`, `SpecialKey`, tree arrows |
+| `punctuation` | `Punctuation` — brackets / delimiters |
+| `annotation` | `@attribute`, `PreCondit` — attributes / decorators (`@override`) |
+| `emphasis` | accent **yellow**: fuzzy-match highlights (Telescope/Snacks/GrugFar), icons, prompt prefixes, which-key keys |
 
-**state** (search & selection): `search` (`Search` + `CurSearch`, and flash's
-current-match label), `incsearch` (`IncSearch` + `Substitute`), `selection` — the
-terminal selection background (see
-[Extras](#extras--terminal-bat--claude-code-themes)) — and `selection_fg` for the
-text drawn on it.
+**ui** — surfaces, borders, non-syntax text (all 🔒)
 
-Locked roles: the **ui** section above, plus the identity roles `added`,
-`changed`, `removed` (diff, green/blue/red) and
-`error`, `warn`, `info`, `hint`, `success` (diagnostics/status). These are
-**locked** — `hue_shift`/`chroma_mult`/`n_hues`/`base_hue` never move them (only
-their lightness remaps to fit a new background), so a diff stays green/blue/red
-and an error stays red whatever you do to the wheel. They change only when you
-pin one explicitly, and a pin flows through the whole family: for diff, the
-sign/text foreground and the derived line backgrounds; for a diagnostic, every
+| Role | Recolors |
+|---|---|
+| `text` | body text (`Normal` fg), terminal ANSI 7 |
+| `inactive` | dimmed / inactive UI text, terminal ANSI 8 |
+| `disabled` | disabled text |
+| `line_number` | `LineNr` |
+| `bg_cursorline` | `CursorLine` + all picker/tree current-item lines |
+| `bg_sidebar` | tree/sidebar backgrounds, `StatusLine`, `TabLineFill` |
+| `bg_float` | floats (`NormalFloat`), `Pmenu` body, inactive `TabLine` |
+| `bg_selected` | `PmenuSel`, `Visual`, `WildMenu`, `QuickFixLine`, active `TabLineSel` |
+| `border` | window separators / borders |
+| `border_focused` | focused-window border |
+| `border_emphasized` | emphasized border |
+| `border_float` | float border |
+
+**state** — search & selection
+
+| Role | Recolors |
+|---|---|
+| `search` | `Search`, `CurSearch`, flash's current-match label (background) |
+| `incsearch` | `IncSearch`, `Substitute` (background) |
+| `term_selection` | `:terminal` selection **background** + [extras](#extras--terminal-bat--claude-code-themes) — **not** editor Visual (that is `bg_selected`) |
+| `term_selection_fg` | `:terminal` selection **foreground** |
+
+**diff** — identity colors (all 🔒)
+
+| Role | Recolors |
+|---|---|
+| `added` | `DiffAdd`, added sign/text, git-added (green) |
+| `changed` | `DiffChange`, `DiffText`, changed sign/text (blue) |
+| `removed` | `DiffDelete`, removed sign/text (red) |
+
+**diagnostic & status** — identity colors (all 🔒)
+
+| Role | Recolors |
+|---|---|
+| `error` | `DiagnosticError`, `ErrorMsg`, `errorText` |
+| `warn` | `DiagnosticWarn`, `WarningMsg`, `warningText` |
+| `info` | `DiagnosticInfo` |
+| `hint` | `DiagnosticHint` |
+| `success` | git-staged / `NOTE` status, `successText` |
+
+🔒 **Locked roles** (all **ui**, **diff**, and **diagnostic** roles):
+`hue_shift`/`chroma_mult`/`n_hues`/`base_hue` never move them — only their
+lightness remaps to fit a new background — so a diff stays green/blue/red and an
+error stays red whatever you do to the wheel. They change only when you pin one
+explicitly, and a pin flows through the whole family: for diff, the sign/text
+foreground and the derived line backgrounds; for a diagnostic, every
 `Diagnostic*`/`*Msg` group plus the `errorText`/`warningText`/`successText`
-integration colors. Each diagnostic level owns a dedicated palette key.
+integration colors. Each diff/diagnostic identity owns a dedicated palette key.
 
 ```lua
 flavour = {
@@ -385,8 +430,8 @@ more saturated, not lighter) and flavour-tunable via `ansi_bright_l` /
 generator, and the playground's terminal-preview section, so `:terminal`, the
 generated theme files, and the preview always agree. `foreground` (and the
 cursor) is the emphasis foreground — the flavour's `foreground` knob; the
-selection background/foreground come from the `selection`/`selection_fg` flavour
-roles, so a flavour flows into the generated terminal theme.
+selection background/foreground come from the `term_selection`/`term_selection_fg`
+flavour roles, so a flavour flows into the generated terminal theme.
 
 Regenerate the committed themes (all, or a subset):
 

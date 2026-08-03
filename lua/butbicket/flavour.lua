@@ -52,11 +52,12 @@ M.ROLES = {
   -- syntax red: Constant / Conditional / Exception / SpecialChar / @punctuation
   -- .special + several cmp kinds + terminal color 1. Distinct from diagnostic
   -- error red (`error`/`errorBase`) since that lift — free to rotate/pin.
-  { name = "constant", keys = { "syntaxError" }, group = "syntax" },
+  { name = "syntax_red", keys = { "syntaxError" }, group = "syntax" },
   { name = "number", keys = { "number", "syntaxNumber" }, group = "syntax" },
   { name = "string", keys = { "stringText" }, group = "syntax" },
   { name = "link", keys = { "linkText", "blue" }, group = "syntax" },
-  { name = "accent", keys = { "hotpink" }, group = "syntax" },
+  -- hotpink: matching-pair + jump accent (MatchParen, MatchWord, MiniJump, Flash).
+  { name = "match", keys = { "hotpink" }, group = "syntax" },
   { name = "comment", keys = { "commentText" }, group = "syntax" },
   -- variable family, split into three tunable roles so @variable, @variable
   -- .member and @variable.parameter keep their own identity under a flavour
@@ -148,17 +149,18 @@ M.ROLES = {
     group = "state",
     surface = "bg",
   },
-  -- selection: the terminal (and, historically, editor) selection background +
-  -- the text drawn on it. Own keys so both are independently tunable; the extras
-  -- generator emits `selected` as selection-background and `selectionText` as
-  -- selection-foreground. `selected` is read only by the terminal theme.
+  -- term_selection: the :terminal (and extras) selection background + the text
+  -- drawn on it. Own keys so both are independently tunable; the extras generator
+  -- emits `selected` as selection-background and `selectionText` as selection-
+  -- foreground. Editor Visual selection is NOT here — that is `bg_selected`
+  -- (menuOptionBackground); these keys feed only the terminal theme.
   {
-    name = "selection",
+    name = "term_selection",
     keys = { "selected" },
     group = "state",
     surface = "bg",
   },
-  { name = "selection_fg", keys = { "selectionText" }, group = "state" },
+  { name = "term_selection_fg", keys = { "selectionText" }, group = "state" },
   -- ── diff identities ───────────────────────────────────────────────────────
   -- locked so hue changes never turn green/blue/red into something confusing.
   -- colorscheme.lua derives the dim/mid backgrounds from these, so pinning one
@@ -252,12 +254,12 @@ end
 ---@field base_hue? number degrees: where the hue slots start (default 0)
 ---@field accents? table<string, string|number> pin a role to a hex (exact color)
 ---       or a number (hue degrees, hue-only). Roles by section — syntax:
----       keyword, func, special, type, constant, number, string, link, accent,
+---       keyword, func, special, type, syntax_red, number, string, link, match,
 ---       comment, variable, member, parameter, operator, punctuation, annotation,
 ---       emphasis; ui: text, inactive, disabled, line_number, bg_cursorline,
 ---       bg_sidebar, bg_float, bg_selected, border, border_focused,
----       border_emphasized, border_float; state: search, incsearch, selection,
----       selection_fg; diff: added, changed, removed; diagnostic: error, warn,
+---       border_emphasized, border_float; state: search, incsearch, term_selection,
+---       term_selection_fg; diff: added, changed, removed; diagnostic: error, warn,
 ---       info, hint, success. The ui + diff + diagnostic roles are locked — the
 ---       hue wheel skips them, only an explicit pin (or the lightness remap) moves
 ---       them.

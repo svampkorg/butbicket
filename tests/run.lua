@@ -472,12 +472,12 @@ do
     keyword = { "keyword", "syntaxKeyword" }, -- Statement, Boolean, Define
     func = { "syntaxFunction" }, -- Function, Method
     type = { "type" }, -- Type
-    constant = { "syntaxError" }, -- Constant, Conditional, Exception, cmp kinds
+    syntax_red = { "syntaxError" }, -- Constant, Conditional, Exception, cmp kinds
     number = { "syntaxNumber" }, -- Number, Float, @number
     string = { "stringText" }, -- String, Character
     link = { "blue" }, -- Tag
     special = { "specialKeyword" }, -- Debug, @debug
-    accent = { "hotpink" }, -- MatchParen
+    match = { "hotpink" }, -- MatchParen, MatchWord, MiniJump, Flash
     comment = { "commentText" }, -- Comment, SpecialComment, @comment
     variable = { "variable" }, -- @variable
     member = { "variable_member" }, -- @variable.member
@@ -488,8 +488,8 @@ do
     emphasis = { "accentEmphasis" }, -- TelescopeMatching, icons, keys
     search = { "searchBase" }, -- Search, CurSearch (+ flash current label)
     incsearch = { "incSearchBase" }, -- IncSearch, Substitute
-    selection = { "selected" }, -- terminal selection-background
-    selection_fg = { "selectionText" }, -- terminal selection-foreground
+    term_selection = { "selected" }, -- terminal selection-background
+    term_selection_fg = { "selectionText" }, -- terminal selection-foreground
     -- UI chrome (locked); an exact-hex pin still overrides a locked role
     text = { "mainText" }, -- body text / ANSI 7
     inactive = { "inactiveText" }, -- inactive UI / ANSI 8
