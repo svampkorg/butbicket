@@ -201,8 +201,11 @@ Conditional/Exception — syntax red), `number`, `string`, `link`, `accent`,
 
 **ui** (surfaces, borders, non-syntax text — all locked, see below): `text`
 (body text / terminal ANSI 7), `inactive` (dimmed UI / ANSI 8), `disabled`,
-`line_number`, `cursorline`, `bg_sidebar`, `bg_popup`, `bg_float`, `bg_menu`,
-`border`, `border_focused`, `border_emphasized`, `border_float`.
+`line_number`, `bg_cursorline` (`CursorLine` + all picker/tree current-item
+lines), `bg_sidebar` (trees, sidebars, `StatusLine`, `TabLineFill`), `bg_float`
+(floats, `Pmenu` body, inactive `TabLine`), `bg_selected` (`PmenuSel`, `Visual`,
+`WildMenu`, active `TabLineSel`, `QuickFixLine`), `border`, `border_focused`,
+`border_emphasized`, `border_float`.
 
 **state** (search & selection): `search` (`Search` + `CurSearch`, and flash's
 current-match label), `incsearch` (`IncSearch` + `Substitute`), `selection` — the

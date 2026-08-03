@@ -91,7 +91,7 @@ M.ROLES = {
     locked = true,
   },
   {
-    name = "cursorline",
+    name = "bg_cursorline",
     keys = { "cursorline" },
     group = "ui",
     surface = "bg",
@@ -105,13 +105,6 @@ M.ROLES = {
     locked = true,
   },
   {
-    name = "bg_popup",
-    keys = { "popupBackground" },
-    group = "ui",
-    surface = "bg",
-    locked = true,
-  },
-  {
     name = "bg_float",
     keys = { "floatingWindowBackground" },
     group = "ui",
@@ -119,7 +112,7 @@ M.ROLES = {
     locked = true,
   },
   {
-    name = "bg_menu",
+    name = "bg_selected",
     keys = { "menuOptionBackground" },
     group = "ui",
     surface = "bg",
@@ -261,8 +254,8 @@ end
 ---       or a number (hue degrees, hue-only). Roles by section — syntax:
 ---       keyword, func, special, type, constant, number, string, link, accent,
 ---       comment, variable, member, parameter, operator, punctuation, annotation,
----       emphasis; ui: text, inactive, disabled, line_number, cursorline,
----       bg_sidebar, bg_popup, bg_float, bg_menu, border, border_focused,
+---       emphasis; ui: text, inactive, disabled, line_number, bg_cursorline,
+---       bg_sidebar, bg_float, bg_selected, border, border_focused,
 ---       border_emphasized, border_float; state: search, incsearch, selection,
 ---       selection_fg; diff: added, changed, removed; diagnostic: error, warn,
 ---       info, hint, success. The ui + diff + diagnostic roles are locked — the

@@ -15,8 +15,11 @@ function M.highlights()
       bg = c.syntaxFunction,
       bold = true,
     },
-    SnacksPickerInput = { bg = c.popupBackground },
-    SnacksPickerInputBorder = { fg = c.floatBorder, bg = c.popupBackground },
+    SnacksPickerInput = { bg = c.floatingWindowBackground },
+    SnacksPickerInputBorder = {
+      fg = c.floatBorder,
+      bg = c.floatingWindowBackground,
+    },
     SnacksPickerInputSearch = { fg = c.syntaxKeyword },
     SnacksPickerPrompt = { fg = c.syntaxKeyword },
     SnacksPickerPreview = { bg = c.editorBackground },

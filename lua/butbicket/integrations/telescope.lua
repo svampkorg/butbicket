@@ -26,8 +26,11 @@ function M.highlights()
       bg = c.successText,
       bold = true,
     },
-    TelescopePromptNormal = { fg = c.mainText, bg = c.popupBackground },
-    TelescopePromptBorder = { fg = c.floatBorder, bg = c.popupBackground },
+    TelescopePromptNormal = { fg = c.mainText, bg = c.floatingWindowBackground },
+    TelescopePromptBorder = {
+      fg = c.floatBorder,
+      bg = c.floatingWindowBackground,
+    },
     TelescopePromptTitle = {
       fg = c.editorBackground,
       bg = c.syntaxFunction,

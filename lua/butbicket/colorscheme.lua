@@ -118,7 +118,6 @@ if vim.o.background == "light" then
 
   colorscheme.editorBackground = config.transparent and "none" or "#FDFDFD"
   colorscheme.sidebarBackground = "#dddddd"
-  colorscheme.popupBackground = "#f6f6f6"
   colorscheme.floatingWindowBackground = "#e0e0e0"
   colorscheme.menuOptionBackground = "#ededed"
 
@@ -149,7 +148,6 @@ else
   colorscheme.editorBackground = config.transparent and "none"
     or colorscheme.base
   colorscheme.sidebarBackground = colorscheme.base_2
-  colorscheme.popupBackground = colorscheme.base_2
   colorscheme.floatingWindowBackground = colorscheme.base_1
   colorscheme.menuOptionBackground = colorscheme.base_3
 

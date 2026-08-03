@@ -16,7 +16,7 @@ return {
   Cursor = { fg = colorscheme.editorBackground, bg = colorscheme.mainText },
   lCursor = { link = "Cursor" },
   CursorIM = { link = "Cursor" },
-  CursorLine = { bg = colorscheme.popupBackground },
+  CursorLine = { bg = colorscheme.cursorline },
   CursorColumn = { link = "CursorLine" },
   Directory = { fg = colorscheme.syntaxFunction },
   DiffAdd = { bg = colorscheme.added_dim },
@@ -75,7 +75,7 @@ return {
   SpecialKey = { fg = colorscheme.syntaxOperator },
   StatusLine = {
     fg = colorscheme.mainText,
-    bg = colorscheme.floatingWindowBackground,
+    bg = colorscheme.sidebarBackground,
   },
   StatusLineNC = {
     bg = colorscheme.sidebarBackground,
@@ -85,9 +85,9 @@ return {
     bg = colorscheme.floatingWindowBackground,
     fg = colorscheme.mainText,
   },
-  TabLineFill = { bg = colorscheme.windowBorder },
+  TabLineFill = { bg = colorscheme.sidebarBackground },
   TabLineSel = {
-    bg = colorscheme.editorBackground,
+    bg = colorscheme.menuOptionBackground,
     fg = colorscheme.mainText,
     bold = true,
   },
