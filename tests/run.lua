@@ -139,6 +139,156 @@ for _, bg in ipairs({ "dark", "light" }) do
   end
 end
 
+-- Color math helpers used everywhere (diff/diagnostic derivation, every shade,
+-- Search/IncSearch mixes). Pure functions with known outputs — a regression here
+-- silently recolors the whole scheme, so pin the arithmetic.
+print("\n== utils ==")
+do
+  local u = require("butbicket.utils")
+  check(
+    u.mix("#000000", "#ffffff", 0.5) == "#808080",
+    "mix: black<->white midpoint = #808080"
+  )
+  check(
+    u.mix("#ff0000", "#0000ff", 0.5) == "#800080",
+    "mix: red<->blue midpoint = #800080"
+  )
+  check(
+    u.mix("#123456", "#abcdef", 1) == "#123456",
+    "mix: alpha=1 returns fg verbatim"
+  )
+  check(
+    u.mix("#123456", "#abcdef", 0) == "#ABCDEF",
+    "mix: alpha=0 returns bg verbatim"
+  )
+  vim.o.background = "dark"
+  check(
+    u.shade("#808080", 0.5) == "#C0C0C0",
+    "shade(dark): lightens toward white"
+  )
+  vim.o.background = "light"
+  check(
+    u.shade("#808080", 0.5) == "#404040",
+    "shade(light): darkens toward black"
+  )
+  vim.o.background = "dark"
+  check(
+    u.shade("#808080", 0.5, "#000000") == "#404040",
+    "shade: explicit base overrides the polarity default"
+  )
+end
+
+-- Contrast helpers grade every fg-on-bg pair in this suite + the playground's
+-- live AA readout. If the yardstick drifts, every floor check becomes noise.
+print("\n== contrast ==")
+do
+  local ct = require("butbicket.contrast")
+  local function approx(a, b)
+    return math.abs(a - b) < 0.01
+  end
+  check(
+    approx(ct.luminance("#ffffff"), 1) and approx(ct.luminance("#000000"), 0),
+    "luminance: white = 1, black = 0"
+  )
+  check(
+    approx(ct.ratio("#ffffff", "#000000"), 21),
+    "ratio: white on black = 21:1 (max)"
+  )
+  check(
+    approx(ct.ratio("#3a3a3a", "#3a3a3a"), 1),
+    "ratio: identical colors = 1:1 (min)"
+  )
+  check(
+    ct.ratio("#ffffff", "#123456") == ct.ratio("#123456", "#ffffff"),
+    "ratio: symmetric in its arguments"
+  )
+end
+
+-- Undefined-palette-key guard. Every `colorscheme.<key>` / `c.<key>` that
+-- hl-groups.lua and the integration modules reference must exist in BOTH
+-- background palettes. A renamed or deleted key leaves `bg = colorscheme.<gone>`
+-- == nil, which nvim_set_hl reads as "clear this group" — a silent miscolor that
+-- no other test catches (a nil field is indistinguishable from an absent one once
+-- the table is built). We wrap the palette in a proxy that records any nil access
+-- and build every highlight table through it, so a dangling reference fails here
+-- instead of shipping. This is the check that would have caught the popupBackground
+-- removal had a consumer been missed.
+print("\n== hl-group palette references ==")
+do
+  -- self-check: prove the proxy actually trips on a missing key (a passing guard
+  -- test is worthless if the mechanism is silently a no-op).
+  local tripped = false
+  local probe = setmetatable({}, {
+    __index = function()
+      tripped = true
+      return nil
+    end,
+  })
+  local _ = probe.definitely_absent_key
+  check(tripped, "palette guard trips on an undefined key (self-check)")
+
+  local reg = require("butbicket.integrations").registry
+  local imods = require("butbicket.integrations").modules()
+  local function purge()
+    package.loaded["butbicket.colorscheme"] = nil
+    package.loaded["butbicket.hl-groups"] = nil
+    package.loaded["butbicket.integrations"] = nil
+    for _, m in ipairs(imods) do
+      package.loaded[m] = nil
+    end
+  end
+
+  for _, bg in ipairs({ "dark", "light" }) do
+    vim.o.background = bg
+    purge()
+    local real = require("butbicket.colorscheme")
+    local missing = {}
+    local guard = setmetatable({}, {
+      __index = function(_, k)
+        local v = real[k]
+        if v == nil then
+          missing[k] = true
+        end
+        return v
+      end,
+    })
+    package.loaded["butbicket.colorscheme"] = guard
+
+    local cfg = { transparent = false, italics = { bufferline = false } }
+    local ok, err = pcall(function()
+      require("butbicket.hl-groups") -- literal touches every core reference
+      for _, spec in ipairs(reg) do
+        package.loaded["butbicket.integrations." .. spec.module] = nil
+        local mod = require("butbicket.integrations." .. spec.module)
+        if spec.wants_config then
+          mod.highlights(cfg)
+        else
+          mod.highlights()
+        end
+      end
+    end)
+    check(ok, "hl-groups + integrations build cleanly (" .. bg .. ")")
+    if not ok then
+      print("       " .. tostring(err))
+    end
+    local names = {}
+    for k in pairs(missing) do
+      names[#names + 1] = k
+    end
+    check(
+      #names == 0,
+      "no undefined palette key referenced ("
+        .. bg
+        .. (#names > 0 and "): " .. table.concat(names, ", ") or ")")
+    )
+  end
+
+  -- restore the real palette + applied groups for the rest of the suite
+  purge()
+  vim.o.background = "dark"
+  require("butbicket").colorscheme()
+end
+
 -- OKLab math: hex -> OKLch -> hex must round-trip within 1/255 per channel.
 -- Guards the conversion module the palette tooling (flavour, light preview)
 -- depends on.
@@ -603,6 +753,49 @@ do
   check(
     oklab.lightness(hi.ansi[10]) > oklab.lightness(spec.ansi[10]),
     "ansi_bright_l delta lifts the derived bright lightness"
+  )
+
+  -- light polarity: colorscheme.lua stamps a NEGATIVE lightness delta, so the
+  -- brights are DARKER than their normals (lighter would wash out on white).
+  vim.o.background = "light"
+  package.loaded["butbicket.colorscheme"] = nil
+  local cl = require("butbicket.colorscheme")
+  local ls = terminal.spec(cl)
+  local darker = true
+  for i = 1, 6 do
+    if oklab.lightness(ls.ansi[i + 8]) >= oklab.lightness(ls.ansi[i]) then
+      darker = false
+    end
+  end
+  check(darker, "light bright ANSI (9-14) are darker than their normals (1-6)")
+  vim.o.background = "dark"
+
+  -- bright_deltas: per-polarity defaults, overridable by a flavour recipe.
+  local dl = terminal.bright_deltas("dark", nil)
+  local ll = terminal.bright_deltas("light", nil)
+  check(
+    dl > 0 and ll < 0,
+    "bright_deltas: dark default lifts, light default darkens"
+  )
+  check(
+    terminal.bright_deltas("dark", { ansi_bright_l = -3 }) == -3,
+    "bright_deltas: flavour ansi_bright_l overrides the default"
+  )
+
+  -- the per-polarity delta reaches the palette via colorscheme.lua's stamp
+  -- (spec() reads c.ansiBrightL) — guards that wiring, not just spec()'s fallback.
+  vim.o.background = "light"
+  package.loaded["butbicket.colorscheme"] = nil
+  local stamp_light = require("butbicket.colorscheme").ansiBrightL
+  vim.o.background = "dark"
+  package.loaded["butbicket.colorscheme"] = nil
+  local stamp_dark = require("butbicket.colorscheme").ansiBrightL
+  check(
+    stamp_dark ~= nil
+      and stamp_light ~= nil
+      and stamp_dark > 0
+      and stamp_light < 0,
+    "colorscheme stamps ansiBrightL per polarity (dark > 0, light < 0)"
   )
 end
 
