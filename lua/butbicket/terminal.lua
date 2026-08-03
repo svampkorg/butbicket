@@ -83,12 +83,17 @@ M.SPECIAL = {
 ---Resolve the terminal palette from a colorscheme table. Slots 0-7 are read from
 ---the palette; 8-15 are derived brights. The bright deltas are read from
 ---`c.ansiBrightL` / `c.ansiBrightC` (stamped by colorscheme.lua / the playground),
----falling back to the dark defaults if absent.
+---falling back to the current background's per-polarity defaults if absent.
 ---@param c table<string, any> the resolved (post-flavour) palette
 ---@return { ansi: table<integer,string>, bg: string, fg: string, cursor: string, sel_bg: string, sel_fg: string, accent: string }
 function M.spec(c)
-  local l_d = c.ansiBrightL or M.BRIGHT_DEFAULT.dark.l
-  local c_m = c.ansiBrightC or M.BRIGHT_DEFAULT.dark.c
+  -- Normally `ansiBrightL`/`ansiBrightC` are stamped by colorscheme.lua; the
+  -- fallback only matters for a raw, unstamped palette. Key it on the current
+  -- background so an unstamped light palette still gets the light deltas, not a
+  -- dark bias.
+  local d = M.BRIGHT_DEFAULT[vim.o.background] or M.BRIGHT_DEFAULT.dark
+  local l_d = c.ansiBrightL or d.l
+  local c_m = c.ansiBrightC or d.c
   local ansi = {}
   for i = 0, 7 do
     ansi[i] = c[M.ANSI[i]]

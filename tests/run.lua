@@ -797,6 +797,20 @@ do
       and stamp_light < 0,
     "colorscheme stamps ansiBrightL per polarity (dark > 0, light < 0)"
   )
+
+  -- spec() fallback (unstamped palette) keys on vim.o.background, not a dark
+  -- bias: an unstamped light palette must still derive darker brights.
+  vim.o.background = "light"
+  package.loaded["butbicket.colorscheme"] = nil
+  local raw = require("butbicket.colorscheme")
+  raw.ansiBrightL, raw.ansiBrightC = nil, nil -- strip the stamp
+  local rs = terminal.spec(raw)
+  check(
+    oklab.lightness(rs.ansi[9]) < oklab.lightness(rs.ansi[1]),
+    "spec() unstamped-palette fallback respects light polarity (bright darker)"
+  )
+  vim.o.background = "dark"
+  package.loaded["butbicket.colorscheme"] = nil
 end
 
 -- Extras generator: emits one file per target, and the output reflects the
