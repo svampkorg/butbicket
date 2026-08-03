@@ -419,6 +419,61 @@ do
   )
 end
 
+-- Health check: requiring must be side-effect-free, and `check()` must run
+-- without throwing for every config.flavour shape (invalid values are reported
+-- via vim.health, never raised). Also covers the integration gating helpers that
+-- health reuses.
+print("\n== health ==")
+do
+  local wins_before = #vim.api.nvim_list_wins()
+  local health = require("butbicket.health")
+  check(
+    #vim.api.nvim_list_wins() == wins_before,
+    "require('butbicket.health') opens no window"
+  )
+  check(type(health.check) == "function", "health exposes check()")
+
+  local I = require("butbicket.integrations")
+  check(
+    I.enabled({ default = true }, "cmp") == true,
+    "integrations.enabled: unlisted name follows default=true"
+  )
+  check(
+    I.enabled({ default = false }, "cmp") == false,
+    "integrations.enabled: unlisted name follows default=false"
+  )
+  check(
+    I.enabled({ default = true, cmp = false }, "cmp") == false,
+    "integrations.enabled: explicit per-name override wins"
+  )
+  check(
+    I.detectable("butbicket-no-such-plugin-xyz") == false,
+    "integrations.detectable: absent module is not detectable"
+  )
+  check(I.detectable(function()
+    return true
+  end) == true, "integrations.detectable: predicate is honored")
+
+  -- check() must survive every flavour shape. Write the raw config key (as the
+  -- playground does) so the metatable default is restored on cleanup.
+  local config = require("butbicket.config")
+  local shapes = {
+    false,
+    { hue_shift = 20 }, -- single recipe
+    { dark = { hue_shift = 10 }, light = { chroma_mult = 1.1 } }, -- per-bg
+    "bogus", -- invalid: reported, not raised
+    { dark = "bogus" }, -- invalid per-bg side
+  }
+  local all_ok = true
+  for _, shape in ipairs(shapes) do
+    config.flavour = shape
+    local ran = pcall(health.check)
+    all_ok = all_ok and ran
+  end
+  config.flavour = nil
+  check(all_ok, "health.check() runs without error for every flavour shape")
+end
+
 -- Flavour playground: pure helpers (no UI). Requiring the module must not open
 -- any window, and serialize() must emit a paste-ready, loadable flavour block.
 print("\n== playground ==")

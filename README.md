@@ -67,6 +67,11 @@ colorscheme butbicket-dark
 colorscheme butbicket-light
 ```
 
+Run `:checkhealth butbicket` to verify your setup — it reports your Neovim
+version, `termguicolors`, the active colorscheme, your config (including the
+`flavour` shape), and which integrations are actually being themed (enabled +
+installed) versus skipped or disabled.
+
 ## Configuration
 
 `setup {}` is optional. Defaults:

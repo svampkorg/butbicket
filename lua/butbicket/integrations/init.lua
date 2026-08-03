@@ -105,7 +105,7 @@ M.registry = {
 ---is loaded or requireable.
 ---@param detect string|string[]|fun():boolean
 ---@return boolean
-local function detectable(detect)
+function M.detectable(detect)
   if type(detect) == "function" then
     return detect() and true or false
   end
@@ -126,7 +126,7 @@ end
 ---@param integrations butbicket.Integrations
 ---@param name string
 ---@return boolean
-local function enabled(integrations, name)
+function M.enabled(integrations, name)
   local value = integrations[name]
   if value == nil then
     value = integrations.default
@@ -142,7 +142,7 @@ end
 ---@param config butbicket.Config
 ---@return boolean
 function M.has(spec, config)
-  return enabled(config.integrations, spec.name) and detectable(spec.detect)
+  return M.enabled(config.integrations, spec.name) and M.detectable(spec.detect)
 end
 
 ---Merged highlight groups from every enabled + installed, non-standalone
