@@ -7,7 +7,7 @@ function M.highlights()
     NvimTreeNormal = { fg = c.mainText, bg = c.sidebarBackground },
     NvimTreeNormalNC = { fg = c.mainText, bg = c.sidebarBackground },
     NvimTreeEndOfBuffer = { fg = c.sidebarBackground, bg = c.sidebarBackground },
-    NvimTreeWinSeparator = { fg = c.windowBorder, bg = c.sidebarBackground },
+    NvimTreeWinSeparator = { bg = c.sidebarBackground },
     NvimTreeCursorLine = { bg = c.cursorline },
     NvimTreeRootFolder = { fg = c.syntaxKeyword, bold = true },
     NvimTreeFolderName = { fg = c.linkText },
