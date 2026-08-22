@@ -5,7 +5,7 @@ local M = {}
 function M.highlights()
   return {
     TreesitterContext = { bg = c.base_1 },
-    TreesitterContextLineNumber = { bg = c.base_2, fg = c.separator },
+    TreesitterContextLineNumber = { bg = c.base_1, fg = c.separator },
     TreesitterContextBottom = {
       cterm = { underline = false },
       sp = c.base_3,
