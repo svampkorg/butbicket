@@ -1,19 +1,23 @@
 local colorscheme = require("butbicket.colorscheme")
 local config = require("butbicket.config")
 local utils = require("butbicket.utils")
-local bg = config.transparent and "NONE" or colorscheme.editorBackground
+local bg = config.transparent and "NONE" or colorscheme.editorBackgroundSolid
 
 return {
   Normal = { fg = colorscheme.mainText, bg = bg },
   LineNr = { fg = colorscheme.lineNumberText },
   ColorColumn = {
-    bg = utils.shade(colorscheme.linkText, 0.5, colorscheme.editorBackground),
+    bg = utils.shade(
+      colorscheme.linkText,
+      0.5,
+      colorscheme.editorBackgroundSolid
+    ),
   },
   Added = { fg = colorscheme.added_bright },
   Changed = { fg = colorscheme.changed_bright },
   Removed = { fg = colorscheme.removed_bright },
   Conceal = {},
-  Cursor = { fg = colorscheme.editorBackground, bg = colorscheme.mainText },
+  Cursor = { fg = colorscheme.editorBackgroundSolid, bg = colorscheme.mainText },
   lCursor = { link = "Cursor" },
   CursorIM = { link = "Cursor" },
   CursorLine = { bg = colorscheme.cursorline },
@@ -38,7 +42,7 @@ return {
   IncSearch = {
     bg = utils.mix(
       colorscheme.incSearchBase,
-      colorscheme.editorBackground,
+      colorscheme.editorBackgroundSolid,
       0.30
     ),
   },
@@ -49,7 +53,7 @@ return {
   MsgArea = { link = "Normal" },
   MsgSeparator = { link = "VertSplit" },
   MoreMsg = { fg = colorscheme.syntaxFunction },
-  NonText = { fg = utils.shade(colorscheme.editorBackground, 0.75) },
+  NonText = { fg = utils.shade(colorscheme.editorBackgroundSolid, 0.75) },
   NormalFloat = { bg = colorscheme.floatingWindowBackground },
   FloatBorder = {
     bg = colorscheme.floatingWindowBackground,
@@ -66,10 +70,10 @@ return {
     bg = utils.shade(
       colorscheme.floatBorder,
       0.5,
-      colorscheme.editorBackground
+      colorscheme.editorBackgroundSolid
     ),
   },
-  PmenuThumb = { bg = utils.shade(colorscheme.editorBackground, 0.20) },
+  PmenuThumb = { bg = utils.shade(colorscheme.editorBackgroundSolid, 0.20) },
   Question = { fg = colorscheme.syntaxFunction },
   QuickFixLine = { bg = colorscheme.cursorline },
   SpecialKey = { fg = colorscheme.syntaxOperator },
@@ -92,10 +96,18 @@ return {
     bold = true,
   },
   Search = {
-    bg = utils.mix(colorscheme.searchBase, colorscheme.editorBackground, 0.4),
+    bg = utils.mix(
+      colorscheme.searchBase,
+      colorscheme.editorBackgroundSolid,
+      0.4
+    ),
   },
   CurSearch = {
-    bg = utils.mix(colorscheme.searchBase, colorscheme.editorBackground, 0.8),
+    bg = utils.mix(
+      colorscheme.searchBase,
+      colorscheme.editorBackgroundSolid,
+      0.8
+    ),
   },
   SpellBad = { undercurl = true, sp = colorscheme.errorBase },
   SpellCap = { undercurl = true, sp = colorscheme.syntaxFunction },
@@ -112,7 +124,11 @@ return {
     italic = config.italics.comments or false,
   },
   Dimmed = {
-    fg = utils.mix(colorscheme.commentText, colorscheme.editorBackground, 0.50),
+    fg = utils.mix(
+      colorscheme.commentText,
+      colorscheme.editorBackgroundSolid,
+      0.50
+    ),
   },
   SpecialComment = { fg = colorscheme.commentText },
   Constant = { fg = colorscheme.syntaxError },
@@ -161,7 +177,7 @@ return {
   Underlined = { underline = true },
   Bold = { bold = true },
   Italic = { italic = true },
-  Ignore = { fg = colorscheme.editorBackground },
+  Ignore = { fg = colorscheme.editorBackgroundSolid },
   Error = { link = "ErrorMsg" },
   Todo = { fg = colorscheme.warnBase, bold = true },
   DiagnosticError = { link = "Error" },
@@ -177,16 +193,32 @@ return {
   DiagnosticUnderlineInfo = { undercurl = true, fg = colorscheme.infoBase },
   DiagnosticUnderlineHint = { undercurl = true, fg = colorscheme.hintBase },
   DiagnosticLineError = {
-    bg = utils.shade(colorscheme.errorBase, 0.1, colorscheme.editorBackground),
+    bg = utils.shade(
+      colorscheme.errorBase,
+      0.1,
+      colorscheme.editorBackgroundSolid
+    ),
   },
   DiagnosticLineWarn = {
-    bg = utils.shade(colorscheme.warnBase, 0.1, colorscheme.editorBackground),
+    bg = utils.shade(
+      colorscheme.warnBase,
+      0.1,
+      colorscheme.editorBackgroundSolid
+    ),
   },
   DiagnosticLineInfo = {
-    bg = utils.shade(colorscheme.infoBase, 0.1, colorscheme.editorBackground),
+    bg = utils.shade(
+      colorscheme.infoBase,
+      0.1,
+      colorscheme.editorBackgroundSolid
+    ),
   },
   DiagnosticLineHint = {
-    bg = utils.shade(colorscheme.hintBase, 0.1, colorscheme.editorBackground),
+    bg = utils.shade(
+      colorscheme.hintBase,
+      0.1,
+      colorscheme.editorBackgroundSolid
+    ),
   },
   -- treesitter-context, neo-tree and lazy groups now live in their own
   -- auto-gated integration modules.

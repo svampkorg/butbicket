@@ -218,6 +218,23 @@ end
 result.ansiBrightL, result.ansiBrightC =
   require("butbicket.terminal").bright_deltas(vim.o.background, flavour_variant)
 
+-- Concrete editor background for color math. `editorBackground` may be "none"
+-- (transparent = true), which has no RGB to blend against, so hl-groups and the
+-- derivations below shade/mix against this instead: the flavour's background if
+-- one is set, otherwise the canonical base for the current polarity.
+do
+  local solid = result.editorBackground
+  if type(solid) ~= "string" or not solid:match("^#%x%x%x%x%x%x$") then
+    local fb = flavour_variant and flavour_variant.background
+    if type(fb) == "string" and fb:match("^#%x%x%x%x%x%x$") then
+      solid = fb
+    else
+      solid = (vim.o.background == "light") and "#FDFDFD" or "#101214"
+    end
+  end
+  result.editorBackgroundSolid = solid
+end
+
 -- Derive the diff family from the three locked identity colors, AFTER the
 -- flavour so it operates on the final palette. `*_bright` is the identity fg;
 -- the mid (`*`) and dim (`*_dim`) backgrounds are the identity blended toward
@@ -226,10 +243,7 @@ result.ansiBrightL, result.ansiBrightC =
 -- background keep the backgrounds pale; heavier on dark keep them readable.
 do
   local utils = require("butbicket.utils")
-  local ebg = result.editorBackground
-  if type(ebg) ~= "string" or not ebg:match("^#%x%x%x%x%x%x$") then
-    ebg = (vim.o.background == "light") and "#ffffff" or "#101214"
-  end
+  local ebg = result.editorBackgroundSolid
   local mid, dim = 0.72, 0.42
   if vim.o.background == "light" then
     mid, dim = 0.24, 0.1
