@@ -40,22 +40,22 @@ function M.highlights()
 
     -- mini.hipatterns
     MiniHipatternsFixme = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.errorText,
       bold = true,
     },
     MiniHipatternsHack = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.warningText,
       bold = true,
     },
     MiniHipatternsTodo = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.linkText,
       bold = true,
     },
     MiniHipatternsNote = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.successText,
       bold = true,
     },
@@ -78,32 +78,32 @@ function M.highlights()
 
     -- mini.statusline
     MiniStatuslineModeNormal = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.linkText,
       bold = true,
     },
     MiniStatuslineModeInsert = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.successText,
       bold = true,
     },
     MiniStatuslineModeVisual = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.specialKeyword,
       bold = true,
     },
     MiniStatuslineModeReplace = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.errorText,
       bold = true,
     },
     MiniStatuslineModeCommand = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.accentEmphasis,
       bold = true,
     },
     MiniStatuslineModeOther = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.method,
       bold = true,
     },
@@ -139,7 +139,7 @@ function M.highlights()
     },
     MiniTablineFill = { bg = c.windowBorder },
     MiniTablineTabpagesection = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.syntaxFunction,
       bold = true,
     },

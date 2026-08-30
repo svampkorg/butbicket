@@ -11,7 +11,7 @@ function M.highlights()
     SnacksPicker = { fg = c.mainText, bg = c.floatingWindowBackground },
     SnacksPickerBorder = { fg = c.floatBorder, bg = c.floatingWindowBackground },
     SnacksPickerTitle = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.syntaxFunction,
       bold = true,
     },

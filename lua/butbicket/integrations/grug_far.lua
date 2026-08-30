@@ -22,7 +22,10 @@ function M.highlights()
     GrugFarResultsColumnNr = { fg = c.lineNumberText },
     GrugFarResultsNumberLabel = { fg = c.number },
     GrugFarResultsCursorLineNo = { fg = c.lineNumberText, bold = true },
-    GrugFarResultsMatch = { fg = c.editorBackground, bg = c.accentEmphasis },
+    GrugFarResultsMatch = {
+      fg = c.editorBackgroundSolid,
+      bg = c.accentEmphasis,
+    },
     GrugFarResultsMatchAdded = { fg = c.added_bright },
     GrugFarResultsMatchRemoved = { fg = c.removed_bright },
     GrugFarResultsAddIndicator = { fg = c.added_bright },

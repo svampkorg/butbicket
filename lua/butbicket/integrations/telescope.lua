@@ -15,14 +15,14 @@ function M.highlights()
       bg = c.floatingWindowBackground,
     },
     TelescopeResultsTitle = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.accentEmphasis,
       bold = true,
     },
     TelescopePreviewNormal = { fg = c.mainText, bg = c.editorBackground },
     TelescopePreviewBorder = { fg = c.floatBorder, bg = c.editorBackground },
     TelescopePreviewTitle = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.successText,
       bold = true,
     },
@@ -32,7 +32,7 @@ function M.highlights()
       bg = c.floatingWindowBackground,
     },
     TelescopePromptTitle = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.syntaxFunction,
       bold = true,
     },

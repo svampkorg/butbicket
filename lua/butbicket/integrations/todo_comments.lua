@@ -23,7 +23,7 @@ function M.highlights()
   for name, color in pairs(keywords) do
     groups["TodoFg" .. name] = { fg = color }
     groups["TodoBg" .. name] =
-      { fg = c.editorBackground, bg = color, bold = true }
+      { fg = c.editorBackgroundSolid, bg = color, bold = true }
     groups["TodoSign" .. name] = { fg = color }
   end
   return groups
