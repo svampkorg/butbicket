@@ -24,7 +24,7 @@ function M.highlights()
     NvimTreeSymlink = { fg = c.linkText, italic = true },
     NvimTreeIndentMarker = { fg = c.lineNumberText },
     NvimTreeWindowPicker = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.syntaxKeyword,
       bold = true,
     },

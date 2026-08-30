@@ -56,7 +56,9 @@ local function label_chip(lch, dark)
     c = math.max(lch.c, 34),
     h = ((lch.h or 0) + 180) % 360,
   })
-  local black, white = colorscheme.editorBackground, colorscheme.text
+  -- editorBackgroundSolid (never "none" under transparent) — this is fed to
+  -- contrast.ratio as the near-black letter candidate, which needs real RGB.
+  local black, white = colorscheme.editorBackgroundSolid, colorscheme.text
   local letter = contrast.ratio(white, chip) >= contrast.ratio(black, chip)
       and white
     or black

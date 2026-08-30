@@ -13,7 +13,7 @@ function M.highlights()
     WhichKeyNormal = { bg = c.floatingWindowBackground },
     WhichKeyBorder = { fg = c.floatBorder, bg = c.floatingWindowBackground },
     WhichKeyTitle = {
-      fg = c.editorBackground,
+      fg = c.editorBackgroundSolid,
       bg = c.syntaxFunction,
       bold = true,
     },
