@@ -91,7 +91,7 @@ return {
   },
   TabLineFill = { bg = colorscheme.sidebarBackground },
   TabLineSel = {
-    bg = colorscheme.floatingWindowBackground,
+    bg = colorscheme.sidebarBackground,
     fg = colorscheme.mainText,
     bold = true,
   },
