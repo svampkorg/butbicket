@@ -86,7 +86,7 @@ return {
     fg = colorscheme.slate_gray,
   },
   TabLine = {
-    bg = colorscheme.floatingWindowBackground,
+    bg = colorscheme.sidebarBackground,
     fg = colorscheme.mainText,
   },
   TabLineFill = { bg = colorscheme.sidebarBackground },
